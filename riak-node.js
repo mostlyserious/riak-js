@@ -23,7 +23,7 @@ Riak.prototype.getClient = function(port, host) {
 }
 
 Riak.prototype.log = function(message, error) {
-  sys.puts('[riak-js] ' + (error ? 'ERROR: ' : '') + message);
+  sys.log('[riak-js] ' + (error ? 'ERROR: ' : '') + message);
 }
 
 Riak.prototype.stringifyQuery = function(query) {

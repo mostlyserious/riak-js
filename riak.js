@@ -121,6 +121,6 @@ Riak.prototype.ensure = function(obj) {
 
 // exports
 
-if (exports) {
+if (typeof exports !== 'undefined') {
  exports.common = Riak;
 }
