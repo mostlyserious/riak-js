@@ -66,15 +66,6 @@ Riak.prototype.execute = function (url, options) {
 
     // *** //
 
-    function getMeta(xhr) {
-      var meta = {}, h = xhr.getAllResponseHeaders();
-      meta.statusCode = xhr.status;
-      for (p in h) {
-        meta.headers[p] = h[p];
-      }
-      return meta;
-    }
-
     self.client.ajaxSetup({
     	beforeSend: function(xhr) {
     	  for (p in options.headers) {
@@ -87,19 +78,32 @@ Riak.prototype.execute = function (url, options) {
        type: options.method.toUpperCase(),
        url: path,
        data: options.data,
+       processData: false,
+       contentType: options.headers['content-type'],
        success: function(data, textStatus, xhr) {
-         db.log(db.toJSON(getMeta(xhr)));
-         db.log('success callback: ' + db.toJSON(callback));
-         db.log('data: ' + data);
          callback(data, getMeta(xhr));
        },
        error: function(xhr, message, error) {
-         db.log('error errback: ' + db.toJSON(errback));
          errback(message, getMeta(xhr), error);
        }
     };
 
     self.client.ajax(request);
+
+    // helper
+    function getMeta(xhr) {
+      var meta = {}, headers = xhr.getAllResponseHeaders();
+      meta.headers = {};
+      meta.statusCode = xhr.status;
+      if (headers.length) {
+        headers.split('\r\n').forEach(function(header) {
+          // header of type: Content-Length: 146
+          var i = header.indexOf(':');
+          meta.headers[header.substring(0, i).toLowerCase()] = header.substring(i+2);
+        });
+      }
+      return meta;
+    }
 
   }
 }
