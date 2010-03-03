@@ -31,7 +31,7 @@ Riak.prototype.stringifyQuery = function(query) {
 }
 
 Riak.prototype.mixin = function(target, obj1, obj2) {
-  return process.mixin(true, {}, obj1, obj2);
+  return process.mixin(true, target, obj1, obj2);
 }
 
 Riak.prototype.execute = function (url, options) {
@@ -40,7 +40,7 @@ Riak.prototype.execute = function (url, options) {
 
  return function(callback, errback) {
 
-    options = process.mixin({}, self.defaults, options);
+    options = Riak.prototype.mixin({}, self.defaults, options);
 
     callback = callback || options.callback;
     errback = errback || options.errback;
