@@ -36,11 +36,10 @@ Riak.prototype.mixin = function(target, obj1, obj2) {
 
 Riak.prototype.execute = function (url, options) {
 
- var self = this;
+  var self = this;
+  options = Riak.prototype.mixin({}, this.defaults, options);
 
- return function(callback, errback) {
-
-    options = Riak.prototype.mixin({}, self.defaults, options);
+  return function(callback, errback) {
 
     callback = callback || options.callback;
     errback = errback || options.errback;
