@@ -24,19 +24,23 @@ All operations take an _options_ object as the last argument. These specified op
 
 as well as `localhost` for the host and `8098` for the port.
 
-#### An example session for node.js would be:
+#### An example session
+
+##### node.js
 
     require.paths.unshift(".");
     var Riak = require('riak-node'), db = new Riak.Client();
+
+##### jQuery
+
+    var db = new Riak();
 
 Get and save a document
 
      db.get('albums', 4)(function(response, meta) {
          response.tracks = 12;
          db.save(response)(); // here we use the provided default callbacks that log the result
-       }, function(error_response, meta) {
-         // something in case of error
-     });
+       });
 
 Check out the `airport-test.js` file for more.
 
