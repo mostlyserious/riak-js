@@ -31,7 +31,8 @@ Riak.prototype.stringifyQuery = function(query) {
 }
 
 Riak.prototype.mixin = function(target, obj1, obj2) {
-  return process.mixin(true, target, obj1, obj2);
+  // restore deep copy when bug #70 is fixed
+  return process.mixin(target, obj1, obj2);
 }
 
 Riak.prototype.execute = function (url, options) {

@@ -110,4 +110,4 @@ db.walk(airline_bucket, 'KLM', [["_", "flight"]])(function(response) {
       db.remove(bucket, key)(function(){});
     })
   })
-})
+});
