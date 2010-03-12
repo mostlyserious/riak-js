@@ -54,3 +54,10 @@ Check out the `airport-test.js` file for more.
  - Link-walking is done through the map/reduce facility (easier to handle responses)
  - If no `language` is provided in any map/reduce phase, `language: javascript` is assumed
  - http.Client queues all requests, so if you want to run requests in parallel you need to create one client instance for each request
+
+#### TODO
+
+ - Support all code in
+   => http://bitbucket.org/justin/riak/src/tip/doc/raw-http-howto.txt
+   => http://bitbucket.org/justin/riak/src/tip/doc/js-mapreduce.org
+   => http://blog.basho.com/2010/02/24/link-walking-by-example/
