@@ -16,7 +16,7 @@ var sys = require('sys'),
   Riak = require('../riak-node')
   assert = require('assert');
 
-var db = new Riak.Client(),
+var db = new Riak.Client(8098, 'localhost', {debug: false}),
   bucket = 'riak-js-random-bucket',
   doc = "test",
   doc_json = "test-json",

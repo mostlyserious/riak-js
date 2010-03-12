@@ -26,7 +26,8 @@ Riak.prototype.defaults = {
   headers: {},
   callback: function(response, meta) { Riak.prototype.log(response) },
   errback: function(response, meta) { Riak.prototype.log(meta.statusCode + ": " + response, 'error') },
-  returnbody: false
+  returnbody: false,
+  debug: true
 }
 
 // db operations
@@ -121,6 +122,6 @@ Riak.prototype.ensure = function(obj) {
 
 // exports
 
-if (typeof exports !== 'undefined') {
+if (typeof exports === 'object') {
  exports.common = Riak;
 }

@@ -17,7 +17,7 @@ Riak.prototype.getClient = function() {
 }
 
 Riak.prototype.log = function(message, error) {
-  if (typeof console !== 'undefined') {
+  if (this.defaults.debug && typeof console === 'object') {
     console.log('[riak-js] ' + (error ? 'ERROR: ' : '') + message);
   }
 }
