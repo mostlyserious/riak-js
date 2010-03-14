@@ -12,9 +12,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
-var sys = require('sys'),
-  Riak = require('../riak-node')
+require.paths.unshift("../lib");
+
+var Riak = require('riak-node')
   assert = require('assert');
+
+process.mixin(require('sys'));
 
 var db = new Riak.Client(8098, 'localhost', {debug: false}),
   bucket = 'riak-js-random-bucket',
