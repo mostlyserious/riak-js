@@ -28,8 +28,10 @@ as well as `localhost` for the host and `8098` for the port.
 
 #### node.js
 
-    require.paths.unshift(".");
+    require.paths.unshift("lib");
     var Riak = require('riak-node'), db = new Riak.Client();
+
+Also available through kiwi: `kiwi install riak-js`
 
 #### browser with jQuery
 
