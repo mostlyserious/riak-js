@@ -2,5 +2,5 @@
   name: riak-js
   description: Riak Javascript client
   tags: riak nosql
-  version: 0.1.0
+  version: 0.1.1
 
