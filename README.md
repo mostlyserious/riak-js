@@ -18,6 +18,7 @@ All operations take an `options` object as the last argument. These specified op
       headers: {},
       callback: function(response, meta) { Riak.prototype.log(response) },
       errback: function(response, meta) { Riak.prototype.log(meta.statusCode + ": " + response, 'error') },
+      clientErrback: function(port, host) { Riak.prototype.log('Couldn\'t reach ' + host + ':' + port, true) },
       returnbody: false,
       debug: true
     }
