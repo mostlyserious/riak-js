@@ -17,12 +17,12 @@ require.paths.unshift("../lib");
 var Riak = require('riak-node'),
   assert = require('assert');
 
-process.mixin(require('sys'));
-
 var db = new Riak.Client(),
   airline_bucket = 'test-airlines',
   airport_bucket = 'test-airports',
   flight_bucket = 'test-flights';
+
+db.mixin(GLOBAL, require('sys'));
 
 // setup
 
