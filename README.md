@@ -18,12 +18,13 @@ All operations take an `options` object as the last argument. These specified op
       headers: {},
       callback: function(response, meta) { Riak.prototype.log(response) },
       errback: function(response, meta) { Riak.prototype.log(meta.statusCode + ": " + response, 'error') },
-      clientErrback: function(port, host) { Riak.prototype.log('Couldn\'t reach ' + host + ':' + port, true) },
       returnbody: false,
       debug: true
     }
 
-as well as `localhost` for the host and `8098` for the port.
+During client instantiation, defaults are `localhost` for the host and `8098` for the port. If you pass-in the `defaults` as the last argument, they will apply to the whole session instead of per-request:
+
+    var db = new Riak.Client(8098, 'localhost', { interface: 'bananas', debug: false });
 
 ### Set up
 
@@ -34,7 +35,7 @@ as well as `localhost` for the host and `8098` for the port.
 
 Also available through kiwi: `kiwi install riak-js`
 
-#### browser with jQuery
+#### In the browser with jQuery
 
     var db = new Riak();
 
@@ -42,19 +43,19 @@ Also available through kiwi: `kiwi install riak-js`
 
 #### Get and save a document
 
-     db.get('albums', 4)(function(response, meta) {
-         response.tracks = 12;
-         db.save(response)(); // here we use the provided default callbacks that log the result
+     db.get('albums', 4)(function(album, meta) {
+         album.tracks = 12;
+         db.save(album)(); // here we use the provided default callbacks that log the result
        });
 
 Check out the `airport-test.js` file for more.
 
-### Noteworthy items
+### Noteworthy points
 
  - All operations return a function that takes two arguments (two functions: callback and errback). Therefore you *must* call it for something to happen: `db.get('bucket')()` (default callbacks), or `db.get('bucket', 'key')(mycallback, myerrback)`
- - These functions are passed in two arguments, the `response` and a `meta` object: `var mycallback = function(response, meta) {}`
+ - These functions are passed in two arguments, the `response` object and a `meta` object: `var mycallback = function(response, meta) {}`
  - Headers are exposed through `meta.headers` and the status code through `meta.statusCode`
- - All operations accept an `options` object as the last argument, which will be *mixed-in* with the defaults
+ - All operations accept an `options` object as the last argument, which will be *mixed-in* as to override certain defaults
  - If no `Content-Type` header is provided, `application/json` will be assumed - which in turn will be serialized into JSON
  - Link-walking is done through the map/reduce interface
  - If no `language` is provided in any map/reduce phase, `language: javascript` is assumed
