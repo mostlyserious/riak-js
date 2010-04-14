@@ -7,6 +7,7 @@ A Javascript library for Riak
  - Sensible yet overridable defaults (init, per-request)
  - Operations: get bucket, get doc, save, remove, walk, map/reduce
  - Available for node.js (v0.1.30+) and browser/jQuery platforms and Riak 0.8+
+ - Tested on patched v0.1.90 (actually commit 4681e34) - only issues a deprecation warning
 
 ### Defaults
 
@@ -16,8 +17,12 @@ All operations take an `options` object as the last argument. These specified op
       method: 'GET',
       interface: 'riak',
       headers: {},
-      callback: function(response, meta) { Riak.prototype.log(response) },
-      errback: function(response, meta) { Riak.prototype.log(meta.statusCode + ": " + response, 'error') },
+      callback: function(response, meta) {
+        Riak.prototype.log(meta.headers['content-type'] === 'application/json' ? JSON.stringify(response) : response)
+      },
+      errback: function(response, meta) {
+        Riak.prototype.log((meta ? meta.statusCode + ": " : "") + response, 'error')
+      },
       returnbody: false,
       debug: true
     }
@@ -66,7 +71,7 @@ Check out the `airport-test.js` file for more.
  - If no `Content-Type` header is provided, `application/json` will be assumed - which in turn will be serialized into JSON
  - Link-walking is done through the map/reduce interface
  - If no `language` is provided in any map/reduce phase, `language: javascript` is assumed
- - http.Client queues all requests, so if you want to run requests in parallel you need to create one client instance for each request
+ - `http.Client` queues all requests, so if you want to run requests in parallel you need to create one client instance for each request
 
 ### TODO
 
