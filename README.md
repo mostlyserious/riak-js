@@ -50,6 +50,13 @@ Also available through kiwi: `kiwi install riak-js`
 
 Check out the `airport-test.js` file for more.
 
+#### Save an image
+
+    fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
+      if (err) throw err;
+      db.save('images', 'test', data, { requestEncoding: 'binary', headers: { "content-type": "image/jpeg"} })();
+    });
+
 ### Noteworthy points
 
  - All operations return a function that takes two arguments (two functions: callback and errback). Therefore you *must* call it for something to happen: `db.get('bucket')()` (default callbacks), or `db.get('bucket', 'key')(mycallback, myerrback)`
@@ -63,10 +70,10 @@ Check out the `airport-test.js` file for more.
 
 ### TODO
 
+ - Make it more convenient to work with Content-Types / MIME types / binary files
+ - In-browser tests for the jQuery version
  - Support most code/functionality described in
    - http://bitbucket.org/justin/riak/src/tip/doc/raw-http-howto.txt
    - http://bitbucket.org/justin/riak/src/tip/doc/js-mapreduce.org
    - http://blog.basho.com/2010/02/24/link-walking-by-example/
    - http://hg.basho.com/riak/src/tip/client_lib/javascript/
-
- - Multipart file uploads
