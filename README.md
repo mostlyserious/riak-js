@@ -17,14 +17,16 @@ All operations take an `options` object as the last argument. These specified op
       method: 'GET',
       interface: 'riak',
       headers: {},
+      returnbody: false,
+      debug: true,
       callback: function(response, meta) {
-        Riak.prototype.log(meta.headers['content-type'] === 'application/json' ? JSON.stringify(response) : response)
+        if (response)
+          Riak.prototype.log(meta.headers['content-type'] === 'application/json' ? JSON.stringify(response) : response)
       },
       errback: function(response, meta) {
-        Riak.prototype.log((meta ? meta.statusCode + ": " : "") + response, 'error')
-      },
-      returnbody: false,
-      debug: true
+        if (response)
+          Riak.prototype.log((meta ? meta.statusCode + ": " : "") + response, 'error')
+      }
     }
 
 During client instantiation, defaults are `localhost` for the host and `8098` for the port. If you pass-in the `defaults` as the last argument, they will apply to the whole session instead of per-request:
