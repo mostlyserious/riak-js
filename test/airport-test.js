@@ -108,9 +108,5 @@ db.walk(airline_bucket, 'KLM', [["_", "flight"]])(function(response) {
 // cleanup
 
 [airline_bucket, airport_bucket, flight_bucket].forEach(function(bucket) {
-  db.get(bucket)(function(response) {
-    response.keys.forEach(function(key) {
-      db.remove(bucket, key)(function(){});
-    })
-  })
+  db.removeAll(bucket)(function(){});
 });
