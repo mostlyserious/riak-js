@@ -17,7 +17,7 @@ require.paths.unshift("../lib");
 var Riak = require('riak-node')
   assert = require('assert');
 
-var db = new Riak.Client(8098, 'localhost', {debug: false}),
+var db = new Riak.Client({host: '127.0.0.1', port: 8098, debug: false}),
   bucket = 'riak-js-random-bucket',
   doc = "test",
   doc_json = "test-json",

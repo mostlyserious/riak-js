@@ -28,9 +28,11 @@ All operations take an `options` object as the last argument. These specified op
       }
     }
 
-During client instantiation, defaults are `localhost` for the host and `8098` for the port. If you pass-in the `defaults` as the last argument, they will apply to the whole session instead of per-request:
+During client instantiation, defaults are `localhost` for the host and `8098` for the port. If you pass-in the `defaults` as an argument, they will apply to the whole session instead of per-request:
 
-    var db = new Riak.Client(8098, 'localhost', { interface: 'bananas', debug: false });
+    var db = new Riak.Client({ host: 'localhost', port: 8098, interface: 'bananas', debug: false });
+
+Note that you cannot change host or port on the instantiated client.
 
 ### Set up
 
