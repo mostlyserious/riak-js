@@ -15,14 +15,16 @@
 require.paths.unshift("../lib");
 
 var Riak = require('riak-node')
-  assert = require('assert');
+  assert = require('assert'),
+  sys = require('sys');
 
 var db = new Riak.Client({host: '127.0.0.1', port: 8098, debug: false}),
   bucket = 'riak-js-random-bucket',
   doc = "test",
   doc_json = "test-json",
   content = "this is a test",
-  content_json = { a: 1, b: "test", c: false };
+  content_json = { a: 1, b: "test", c: false },
+  content_json_2 = { a: 1, b: "test", c: true };
 
 db.save(bucket, doc, content, {returnbody: true})(function(response, meta) {
   assert.ok(response);
@@ -41,6 +43,12 @@ db.save(bucket, doc, content, {returnbody: true})(function(response, meta) {
 db.save(bucket, doc_json, content_json)(function(response, meta) {
   assert.equal(204, meta.statusCode);
   db.get(bucket, doc_json)(function(response2, meta2) {
+    assert.deepEqual(response2, content_json);
+    db.save(bucket, doc_json, content_json_2)(function() {
+      db.get(bucket, doc_json)(function(response3) {
+        assert.deepEqual(response3, content_json_2);
+      })
+    })
     // check objects and meta (headers)
     // deepEqual response
   });
