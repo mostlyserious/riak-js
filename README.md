@@ -6,7 +6,7 @@ A Javascript library for Riak
 
  - Sensible yet overridable defaults (init, per-request)
  - Operations: get bucket, get doc, save, remove, walk, map/reduce
- - Available for node.js (v0.1.90+) and browser/jQuery platforms and Riak 0.8+
+ - Available for node.js (v0.1.95+) and browser/jQuery platforms and Riak 0.8+
 
 ### Defaults
 
@@ -78,10 +78,13 @@ Check out the `airport-test.js` file for more.
 
 ### TODO
 
- - Make it more convenient to work with Content-Types / MIME types / binary files
- - In-browser tests for the jQuery version
+ - Make it more convenient to work with Content-Types / MIME types / binary files (use shortcuts instead of accessing the more verbose HTTP header)
+ - Put back the clientId (requests need to have the vclock header provided)
+ - Better Map/Reduce client API
+ - Etag support
+ - In-browser tests for the jQuery version (use JSpec, for both node & jQuery)
  - Support most code/functionality described in
-   - http://bitbucket.org/justin/riak/src/tip/doc/raw-http-howto.txt
+   - http://wiki.basho.com/display/RIAK/REST+API
    - http://bitbucket.org/justin/riak/src/tip/doc/js-mapreduce.org
    - http://blog.basho.com/2010/02/24/link-walking-by-example/
    - http://hg.basho.com/riak/src/tip/client_lib/javascript/
