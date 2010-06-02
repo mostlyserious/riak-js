@@ -22,6 +22,7 @@ var db = new Riak.Client({host: '127.0.0.1', port: 8098, debug: false}),
   bucket = 'riak-js-random-bucket',
   doc = "test",
   doc_json = "test-json",
+  missing_doc = "I_do_not_exist",
   content = "this is a test",
   content_json = { a: 1, b: "test", c: false },
   content_json_2 = { a: 1, b: "test", c: true };
@@ -54,6 +55,13 @@ db.save(bucket, doc_json, content_json)(function(response, meta) {
   });
 });
 
+db.head(bucket, missing_doc)(function(response,meta){
+  assert.equal(404, meta.statusCode);
+});
+
+db.head(bucket, doc)(function(response,meta){
+  assert.equal(200, meta.statusCode);
+});
 
 // wait 2 seconds and delete all documents from the test bucket no matter what
 var nothing = function() {};
@@ -66,3 +74,4 @@ var func = function() { db.get(bucket)(function(resp) {
 }
 
 setTimeout(func, 2000);
+
