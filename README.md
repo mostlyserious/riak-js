@@ -41,8 +41,6 @@ Note that you cannot change host or port on the instantiated client.
     require.paths.unshift("lib");
     var Riak = require('riak-node'), db = new Riak.Client();
 
-Also available through kiwi: `kiwi install riak-js`
-
 #### In the browser with jQuery
 
     var db = new Riak();
