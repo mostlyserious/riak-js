@@ -6,17 +6,17 @@ A Javascript library for Riak
 
  - Sensible yet overridable defaults (init, per-request)
  - Operations: get bucket, get doc, save, remove, walk, map/reduce
- - Available for node.js (v0.1.95+) and browser/jQuery platforms and Riak 0.8+
+ - Available for node.js (v0.1.95+) and browser/jQuery platforms and Riak 0.10+
 
 ### Defaults
 
 All operations take an `options` object as the last argument. These specified options will override the defaults, which are defined as:
 
     {
+      clientId: 'riak-js-' + process.ENV['USER'], 
       method: 'GET',
       interface: 'riak',
       headers: {},
-      returnbody: false,
       debug: true,
       callback: function(response, meta) {
         if (response)
@@ -73,11 +73,17 @@ Check out the `airport-test.js` file for more.
  - Link-walking is done through the map/reduce interface
  - If no `language` is provided in any map/reduce phase, `language: javascript` is assumed
  - `http.Client` queues all requests, so if you want to run requests in parallel you need to create one client instance for each request
+ 
+### Authors and contributors (in no particular order)
+
+   - frank06
+   - siculars
+   - freshtonic
+   - botanicus
 
 ### TODO
 
  - Make it more convenient to work with Content-Types / MIME types / binary files (use shortcuts instead of accessing the more verbose HTTP header)
- - Put back the clientId (requests need to have the vclock header provided)
  - Better Map/Reduce client API
  - Etag support
  - In-browser tests for the jQuery version (use JSpec, for both node & jQuery)
