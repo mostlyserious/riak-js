@@ -90,7 +90,6 @@ Note that you cannot change host or port on the instantiated client.
 
  - Make it more convenient to work with Content-Types / MIME types / binary files (use shortcuts instead of accessing the more verbose HTTP header)
  - Better Map/Reduce client API
- - Etag support
  - In-browser tests for the jQuery version (use JSpec, for both node & jQuery)
  - Support most code/functionality described in
    - http://wiki.basho.com/display/RIAK/REST+API
