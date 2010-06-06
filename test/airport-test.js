@@ -18,9 +18,9 @@ var Riak = require('riak-node'),
   assert = require('assert');
 
 var db = new Riak.Client(),
-  airline_bucket = 'test-airlines',
-  airport_bucket = 'test-airports',
-  flight_bucket = 'test-flights';
+  airline_bucket = 'riak-js-test-airlines',
+  airport_bucket = 'riak-js-test-airports',
+  flight_bucket = 'riak-js-test-flights';
 
 db.mixin(GLOBAL, require('sys'));
 
