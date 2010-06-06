@@ -36,5 +36,5 @@
    },
    "os": [ "linux", "darwin" ],
    "dependencies": {},
-   "engines": { "node": ">=0.1.95" }
+   "engines": { "node": ">=0.1.97" }
 }

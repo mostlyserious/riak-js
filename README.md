@@ -6,7 +6,7 @@ A Javascript library for Riak
 
  - Sensible yet overridable defaults (init, per-request)
  - Operations: get bucket, get doc, save, remove, walk, map/reduce
- - Available for node.js (v0.1.95+) and browser/jQuery platforms and Riak 0.10+
+ - Available for node.js (v0.1.97+) and browser/jQuery platforms and Riak 0.10+
 
 ### Set up
 
