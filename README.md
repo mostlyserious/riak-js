@@ -47,7 +47,7 @@ Check out the `airport-test.js` file for more.
 All operations take an `options` object as the last argument. These specified options will override the defaults, which are defined as:
 
     {
-      clientId: 'riak-js-' + process.ENV['USER'], 
+      clientId: 'riak-js', 
       method: 'GET',
       interface: 'riak',
       headers: {},
