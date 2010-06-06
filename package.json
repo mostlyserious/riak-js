@@ -1,0 +1,40 @@
+{
+   "name": "riak-js",
+   "version": "0.1.2",
+   "description": "Riak Javascript client (node + jquery)",
+   "keywords": [
+       "riak",
+       "node",
+       "async",
+       "nosql",
+       "database" 
+   ],
+   "maintainers": [
+       {
+           "name": "Francisco Treacy",
+           "email": "francisco.treacy@gmail.com",
+           "web": "http://franciscotreacy.com" 
+       } 
+   ],
+   "bugs": {
+       "web": "http://github.com/frank06/riak-js/issues" 
+   },
+   "licenses": [
+       {
+           "type": "Apache License 2.0",
+           "url": "http://www.apache.org/licenses/LICENSE-2.0" 
+       } 
+   ],
+   "repositories": [
+       {
+           "type": "git",
+           "url": "git://github.com/frank06/riak-js.git" 
+       } 
+   ],
+   "directories": {
+       "lib": "./lib"
+   },
+   "os": [ "linux", "darwin" ],
+   "dependencies": {},
+   "engines": { "node": ">=0.1.95" }
+}
