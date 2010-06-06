@@ -32,8 +32,10 @@ A Javascript library for Riak
          album.tracks = 12;
          db.save(album)(); // here we use the provided default callbacks that log the result
        });
+       
+#### Use the Map/Reduce API
 
-Check out the `airport-test.js` file for more.
+    db.map({name: 'Riak.mapValuesJson'}).run('albums')()
 
 #### Save an image
 
@@ -42,6 +44,8 @@ Check out the `airport-test.js` file for more.
       db.save('images', 'test', data, { requestEncoding: 'binary', headers: { "content-type": "image/jpeg"} })();
     });
 
+
+Check out the tests for more.
 
 ### Defaults
 
@@ -90,7 +94,3 @@ Note that you cannot change host or port on the instantiated client.
 ### TODO
 
  - Make it more convenient to work with Content-Types / MIME types / binary files (use shortcuts instead of accessing the more verbose HTTP header)
- - In-browser tests for the jQuery version (use JSpec, for both node & jQuery)
- - Support most code/functionality described in
-   - http://wiki.basho.com/display/RIAK/REST+API
-   - http://blog.basho.com/2010/02/24/link-walking-by-example/
