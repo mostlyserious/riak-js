@@ -8,6 +8,40 @@ A Javascript library for Riak
  - Operations: get bucket, get doc, save, remove, walk, map/reduce
  - Available for node.js (v0.1.95+) and browser/jQuery platforms and Riak 0.10+
 
+### Set up
+
+#### node.js
+
+    npm install riak-js
+    
+    var Riak = require('riak-js/riak-node'), db = new Riak.Client();
+
+#### jQuery (browser)
+
+    <script type="text/javascript" src="riak.js"></script>
+    <script type="text/javascript" src="riak-jquery.js"></script>
+
+    var db = new Riak();
+
+### An example session
+
+#### Get and save a document
+
+     db.get('albums', 4)(function(album, meta) {
+         album.tracks = 12;
+         db.save(album)(); // here we use the provided default callbacks that log the result
+       });
+
+Check out the `airport-test.js` file for more.
+
+#### Save an image
+
+    fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
+      if (err) throw err;
+      db.save('images', 'test', data, { requestEncoding: 'binary', headers: { "content-type": "image/jpeg"} })();
+    });
+
+
 ### Defaults
 
 All operations take an `options` object as the last argument. These specified options will override the defaults, which are defined as:
@@ -33,35 +67,6 @@ During client instantiation, defaults are `localhost` for the host and `8098` fo
     var db = new Riak.Client({ host: 'localhost', port: 8098, interface: 'bananas', debug: false });
 
 Note that you cannot change host or port on the instantiated client.
-
-### Set up
-
-#### node.js
-
-    require.paths.unshift("lib");
-    var Riak = require('riak-node'), db = new Riak.Client();
-
-#### In the browser with jQuery
-
-    var db = new Riak();
-
-### An example session
-
-#### Get and save a document
-
-     db.get('albums', 4)(function(album, meta) {
-         album.tracks = 12;
-         db.save(album)(); // here we use the provided default callbacks that log the result
-       });
-
-Check out the `airport-test.js` file for more.
-
-#### Save an image
-
-    fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
-      if (err) throw err;
-      db.save('images', 'test', data, { requestEncoding: 'binary', headers: { "content-type": "image/jpeg"} })();
-    });
 
 ### Noteworthy points
 
