@@ -80,21 +80,20 @@ var map = function(v, keydata, args) {
 };
 
 var from = 'EZE', before = 'Wed, 14 Jul 2010',
-  query = {
-    inputs: flight_bucket,
-    query: [ {map: {source: map, arg: {from: from, before: before}}} ]
-  };
-
-var flight_print = function(flight) {
+  flight_print = function(flight) {
   db.log('Flight ' + flight.code + ' with destination ' + flight.to + ' departing ' + flight.departure);
 };
 
-db.mapReduce(query)(function(response) {
-  assert.equal(response.length, 2);
-  db.log('Flights from ' + from + ' before ' + before + ':');
-  response.forEach(flight_print);
-  db.log("");
-});
+// new map/reduce API
+
+db
+  .map({source: map, arg: {from: from, before: before}})
+  .run(flight_bucket)(function(response) {
+    assert.equal(response.length, 2);
+    db.log('Flights from ' + from + ' before ' + before + ':');
+    response.forEach(flight_print);
+    db.log("");
+  })
 
 // link-walking
 
