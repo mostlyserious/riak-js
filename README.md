@@ -5,8 +5,9 @@ A Javascript library for Riak
 ### Features so far
 
  - Sensible yet overridable defaults (init, per-request)
- - Operations: get bucket, get doc, save, remove, walk, map/reduce
- - Available for node.js (v0.1.97+) and browser/jQuery platforms and Riak 0.10+
+ - Operations: get, head, save, remove, walk, map/reduce
+ - Available for node.js (v0.1.97+) and jQuery (browser) platforms; extensible to other implementations
+ - Works on Riak 0.10+
 
 ### Set up
 
@@ -93,6 +94,4 @@ Note that you cannot change host or port on the instantiated client.
  - In-browser tests for the jQuery version (use JSpec, for both node & jQuery)
  - Support most code/functionality described in
    - http://wiki.basho.com/display/RIAK/REST+API
-   - http://bitbucket.org/justin/riak/src/tip/doc/js-mapreduce.org
    - http://blog.basho.com/2010/02/24/link-walking-by-example/
-   - http://hg.basho.com/riak/src/tip/client_lib/javascript/
