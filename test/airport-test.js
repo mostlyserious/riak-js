@@ -24,6 +24,8 @@ var db = new Riak.Client(),
 
 db.mixin(GLOBAL, require('sys'));
 
+// check for more advanced stuff with links at http://blog.basho.com/2010/02/24/link-walking-by-example/
+
 // setup
 
 db.save(airport_bucket, 'EZE', {city: 'Buenos Aires'})();
