@@ -37,6 +37,10 @@ A Javascript library for Riak
 
     db.map({name: 'Riak.mapValuesJson'}).run('albums')()
 
+Note: you can pass arrays of phases, too. Like
+
+    db.link([{ bucket: a, tag: "_", keep: false }, { bucket: b, tag: "songs", keep: true }]).reduce({name: 'Riak.myReduce'}).run('albums')()
+
 #### Save an image
 
     fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
