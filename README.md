@@ -13,9 +13,13 @@ A Javascript library for Riak
 
 #### node.js
 
-    npm install riak-js
+    // npm install riak-js@latest
     
-    var Riak = require('riak-js/riak-node'), db = new Riak.Client();
+    var db = require('riak-js').getClient()
+    
+    // or cloning this repo
+    
+    var db = require('/path/to/riak-js').getClient()
 
 #### jQuery (browser)
 
