@@ -9,16 +9,16 @@ module.exports = {
     
     // db.getAll('users', {where: {city: "Paris", age: 23}})
 
-    'it should return status 404': function() {      
-      db.get(bucket, 'somesuperstrangedocument')(
-        function() {
-          throw new Error('callback shouldn\'t be called when expecting an errback!');
-        },
-        function(response, meta) {
-          assert.equal(404, meta.statusCode)
-        }
-      )
-    },
+    // 'it should return status 404': function() {      
+    //   db.get(bucket, 'somesuperstrangedocument')(
+    //     function() {
+    //       throw new Error('callback shouldn\'t be called when expecting an errback!');
+    //     },
+    //     function(response, meta) {
+    //       assert.equal(404, meta.statusCode)
+    //     }
+    //   )
+    // },
     
     'it should assert document creation and deletion': function() {
       db.save(bucket, 'test', {a: 1}, {returnbody: true})(
