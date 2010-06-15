@@ -6,6 +6,8 @@ var assert = require('assert'),
 module.exports = {
   
     // the aim is to cover most of http://wiki.basho.com/display/RIAK/REST+API
+    
+    // db.getAll('users', {where: {city: "Paris", age: 23}})
 
     'it should return status 404': function() {      
       db.get(bucket, 'somesuperstrangedocument')(
