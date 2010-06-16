@@ -1,7 +1,9 @@
 var assert = require('assert'),
   Riak = require('riak-node'),
-  db = new Riak.Client({debug: false}),
+  db = new Riak.Client({debug: true}),
   bucket = 'riak-js-test-bucket'
+  
+  sys = require('sys')
 
 module.exports = {
   
@@ -55,9 +57,11 @@ module.exports = {
             function(response, meta) {
               assert.deepEqual(response, {loaded: true, items: [1, 5, 8]})
               
-              db.save(bucket, 'test2', {items: [1, 5, 8, 9], other: {s: "a string"}})(
-                function() {
-                  db.get(bucket, 'test2')(function(response) {
+              db.save(bucket, 'test2', {items: [1, 5, 8, 9], other: {s: "a string"}}, {returnbody: true})(
+                function(r,m) {
+                  sys.puts("save status =>" + m.statusCode)
+                  db.get(bucket, 'test2')(function(r, meta) {
+                     sys.puts(sys.inspect(meta))
                     assert.deepEqual(response, {items: [1, 5, 8, 9], other: {s: "a string"}})
                     // assert.ok(9 in response.items)
                   }
