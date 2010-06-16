@@ -86,10 +86,10 @@ var from = 'EZE', before = 'Wed, 14 Jul 2010',
   db.log('Flight ' + flight.code + ' with destination ' + flight.to + ' departing ' + flight.departure);
 };
 
-// new map/reduce API
+// map/reduce
 
 db
-  .map({source: map, arg: {from: from, before: before}})
+  .map(map, {from: from, before: before})
   .run(flight_bucket)(function(response) {
     assert.equal(response.length, 2);
     db.log('Flights from ' + from + ' before ' + before + ':');
