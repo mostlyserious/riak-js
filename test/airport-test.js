@@ -50,16 +50,9 @@ db.save(flight_bucket, 'CPA-729', {code: 'CPA-729', to: 'CDG', from: 'HKK', depa
 db.save(flight_bucket, 'ARG-909', {code: 'ARG-909', to: 'AMS', from: 'EZE', departure: 'Tue, 24 Aug 2010 15:25:00 GMT'})();
 db.save(flight_bucket, 'IBE-4418', {code: 'IBE-4418', to: 'BCN', from: 'JFK', departure: 'Sat, 24 Jul 2010 12:00:00 GMT'})();
 
-var klm_header = {headers: {link: db.makeLinks([
-  { bucket: flight_bucket, key: 'KLM-8098', tag: 'flight' },
-  { bucket: flight_bucket, key: 'KLM-1196', tag: 'flight' }
-])}};
-
-var klm2 = {headers: {link: db.makeLinks([{ bucket: airport_bucket, key: 'AMS', tag: 'base'},
-  { bucket: airport_bucket, key: 'CDG', tag: 'base' }
-])}};
-
-db.save(airline_bucket, 'KLM', {name: 'KLM', fleet: 111, alliance: 'SkyTeam', european: true}, klm_header)();
+db.save(airline_bucket, 'KLM', {name: 'KLM', fleet: 111, alliance: 'SkyTeam', european: true}, { links:
+  [{ bucket: flight_bucket, key: 'KLM-8098', tag: 'flight' }, { bucket: flight_bucket, key: 'KLM-1196', tag: 'flight' }]
+})();
 db.save(airline_bucket, 'AFR', {name: 'Air France', fleet: 263, alliance: 'SkyTeam', european: true})();
 db.save(airline_bucket, 'AMX', {name: 'Aeroméxico', fleet: 43, alliance: 'SkyTeam', european: false})();
 db.save(airline_bucket, 'ARG', {name: 'Aerolíneas Argentinas', fleet: 40, european: false})();
