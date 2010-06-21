@@ -13,13 +13,13 @@ A Javascript library for Riak
 
 #### node.js
 
-    // npm install riak-js@latest
+    // npm install riak-js    # @latest or @stable -- your pick
     
     var db = require('riak-js').getClient()
     
     // or cloning this repo
     
-    var db = require('/path/to/riak-js').getClient()
+    var db = require('/path/to/riak-js/lib').getClient()
 
 #### jQuery (browser)
 
@@ -49,7 +49,7 @@ Note: you can pass arrays of phases, too. Like
 
     fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
       if (err) throw err;
-      db.save('images', 'test', data, { requestEncoding: 'binary', headers: { "content-type": "image/jpeg"} })();
+      db.save('test', 'image', data, { type: 'jpeg' })()
     });
 
 
@@ -67,7 +67,7 @@ All operations take an `options` object as the last argument. These specified op
       debug: true,
       callback: function(response, meta) {
         if (response)
-          Riak.prototype.log(meta.headers['content-type'] === 'application/json' ? JSON.stringify(response) : response)
+          Riak.prototype.log(meta.type === 'application/json' ? JSON.stringify(response) : response)
       },
       errback: function(response, meta) {
         if (response)
@@ -98,7 +98,3 @@ Note that you cannot change host or port on the instantiated client.
    - siculars
    - freshtonic
    - botanicus
-
-### TODO
-
- - Make it more convenient to work with Content-Types / MIME types / binary files (use shortcuts instead of accessing the more verbose HTTP header)
