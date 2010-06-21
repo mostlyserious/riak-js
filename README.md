@@ -68,10 +68,6 @@ All operations take an `options` object as the last argument. These specified op
       callback: function(response, meta) {
         if (response)
           Riak.prototype.log(meta.type === 'application/json' ? JSON.stringify(response) : response)
-      },
-      errback: function(response, meta) {
-        if (response)
-          Riak.prototype.log((meta ? meta.statusCode + ": " : "") + response, 'error')
       }
     }
 

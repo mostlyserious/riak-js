@@ -1,6 +1,6 @@
 var assert = require('assert'),
   Riak = require('riak-node'),
-  db = new Riak.Client({debug: true}),
+  db = new Riak.Client({debug: false}),
   bucket = 'riak-js-test-bucket'
   
   sys = require('sys')
