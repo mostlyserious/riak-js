@@ -79,8 +79,8 @@ Note that you cannot change host or port on the instantiated client.
 
 ### Noteworthy points
 
- - All operations return a function that takes two arguments (two functions: callback and errback). Therefore you *must* call it for something to happen: `db.get('bucket')()` (default callbacks), or `db.get('bucket', 'key')(mycallback, myerrback)`
- - These functions are passed in two arguments, the `response` object and a `meta` object: `var mycallback = function(response, meta) {}`
+ - All operations return a function that takes a `callback`. Therefore you *must* call it for something to happen: `db.get('bucket')()` (default callback), or `db.get('bucket', 'key')(mycallback)`
+ - This function is passed in two arguments, the `response` object and a `meta` object: `var mycallback = function(response, meta) {}`
  - Headers are exposed through `meta.headers` and the status code through `meta.statusCode`
  - All operations accept an `options` object as the last argument, which will be *mixed-in* as to override certain defaults
  - If no `Content-Type` header is provided, `application/json` will be assumed - which in turn will be serialized into JSON
