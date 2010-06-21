@@ -61,8 +61,8 @@ module.exports = {
                 function(r,m) {
                   sys.puts("save status =>" + m.statusCode)
                   db.get(bucket, 'test2')(function(r, meta) {
-                     sys.puts(sys.inspect(meta))
-                    assert.deepEqual(response, {items: [1, 5, 8, 9], other: {s: "a string"}})
+                     sys.puts(sys.inspect(meta.statusCode))
+                    assert.deepEqual(r, {items: [1, 5, 8, 9], other: {s: "a string"}})
                     // assert.ok(9 in response.items)
                   }
                 )
@@ -73,19 +73,19 @@ module.exports = {
       })
     },
     
-    'it should return a 304 if etag matches': function() {
-      db.get(bucket, 'test2')(
-        function(response, meta) {
-          assert.equal(meta.statusCode, 200)
-          var etag = meta.headers['etag']
-                    
-          db.head(bucket, 'test2', {etag: etag})(
-            function(response, meta) {
-              assert.equal(meta.statusCode, 304)
-            }
-          )
-        }
-      )
-    }
+    // 'it should return a 304 if etag matches': function() {
+    //   db.get(bucket, 'test2')(
+    //     function(response, meta) {
+    //       assert.equal(meta.statusCode, 200)
+    //       var etag = meta.headers['etag']
+    //                 
+    //       db.head(bucket, 'test2', {etag: etag})(
+    //         function(response, meta) {
+    //           assert.equal(meta.statusCode, 304)
+    //         }
+    //       )
+    //     }
+    //   )
+    // }
     
 }
