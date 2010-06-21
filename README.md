@@ -49,7 +49,7 @@ Note: you can pass arrays of phases, too. Like
 
     fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
       if (err) throw err;
-      db.save('images', 'test', data, { requestEncoding: 'binary', headers: { "content-type": "image/jpeg"} })();
+      db.save('test', 'image', data, { type: 'jpeg' })()
     });
 
 

@@ -26,7 +26,7 @@ module.exports = {
           // should return content
           assert.ok(response)
           assert.notEqual(204, meta.statusCode)
-
+    
           db.get(bucket, 'test')(
             function(response) {
               assert.deepEqual(response, {a: 1})
@@ -59,7 +59,6 @@ module.exports = {
                 function() {
                   db.get(bucket, 'test2')(function(response) {
                     assert.deepEqual(response, {items: [1, 5, 8, 9], other: {s: "a string"}})
-                    // assert.ok(9 in response.items)
                   }
                 )
               }
@@ -70,12 +69,12 @@ module.exports = {
     },
     
     'it should return a 304 if etag matches': function() {
-      db.get(bucket, 'test2')(
+      db.get(bucket, 'test')(
         function(response, meta) {
           assert.equal(meta.statusCode, 200)
           var etag = meta.headers['etag']
                     
-          db.head(bucket, 'test2', {etag: etag})(
+          db.head(bucket, 'test', {etag: etag})(
             function(response, meta) {
               assert.equal(meta.statusCode, 304)
             }
@@ -103,6 +102,13 @@ module.exports = {
         }
       )
       
-    }
+    },
     
+    'it should test content types': function() {
+      db.save(bucket, 'content', "this is pure text", { returnbody: true, type: 'text' })(
+        function(text, meta) {
+          assert.equal(meta.type, 'text/plain')
+        }
+      )
+    }
 }
