@@ -67,7 +67,7 @@ All operations take an `options` object as the last argument. These specified op
       debug: true,
       callback: function(response, meta) {
         if (response)
-          Riak.prototype.log(meta.headers['content-type'] === 'application/json' ? JSON.stringify(response) : response)
+          Riak.prototype.log(meta.type === 'application/json' ? JSON.stringify(response) : response)
       },
       errback: function(response, meta) {
         if (response)
@@ -98,7 +98,3 @@ Note that you cannot change host or port on the instantiated client.
    - siculars
    - freshtonic
    - botanicus
-
-### TODO
-
- - Make it more convenient to work with Content-Types / MIME types / binary files (use shortcuts instead of accessing the more verbose HTTP header)
