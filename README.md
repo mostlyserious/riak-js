@@ -34,7 +34,7 @@ A Javascript library for Riak
 
      db.get('albums', 4)(function(album, meta) {
          album.tracks = 12;
-         db.save(album)(); // here we use the provided default callbacks that log the result
+         db.save('albums', 4, album)(); // here we use the provided default callbacks that log the result
        });
        
 #### Use the Map/Reduce API
