@@ -1,97 +1,11 @@
-## riak-js
+# riak-js
 
-A Javascript library for Riak
+[Riak](http://riak.basho.com) Javascript library that runs on [node.js](http://nodejs.org/) and [jQuery](http://jquery.com/).
 
-### Features so far
+### Installation
 
- - Sensible yet overridable defaults (init, per-request)
- - Operations: get, head, save, remove, walk, map/reduce
- - Available for node.js (v0.1.97+) and jQuery (browser) platforms; extensible to other implementations
- - Works on Riak 0.10+
+    npm install riak-js
 
-### Set up
+### Features and documentation
 
-#### node.js
-
-    // npm install riak-js    # @latest or @stable -- your pick
-    
-    var db = require('riak-js').getClient()
-    
-    // or cloning this repo
-    
-    var db = require('/path/to/riak-js/lib').getClient()
-
-#### jQuery (browser)
-
-    <script type="text/javascript" src="riak.js"></script>
-    <script type="text/javascript" src="riak-jquery.js"></script>
-
-    var db = new Riak();
-
-### An example session
-
-#### Get and save a document
-
-     db.get('albums', 4)(function(album, meta) {
-         album.tracks = 12;
-         db.save('albums', 4, album)(); // here we use the provided default callbacks that log the result
-       });
-       
-#### Use the Map/Reduce API
-
-    db.map({name: 'Riak.mapValuesJson'}).run('albums')()
-
-Note: you can pass arrays of phases, too. Like
-
-    db.link([{ bucket: a, tag: "_", keep: false }, { bucket: b, tag: "songs", keep: true }]).reduce({name: 'Riak.myReduce'}).run('albums')()
-
-#### Save an image
-
-    fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
-      if (err) throw err;
-      db.save('test', 'image', data, { type: 'jpeg' })()
-    });
-
-
-Check out the tests for more.
-
-### Defaults
-
-All operations take an `options` object as the last argument. These specified options will override the defaults, which are defined as:
-
-    {
-      clientId: 'riak-js', 
-      method: 'GET',
-      interface: 'riak',
-      headers: {},
-      debug: true,
-      callback: function(response, meta) {
-        if (response)
-          Riak.prototype.log(meta.type === 'application/json' ? JSON.stringify(response) : response)
-      }
-    }
-
-During client instantiation, defaults are `localhost` for the host and `8098` for the port. If you pass-in the `defaults` as an argument, they will apply to the whole session instead of per-request:
-
-    var db = new Riak.Client({ host: 'localhost', port: 8098, interface: 'bananas', debug: false });
-
-Note that you cannot change host or port on the instantiated client.
-
-### Noteworthy points
-
- - All operations return a function that takes a `callback`. Therefore you *must* call it for something to happen: `db.get('bucket')()` (default callback), or `db.get('bucket', 'key')(mycallback)`
- - This function is passed in two arguments, the `response` object and a `meta` object: `var mycallback = function(response, meta) {}`
- - Headers are exposed through `meta.headers` and the status code through `meta.statusCode`
- - Client errors are passed-in as the first variable as an `Error` object. When checking for errors, use `if (response instanceof Error) handleError()`
- - All operations accept an `options` object as the last argument, which will be *mixed-in* as to override certain defaults
- - If no `Content-Type` header is provided, `application/json` will be assumed - which in turn will be serialized into JSON
- - Link-walking is done through the map/reduce interface
- - If no `language` is provided in any map/reduce phase, `language: javascript` is assumed
- - `http.Client` queues all requests, so if you want to run requests in parallel you need to create one client instance for each request
- 
-### Authors and contributors (in no particular order)
-
-   - frank06
-   - siculars
-   - freshtonic
-   - botanicus
+[http://riakjs.org](http://riakjs.org)

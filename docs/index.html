@@ -1,67 +1,64 @@
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <title>I want to marry you in Vegas</title>
+    <title>riak-js | Riak Javascript library</title>
     <link href=' http://fonts.googleapis.com/css?family=Molengo' rel='stylesheet' type='text/css' />
     <link href=' http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css' />
     <style type="text/css" media="screen">
-      body {  background: #D9CBA3; }
-      #container { width: 56%; color: white; margin: 20px auto; padding: 30px;
-        -moz-box-shadow:    0 1px 12px rgba(0, 0, 0, 0.7);
-        -webkit-box-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
+      
+      body { background: #D9CBA3; font-size: 16pt; }
+      
+      #container { width: 890px; color: white; margin: 20px auto; padding: 30px;
+        -moz-box-shadow:    0 10px 14px rgba(0, 0, 0, 0.8);
+        -webkit-box-shadow: 0 10px 14px rgba(0, 0, 0, 0.8);
         background-color: #333;
-        font-family: 'Molengo', arial, serif; font-size: 1.3em;
+        font-family: 'Molengo', arial, serif;
+        line-height: 1.4;
       }
-      h1 { text-align: center; font-size: 5.4em; }
-      h2 { font-size: 3.4em; }
-      h3 { font-size: 2.4em; }
-      h4 { font-size: 1.4em; }
-      h1, h2, h3, h4 { font-family: 'Yanone Kaffeesatz', arial, serif; text-shadow:-1px -1px -1px #444;  }
-      p { line-height: 1.6; text-shadow:0 0 0 #E6EBE0; }
+      
+      h1, h2, h3, h4 { font-family: 'Yanone Kaffeesatz', arial, serif; color: #FFC830; text-shadow: 1px 1px 1px #FA8103; }
+      h1 { text-align: center; font-size: 4em; }
+      h2 { font-size: 2.4em; }
+      h3 { font-size: 2em; }
+      h4 { font-size: 1.6em; }
+      
+      a { color: inherit; }
+      
       pre {
+        border: 3px dashed #333;
         padding: 15px; 
         background-color: #444;
         text-wrap: wrap;
-        white-space: pre-wrap;       /* css-3 */
-        white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-        white-space: -pre-wrap;      /* Opera 4-6 */
-        white-space: -o-pre-wrap;    /* Opera 7 */
-        word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
       }
-    code {
-      font-family: 'Monaco',Courier,monospace !important;
-    }
-    .sh_sourceCode {
+        
+      code {
+        padding: 2px;
+        font-size: 0.7em;
+        background-color: #444;
+        color: #C5DBA9;
+        font-family: 'Monaco',Courier,monospace !important;
+      }
+      
+      code .keyword              { font-weight: bold; color: #E9C062; }
+      code .string, code .regexp, code .number { color: #ffbb00 }
+      code .class, code .special { color: white }
+      code .comment              { color: #CCC }
 
-      font-weight: normal;
-      font-style: normal;
-    }
-
-    .sh_sourceCode .sh_symbol , .sh_sourceCode .sh_cbracket {
-      color: #fff;
-    }
-
-    .sh_sourceCode .sh_keyword {
-      font-style: italic;
-    }
-
-    .sh_sourceCode .sh_string, .sh_sourceCode .sh_regexp, .sh_sourceCode .sh_number,
-    .sh_sourceCode .sh_specialchar
-    {
-      color: #B0C4DE;
-    }
-
-    .sh_sourceCode .sh_comment {
-      color: #777;
-    }
     </style>
-    <script type="text/javascript" src="./sh_main.js"></script>
-    <script type="text/javascript" src="./sh_javascript.min.js"></script>
-    <link rel="stylesheet" href="./sh_vim-dark.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+
   </head>
   
   <body>
-    <div id="container">
+    <div id="container" style="position: relative">
+      <a href="http://github.com/frank06/riak-js">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_white_ffffff.png" alt="Fork me on GitHub" />
+      </a>
+      
       <h1>riak-js</h1>
       <div>
         <h3>Javascript library for Riak</h3> 
@@ -79,12 +76,10 @@
         <h4>node.js</h4> 
 
         <pre>
-<code>// npm install riak-js    # @latest or @stable -- your pick
-
+<code>// npm install riak-js  # @latest or @stable -- your pick
 var db = require('riak-js').getClient()
 
 // or cloning this repo
-
 var db = require('/path/to/riak-js/lib').getClient()</code></pre> 
 
         <h4>jQuery (browser)</h4> 
@@ -103,7 +98,7 @@ var db = new Riak();
         <pre>
 <code>db.get('albums', 4)(function(album, meta) {
   album.tracks = 12;
-  db.save('albums', 4, album)(); // here we use the provided default callbacks that log the result
+  db.save('albums', 4, album)(); // we use the provided default callbacks: log the result
 });</code></pre> 
 
         <h4>Use the Map/Reduce API</h4> 
@@ -139,7 +134,7 @@ var db = new Riak();
   debug: true,
   callback: function(response, meta) {
     if (response)
-      Riak.prototype.log(meta.type === 'application/json' ? JSON.stringify(response) : response)
+      Riak.prototype.log(meta.type == 'application/json' ? JSON.stringify(response) : response)
   }
 }</code></pre>
         
@@ -165,18 +160,16 @@ var db = new Riak();
         <h3>Authors and contributors</h3> 
 
         <ul> 
-        <li> frank06</li> 
-        <li> siculars</li> 
-        <li> freshtonic</li> 
-        <li> botanicus</li> 
+        <li><a href="http://github.com/frank06">frank06</a></li> 
+        <li><a href="http://github.com/siculars">siculars</a></li> 
+        <li><a href="http://github.com/freshtonic">freshtonic</a></li> 
+        <li><a href="http://github.com/botanicus">botanicus</a></li> 
         </ul>
         
       </div>
     </div>
     
-    <script type="text/javascript" charset="utf-8">
-      sh_highlightDocument();
-    </script>
+    <script src="hijs.js" type="text/javascript" charset="utf-8"></script>
   </body>
   
 </html>
