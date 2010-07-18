@@ -1,0 +1,182 @@
+<html>
+  <head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>I want to marry you in Vegas</title>
+    <link href=' http://fonts.googleapis.com/css?family=Molengo' rel='stylesheet' type='text/css' />
+    <link href=' http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css' />
+    <style type="text/css" media="screen">
+      body {  background: #D9CBA3; }
+      #container { width: 56%; color: white; margin: 20px auto; padding: 30px;
+        -moz-box-shadow:    0 1px 12px rgba(0, 0, 0, 0.7);
+        -webkit-box-shadow: 0 1px 12px rgba(0, 0, 0, 0.7);
+        background-color: #333;
+        font-family: 'Molengo', arial, serif; font-size: 1.3em;
+      }
+      h1 { text-align: center; font-size: 5.4em; }
+      h2 { font-size: 3.4em; }
+      h3 { font-size: 2.4em; }
+      h4 { font-size: 1.4em; }
+      h1, h2, h3, h4 { font-family: 'Yanone Kaffeesatz', arial, serif; text-shadow:-1px -1px -1px #444;  }
+      p { line-height: 1.6; text-shadow:0 0 0 #E6EBE0; }
+      pre {
+        padding: 15px; 
+        background-color: #444;
+        text-wrap: wrap;
+        white-space: pre-wrap;       /* css-3 */
+        white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+        white-space: -pre-wrap;      /* Opera 4-6 */
+        white-space: -o-pre-wrap;    /* Opera 7 */
+        word-wrap: break-word;       /* Internet Explorer 5.5+ */
+      }
+    code {
+      font-family: 'Monaco',Courier,monospace !important;
+    }
+    .sh_sourceCode {
+
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    .sh_sourceCode .sh_symbol , .sh_sourceCode .sh_cbracket {
+      color: #fff;
+    }
+
+    .sh_sourceCode .sh_keyword {
+      font-style: italic;
+    }
+
+    .sh_sourceCode .sh_string, .sh_sourceCode .sh_regexp, .sh_sourceCode .sh_number,
+    .sh_sourceCode .sh_specialchar
+    {
+      color: #B0C4DE;
+    }
+
+    .sh_sourceCode .sh_comment {
+      color: #777;
+    }
+    </style>
+    <script type="text/javascript" src="./sh_main.js"></script>
+    <script type="text/javascript" src="./sh_javascript.min.js"></script>
+    <link rel="stylesheet" href="./sh_vim-dark.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+  </head>
+  
+  <body>
+    <div id="container">
+      <h1>riak-js</h1>
+      <div>
+        <h3>Javascript library for Riak</h3> 
+
+        <ul> 
+        <li>Sensible yet overridable defaults (init, per-request)</li> 
+        <li>Operations: get, head, save, remove, walk, map/reduce</li> 
+        <li>Available for node.js (v0.1.97+) and jQuery (browser) platforms; extensible to other implementations</li> 
+        <li>Works on Riak 0.10+</li> 
+        </ul> 
+
+
+        <h3>Set up</h3> 
+
+        <h4>node.js</h4> 
+
+        <pre>
+<code>// npm install riak-js    # @latest or @stable -- your pick
+
+var db = require('riak-js').getClient()
+
+// or cloning this repo
+
+var db = require('/path/to/riak-js/lib').getClient()</code></pre> 
+
+        <h4>jQuery (browser)</h4> 
+
+        <pre>
+<code>&lt;script type="text/javascript" src="riak.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="riak-jquery.js"&gt;&lt;/script&gt;
+
+var db = new Riak();
+</code></pre> 
+
+        <h3>An example session</h3> 
+
+        <h4>Get and save a document</h4> 
+
+        <pre>
+<code>db.get('albums', 4)(function(album, meta) {
+  album.tracks = 12;
+  db.save('albums', 4, album)(); // here we use the provided default callbacks that log the result
+});</code></pre> 
+
+        <h4>Use the Map/Reduce API</h4> 
+
+        <pre><code>db.map({name: 'Riak.mapValuesJson'}).run('albums')()</code></pre> 
+
+        <p>Note: you can pass arrays of phases, too. Like</p> 
+
+        <pre>
+<code>db
+  .link([{ bucket: a, tag: "_", keep: false }, { bucket: b, tag: "songs", keep: true }])
+  .reduce({name: 'Riak.myReduce'})
+  .run('albums')()</code></pre> 
+
+        <h4>Save an image</h4> 
+
+        <pre><code>fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
+  if (err) throw err;
+  db.save('test', 'image', data, { type: 'jpeg' })()
+});</code></pre> 
+
+        <p>Check out the tests for more.</p> 
+
+        <h3>Defaults</h3> 
+
+        <p>All operations take an <code>options</code> object as the last argument. These specified options will override the defaults, which are defined as:</p> 
+
+        <pre><code>{
+  clientId: 'riak-js', 
+  method: 'GET',
+  interface: 'riak',
+  headers: {},
+  debug: true,
+  callback: function(response, meta) {
+    if (response)
+      Riak.prototype.log(meta.type === 'application/json' ? JSON.stringify(response) : response)
+  }
+}</code></pre>
+        
+        <p>During client instantiation, defaults are <code>localhost</code> for the host and <code>8098</code> for the port. If you pass-in the <code>defaults</code> as an argument, they will apply to the whole session instead of per-request:</p> 
+
+        <pre><code>var db = new Riak.Client({ host: 'localhost', port: 8098, interface: 'bananas', debug: false });</code></pre> 
+
+        <p>Note that you cannot change host or port on the instantiated client.</p> 
+
+        <h3>Noteworthy points</h3> 
+
+        <ul> 
+        <li>All operations return a function that takes a <code>callback</code>. Therefore you <em>must</em> call it for something to happen: <code>db.get('bucket')()</code> (default callback), or <code>db.get('bucket', 'key')(mycallback)</code></li> 
+        <li>This function is passed in two arguments, the <code>response</code> object and a <code>meta</code> object: <code>var mycallback = function(response, meta) {}</code></li> 
+        <li>Headers are exposed through <code>meta.headers</code> and the status code through <code>meta.statusCode</code></li> 
+        <li>All operations accept an <code>options</code> object as the last argument, which will be <em>mixed-in</em> as to override certain defaults</li> 
+        <li>If no <code>Content-Type</code> header is provided, <code>application/json</code> will be assumed - which in turn will be serialized into JSON</li> 
+        <li>Link-walking is done through the map/reduce interface</li> 
+        <li>If no <code>language</code> is provided in any map/reduce phase, <code>language: javascript</code> is assumed</li> 
+        <li><code>http.Client</code> queues all requests, so if you want to run requests in parallel you need to create one client instance for each request</li> 
+        </ul> 
+
+        <h3>Authors and contributors</h3> 
+
+        <ul> 
+        <li> frank06</li> 
+        <li> siculars</li> 
+        <li> freshtonic</li> 
+        <li> botanicus</li> 
+        </ul>
+        
+      </div>
+    </div>
+    
+    <script type="text/javascript" charset="utf-8">
+      sh_highlightDocument();
+    </script>
+  </body>
+  
+</html>
