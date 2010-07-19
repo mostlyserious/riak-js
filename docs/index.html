@@ -16,11 +16,11 @@
         line-height: 1.4;
       }
       
-      h1, h2, h3, h4 { font-family: 'Yanone Kaffeesatz', arial, serif; color: #FFC830; text-shadow: 1px 1px 1px #FA8103; }
+      h1, h2, h3 { font-family: 'Yanone Kaffeesatz', arial, serif; color: #FFC830; text-shadow: 1px 1px 1px #FA8103; }
       h1 { text-align: center; font-size: 4em; }
-      h2 { font-size: 2.4em; }
-      h3 { font-size: 2em; }
-      h4 { font-size: 1.6em; }
+      h2 { font-size: 2em; }
+      h3 { font-size: 1.7em; }
+      h4 { font-size: 1.3em; }
       
       a { color: inherit; }
       
@@ -48,6 +48,8 @@
       code .string, code .regexp, code .number { color: #ffbb00 }
       code .class, code .special { color: white }
       code .comment              { color: #CCC }
+      
+      .footer { text-align: center; }
 
     </style>
 
@@ -61,28 +63,31 @@
       
       <h1>riak-js</h1>
       <div>
-        <h3>Javascript library for Riak</h3> 
+        <h4>Extensible Javascript library for accessing Riak, with<br/> implementations for <a href="http://nodejs.org">node.js</a> and <a href="http://jquery.com">jQuery</a>.</h4>
+        
+                <pre>
+<code>db.save('airlines', 'KLM', {fleet: 111, alliance: 'SkyTeam'}, { links:
+  [{ bucket: 'flights', key: 'KLM-8098', tag: 'cargo' },
+   { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
+})()</code></pre>
+        
 
         <ul> 
-        <li>Sensible yet overridable defaults (init, per-request)</li> 
-        <li>Operations: get, head, save, remove, walk, map/reduce</li> 
-        <li>Available for node.js (v0.1.97+) and jQuery (browser) platforms; extensible to other implementations</li> 
-        <li>Works on Riak 0.10+</li> 
+          <li>Focused on developer experience – clean API with added sugar</li> 
+          <li>Features all basic HTTP operations, plus link walking and map/reduce with chainable phases</li> 
+          <li>Tested on Riak 0.10+, node.js 0.1.97+ and jQuery 1.4+</li>
         </ul> 
 
-
-        <h3>Set up</h3> 
-
-        <h4>node.js</h4> 
+        <h3>node.js setup</h3> 
 
         <pre>
 <code>// npm install riak-js  # @latest or @stable -- your pick
 var db = require('riak-js').getClient()
 
-// or cloning this repo
+// git clone git://github.com/frank06/riak-js.git  # or cloning the repo
 var db = require('/path/to/riak-js/lib').getClient()</code></pre> 
 
-        <h4>jQuery (browser)</h4> 
+        <h3>jQuery (browser) setup</h3> 
 
         <pre>
 <code>&lt;script type="text/javascript" src="riak.js"&gt;&lt;/script&gt;
@@ -91,44 +96,57 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 var db = new Riak();
 </code></pre> 
 
-        <h3>An example session</h3> 
-
-        <h4>Get and save a document</h4> 
+        <h3>Guide by example</h3> 
 
         <pre>
-<code>db.get('albums', 4)(function(album, meta) {
-  album.tracks = 12;
-  db.save('albums', 4, album)(); // we use the provided default callbacks: log the result
+<code>db.get('flights', 'KLM-5034')(function(flight, meta) {
+  flight.status = 'delayed'
+  db.save('flights', 'KLM-5034', flight)()
 });</code></pre> 
 
-        <h4>Use the Map/Reduce API</h4> 
+        <p>Here we introduce the callback mechanism, and the <code>meta</code> variable, that contains associated information to the retrieved document and the response.</p>
+        
+        <p>Operations always return a function whose only parameter is a function – this is where we provide our callback (but we're not obliged to do so).
+          It gives us back the document as the first parameter, and <code>meta</code> as the second.
+          Things do go wrong, unfortunately, and so if we want to check for errors we do <code>if (flight instanceof Error)</code>.</p>
+        <p>The <code>meta</code> object could look something like:</p>
+        
+<pre><code>{ headers: 
+   { 'x-riak-vclock': 'a85hYGBgymDKBVIsZlzOrhlMiYx5rAwPJu04ygcVtrBxLwIKMwOFFWcAhbMA'
+   , vary: 'Accept-Encoding'
+   , server: 'MochiWeb/1.1 WebMachine/1.6.1 (eat around the stinger)'
+   , link: '< /riak/crew/3428432407>; riaktag="_", < /riak/crew/4428132499>; riaktag="_", < /riak/users>; rel="up"'
+   , 'last-modified': 'Mon, 19 Jul 2010 09:34:25 GMT'
+   , etag: '6LnqO9nVDyCxvCIJk0QdUO'
+   , date: 'Mon, 19 Jul 2010 20:54:42 GMT'
+   , 'content-type': 'application/json'
+   , 'content-length': '511'
+   }
+, key: 'KLM-5034'
+, statusCode: 200
+, type: 'application/json'
+}</code></pre>
 
-        <pre><code>db.map({name: 'Riak.mapValuesJson'}).run('albums')()</code></pre> 
+      <p>It also contains handy methods to deal with links, and shortcuts to certain headers.</p>
 
-        <p>Note: you can pass arrays of phases, too. Like</p> 
 
-        <pre>
-<code>db
-  .link([{ bucket: a, tag: "_", keep: false }, { bucket: b, tag: "songs", keep: true }])
-  .reduce({name: 'Riak.myReduce'})
-  .run('albums')()</code></pre> 
+        <h4>Options</h4> 
 
-        <h4>Save an image</h4> 
-
-        <pre><code>fs.readFile("/path/to/your/image.jpg", 'binary', function (err, data) {
+        <p>riak-js aims to ship sensible defaults, which can of course be overriden. Using <a href="http://api.jquery.com/jQuery.extend/"><code>mixins</code></a> behind the scenes means we only have to supply the properties to override. This can be done during client instantiation, so that it applies to all requests:</p>
+        
+        <pre><code>var db = require('riak-js').getClient({ host: '192.168.1.109', port: 9000, interface: 'backup', debug: false })</code></pre> 
+          
+        <p>But also tune them per-request. An example below saving an image:</p>
+        
+        <pre><code>fs.readFile("drunk-pilot.png", 'binary', function (err, image) {
   if (err) throw err;
-  db.save('test', 'image', data, { type: 'jpeg' })()
+  db.save('evidence', 'pilot-smith-drunk', image, { type: 'jpeg', headers: { 'X-Whatever-Header': 'fire' } })()
 });</code></pre> 
-
-        <p>Check out the tests for more.</p> 
-
-        <h3>Defaults</h3> 
-
-        <p>All operations take an <code>options</code> object as the last argument. These specified options will override the defaults, which are defined as:</p> 
+           
+        <p>And the defaults are:</p> 
 
         <pre><code>{
   clientId: 'riak-js', 
-  method: 'GET',
   interface: 'riak',
   headers: {},
   debug: true,
@@ -138,24 +156,34 @@ var db = new Riak();
   }
 }</code></pre>
         
-        <p>During client instantiation, defaults are <code>localhost</code> for the host and <code>8098</code> for the port. If you pass-in the <code>defaults</code> as an argument, they will apply to the whole session instead of per-request:</p> 
+        <p>Which means that if you don't provide a callback, the result will be logged to stdout. Note that you cannot change host or port once the client is instantiated.</p> 
+        
 
-        <pre><code>var db = new Riak.Client({ host: 'localhost', port: 8098, interface: 'bananas', debug: false });</code></pre> 
+        <h4>Map/Reduce API</h4> 
 
-        <p>Note that you cannot change host or port on the instantiated client.</p> 
+        <pre><code>db.map({name: 'Riak.mapValuesJson'}).run('albums')()</code></pre> 
 
-        <h3>Noteworthy points</h3> 
+        <p>You can chain any number of phases or pass arrays, too:</p> 
+
+        <pre>
+<code>db
+  .link({ bucket: 'flights', keep: false })
+  .map('Riak.mapValuesJson')
+  .reduce(['Riak.filterNotFound', function(value, count) { return value.slice(0, count - 1) }])
+  .run('airlines')(function(flights) {
+    sys.puts(flights)
+  })</code></pre> 
+
+
+        <h3>Good to know</h3> 
 
         <ul> 
-        <li>All operations return a function that takes a <code>callback</code>. Therefore you <em>must</em> call it for something to happen: <code>db.get('bucket')()</code> (default callback), or <code>db.get('bucket', 'key')(mycallback)</code></li> 
-        <li>This function is passed in two arguments, the <code>response</code> object and a <code>meta</code> object: <code>var mycallback = function(response, meta) {}</code></li> 
-        <li>Headers are exposed through <code>meta.headers</code> and the status code through <code>meta.statusCode</code></li> 
-        <li>All operations accept an <code>options</code> object as the last argument, which will be <em>mixed-in</em> as to override certain defaults</li> 
-        <li>If no <code>Content-Type</code> header is provided, <code>application/json</code> will be assumed - which in turn will be serialized into JSON</li> 
-        <li>Link-walking is done through the map/reduce interface</li> 
-        <li>If no <code>language</code> is provided in any map/reduce phase, <code>language: javascript</code> is assumed</li> 
-        <li><code>http.Client</code> queues all requests, so if you want to run requests in parallel you need to create one client instance for each request</li> 
+          <li>If no <code>Content-Type</code> header is provided, <code>application/json</code> will be assumed - which in turn will be serialized into JSON</li> 
+          <li>If no <code>language</code> is provided in any map/reduce phase, <code>language: javascript</code> is assumed</li> 
+          <li>Link-walking is done through the map/reduce interface</li> 
         </ul> 
+
+        <p>Check out the tests for more examples of API usage.</p>
 
         <h3>Authors and contributors</h3> 
 
@@ -167,6 +195,9 @@ var db = new Riak();
         </ul>
         
       </div>
+      
+      <div class="footer">riak-js is supported by <a href="http://widescript.com">widescript</a></div>
+      
     </div>
     
     <script src="hijs.js" type="text/javascript" charset="utf-8"></script>
