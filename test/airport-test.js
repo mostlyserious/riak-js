@@ -17,12 +17,10 @@ require.paths.unshift("../lib");
 var Riak = require('riak-node'),
   assert = require('assert');
 
-var db = new Riak.Client(),
+var db = new Riak(),
   airline_bucket = 'riak-js-test-airlines',
   airport_bucket = 'riak-js-test-airports',
   flight_bucket = 'riak-js-test-flights';
-
-db.mixin(GLOBAL, require('sys'));
 
 // check for more advanced stuff with links at http://blog.basho.com/2010/02/24/link-walking-by-example/
 
@@ -88,11 +86,11 @@ db
     db.log('Flights from ' + from + ' before ' + before + ':');
     response.forEach(flight_print);
     db.log("");
-  })
+  });
 
 // link-walking
 
-db.walk(airline_bucket, 'KLM', [["_", "flight"]])(function(response) {
+db.walk(airline_bucket, 'KLM', [["_", "flight"]])(function(response, meta) {
   assert.equal(response.length, 2);
   db.log('Flights for airline KLM:');
   response.forEach(flight_print);

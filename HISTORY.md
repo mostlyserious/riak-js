@@ -6,6 +6,21 @@ Wishlist
 * Specify timeouts
 * Provide an accurate clientId, bound to user/machine (even in the browser)
 
+=> dox; vows; pretty code; mit license
+=> docs: getAll(where)
+=> require() meta and utils
+=> issue 6 / test jquery version
+=> Meta prototype.__defineGetter__('links', function() {})
+=> search for err & throws, go for node like api function(err, resp, meta)
+=> links uri-unescape
+=> "keys" support
+=> check nori, one client enough for parallel?
+=> err as first arg?
+=> many of the headers should go in the defaults, instead of so much setup
+
+DONE
+
+
 0.2.3 / 2010-06-21
 ------------------
 
