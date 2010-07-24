@@ -65,6 +65,9 @@
       <div>
         <h4>Extensible Javascript library for accessing Riak, with<br/> implementations for <a href="http://nodejs.org">node.js</a> and <a href="http://jquery.com">jQuery</a>.</h4>
         
+        <em>The client is currently undergoing refactoring &mdash; the jQuery version does not work.
+          I'll try to fix this asap</em>
+        
                 <pre>
 <code>db.save('airlines', 'KLM', {fleet: 111, alliance: 'SkyTeam'}, { links:
   [{ bucket: 'flights', key: 'KLM-8098', tag: 'cargo' },
@@ -78,7 +81,13 @@ db.getAll('flights', { where: { ready: true }})()  // Riak 0.12+
           <li>Focused on developer experience – clean API with added sugar</li> 
           <li>Features all basic HTTP operations, plus link walking and map/reduce with chainable phases</li> 
           <li>Tested on Riak 0.10+, node.js 0.1.97+ and jQuery 1.4+</li>
-        </ul> 
+        </ul>
+        
+        <ul> 
+          <li>Code: <a href="http://github.com/frank06/riak-js">frank06/riak-js</a></li> 
+          <li>Documentation: <a href="docs.html">API docs</a></li> 
+          <li>License: <a href="http://opensource.org/licenses/mit-license.php">MIT</a></li>
+        </ul>
 
         <h3>node.js setup</h3> 
 

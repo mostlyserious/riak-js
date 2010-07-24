@@ -1,0 +1,530 @@
+<html>
+	<head>
+		<title>riak-js</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<style>body {
+    margin: 0;
+    padding: 0;
+    font: 14px/1.5 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+    color: #252519;
+}
+a {
+    color: #252519;
+}
+a:hover {
+    text-decoration: underline;
+    color: #19469D;
+}
+p {
+    margin: 12px 0;
+}
+h1, h2, h3 {
+    margin: 0;
+    padding: 0;
+}
+table#source {
+    width: 100%;
+    border-collapse: collapse;
+}
+table#source td:first-child {
+    padding: 30px 40px 30px 40px;
+    vertical-align: top;
+}
+table#source td:first-child,
+table#source td:first-child pre {
+    width: 450px;
+}
+table#source td:last-child {
+    padding: 30px 0 30px 40px;
+    border-left: 1px solid #E5E5EE;
+    background: #F5F5FF;
+}
+table#source tr {
+    border-bottom: 1px solid #E5E5EE;
+}
+table#source tr.filename {
+    padding-top: 40px;
+    border-top: 1px solid #E5E5EE;
+}
+table#source tr.filename td:first-child {
+    text-transform: capitalize;
+}
+table#source tr.filename td:last-child {
+    font-size: 12px;
+}
+table#source tr.filename h2 {
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+}
+table#source tr.code h1,
+table#source tr.code h2,
+table#source tr.code h3 {
+    margin-top: 30px;
+    font-family: "Lucida Grande", "Helvetica Nueue", Arial, sans-serif;
+    font-size: 18px;
+}
+table#source tr.code h2 {
+    font-size: 16px;
+}
+table#source tr.code h3 {
+    font-size: 14px;
+}
+table#source tr.code ul {
+    margin: 15px 0 15px 35px;
+    padding: 0;
+}
+table#source tr.code ul li {
+    margin: 0;
+    padding: 1px 0;
+}
+table#source tr.code ul li p {
+    margin: 0;
+    padding: 0;
+}
+table#source tr.code td:first-child pre {
+    padding: 20px;
+}
+#ribbon {
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+code .string { color: #219161; }
+code .regexp { color: #219161; }
+code .keyword { color: #954121; }
+code .number { color: #19469D; }
+code .comment { color: #bbb; }
+code .this { color: #19469D; }</style>
+		<script>
+			$(function(){
+				$('tr.code').hide();
+				$('tr.filename').toggle(function(){
+					$(this).nextUntil('.filename').fadeIn();
+				}, function(){
+					$(this).nextUntil('.filename').fadeOut();
+				});
+			});
+		</script>
+	</head>
+	<body>
+<table id="source"><tbody><tr><td><h1>riak-js</h1><p>Extensible Javascript library for accessing Riak</p></td><td></td></tr><tr class="filename"><td><h2 id="../lib/index.js"><a href="#">index</a></h2></td><td>../lib/index.js</td></tr><tr class="code">
+<td class="docs">
+<p>Get a riak-js client</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  Initial options, that will apply for the whole session</p></li><li><p><strong>return</strong>: <em>Riak</em>  The riak-js client</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="variable">getClient</span> = <span class="keyword">function</span>(<span class="variable">options</span>) {
+  <span class="keyword">var</span> <span class="class">Riak</span> = <span class="variable">require</span>(<span class="string">'./riak-node'</span>)
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Riak</span>(<span class="variable">options</span>)
+}</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="../lib/riak.js"><a href="#">riak</a></h2></td><td>../lib/riak.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>),
+  <span class="class">Meta</span> = <span class="variable">require</span>(<span class="string">'./meta'</span>),
+  <span class="class">Mapper</span> = <span class="variable">require</span>(<span class="string">'./mapper'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Client defaults
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">defaults</span> = {
+  <span class="variable">clientId</span>: <span class="string">'riak-js'</span>, 
+  <span class="variable">method</span>: <span class="string">'GET'</span>,
+  <span class="variable">interface</span>: <span class="string">'riak'</span>,
+  <span class="variable">headers</span>: { <span class="string">'content-type'</span>: <span class="string">'application/json'</span>, <span class="string">'Host'</span>: &<span class="variable">quot</span>;&<span class="variable">quot</span>; },
+  <span class="variable">debug</span>: <span class="variable">true</span>,
+  <span class="variable">callback</span>: <span class="keyword">function</span>(<span class="variable">response</span>, <span class="variable">meta</span>) {
+    <span class="keyword">if</span> (<span class="variable">response</span>)
+      <span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">log</span>(<span class="variable">meta</span>.<span class="variable">type</span> === <span class="string">'application/json'</span> ? <span class="class">JSON</span>.<span class="variable">stringify</span>(<span class="variable">response</span>) : <span class="variable">response</span>)
+  }
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Fetches a value by key</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket</p></li><li><p><strong>param</strong>: <em>String</em>  key</p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">get</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">key</span>, <span class="variable">options</span>) {
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>);
+  <span class="variable">options</span>.<span class="variable">key</span> = <span class="variable">key</span>;
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">execute</span>(<span class="variable">utils</span>.<span class="variable">path</span>(<span class="variable">bucket</span>, <span class="variable">key</span>), <span class="variable">options</span>);
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Fetches all values in a bucket</p>
+
+<ul><li>options<ul><li><code>where</code>: filters by property (<code>db.getAll('users', {where: {city: "Paris", age: 23}})</code>), works on Riak 0.12+</li><li><code>withId</code>: returns values with its </li></ul></li></ul>
+
+<p>The first argument passed to the callback is an Array holding the results, or an Array holding [key, value]s</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket</p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">getAll</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">options</span>) {
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>);
+  <span class="keyword">if</span> (<span class="variable">options</span>.<span class="variable">where</span>) {
+    <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="string">'Riak.mapByFields'</span>, <span class="variable">options</span>.<span class="variable">where</span>).<span class="variable">run</span>(<span class="variable">bucket</span>)
+  }
+  <span class="keyword">if</span> (<span class="variable">options</span>.<span class="variable">withId</span>) {
+    <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="keyword">function</span>(<span class="variable">v</span>) { <span class="keyword">return</span> [[<span class="variable">v</span>.<span class="variable">key</span>, <span class="variable">v</span>.<span class="variable">values</span>[<span class="number integer">0</span>].<span class="variable">data</span>]] }).<span class="variable">run</span>(<span class="variable">bucket</span>)
+  }
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="string">'Riak.mapValues'</span>).<span class="variable">run</span>(<span class="variable">bucket</span>)
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Fetches the key count for a bucket</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket</p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">count</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">options</span>) {
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>);
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">map</span>(<span class="string">'Riak.mapValues'</span>).<span class="variable">reduce</span>(<span class="keyword">function</span>(<span class="variable">v</span>) { <span class="keyword">return</span> [<span class="variable">v</span>.<span class="variable">length</span>] }).<span class="variable">run</span>(<span class="variable">bucket</span>)
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Fetches only the key's value metadata</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket</p></li><li><p><strong>param</strong>: <em>String</em>  key</p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">head</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">key</span>, <span class="variable">options</span>) {
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>);
+  <span class="variable">options</span>.<span class="variable">method</span> = <span class="string">'HEAD'</span>;
+  <span class="variable">options</span>.<span class="variable">key</span> = <span class="variable">key</span>;
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">execute</span>(<span class="variable">utils</span>.<span class="variable">path</span>(<span class="variable">bucket</span>, <span class="variable">key</span>), <span class="variable">options</span>);
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Removes a value</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket</p></li><li><p><strong>param</strong>: <em>String</em>  key</p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">remove</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">key</span>, <span class="variable">options</span>) {
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>);
+  <span class="variable">options</span>.<span class="variable">method</span> = <span class="string">'DELETE'</span>;
+  <span class="variable">options</span>.<span class="variable">key</span> = <span class="variable">key</span>;
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">execute</span>(<span class="variable">utils</span>.<span class="variable">path</span>(<span class="variable">bucket</span>, <span class="variable">key</span>), <span class="variable">options</span>);
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Removes all values from a bucket</p>
+
+<p><em>IMPORTANT</em>: This issues <em>several</em> requests</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket</p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">removeAll</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">options</span>) {
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>),
+    <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">options</span>.<span class="variable">keys</span> = <span class="variable">true</span>;
+  <span class="keyword">return</span> <span class="keyword">function</span>(<span class="variable">callback</span>) {
+    <span class="variable">callback</span> = <span class="variable">callback</span> || <span class="variable">options</span>.<span class="variable">callback</span>;
+
+    <span class="variable">self</span>.<span class="variable">get</span>(<span class="variable">bucket</span>, <span class="variable">undefined</span>, <span class="variable">options</span>)(<span class="keyword">function</span>(<span class="variable">response</span>) {
+      <span class="variable">response</span>.<span class="variable">keys</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">key</span>) {
+        <span class="variable">self</span>.<span class="variable">remove</span>(<span class="variable">bucket</span>, <span class="variable">key</span>, <span class="variable">options</span>)(<span class="variable">callback</span>);
+      })
+    })    
+  }
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Saves a value</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket</p></li><li><p><strong>param</strong>: <em>String</em>  key</p></li><li><p><strong>param</strong>: <em>Object</em>  data - the value to be stored</p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">save</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">key</span>, <span class="variable">data</span>, <span class="variable">options</span>) {
+  <span class="variable">data</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">data</span>);
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>);
+  <span class="keyword">if</span> (!<span class="variable">options</span>.<span class="variable">method</span>)
+    <span class="variable">options</span>.<span class="variable">method</span> = <span class="variable">key</span> ? <span class="string">'PUT'</span> : <span class="string">'POST'</span>;
+  <span class="variable">options</span>.<span class="variable">data</span> = <span class="variable">data</span>;
+  <span class="variable">options</span>.<span class="variable">key</span> = <span class="variable">key</span>;
+
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">execute</span>(<span class="variable">utils</span>.<span class="variable">path</span>(<span class="variable">bucket</span>, <span class="variable">key</span>), <span class="variable">options</span>);
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Link-walks from a given bucket/key</p>
+
+<p>This implementation uses Map/Reduce</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  bucket from where to start the link-walk</p></li><li><p><strong>param</strong>: <em>String</em>  key from where to start the link-walk</p></li><li><p><strong>param</strong>: <em>Array</em>  spec - a link-walking spec, such as <code>[["bucket", "tag"]]</code></p></li><li><p><strong>param</strong>: <em>Object</em>  options - overrides default options and specifies particular options for this operation</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">walk</span> = <span class="keyword">function</span>(<span class="variable">bucket</span>, <span class="variable">key</span>, <span class="variable">spec</span>, <span class="variable">options</span>) {
+  <span class="keyword">var</span> <span class="variable">linkPhases</span> = <span class="variable">spec</span>.<span class="variable">map</span>(<span class="keyword">function</span>(<span class="variable">unit</span>) {
+    <span class="keyword">return</span> { <span class="variable">bucket</span>: <span class="variable">unit</span>[<span class="number integer">0</span>] || <span class="string">'_'</span>, <span class="variable">tag</span>: <span class="variable">unit</span>[<span class="number integer">1</span>] || <span class="string">'_'</span>, <span class="variable">keep</span>: <span class="variable">unit</span>[<span class="number integer">2</span>] ? <span class="variable">true</span> : <span class="variable">false</span> }
+  });
+    
+  <span class="keyword">return</span> <span class="this">this</span>
+    .<span class="variable">link</span>(<span class="variable">linkPhases</span>)
+    .<span class="variable">reduce</span>({ <span class="variable">language</span>: <span class="string">'erlang'</span>, <span class="variable">module</span>: <span class="string">'riak_kv_mapreduce'</span>,
+      <span class="string">'function'</span>: <span class="string">'reduce_set_union'</span>})
+    .<span class="variable">map</span>(&<span class="variable">quot</span>;<span class="class">Riak</span>.<span class="variable">mapValuesJson</span>&<span class="variable">quot</span>;)
+    .<span class="variable">run</span>(<span class="variable">key</span> ? [[<span class="variable">bucket</span>, <span class="variable">key</span>]] : <span class="variable">bucket</span>, <span class="variable">options</span>);
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Pings the node this client is currently connected to</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">ping</span> = <span class="keyword">function</span>() {
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">head</span>(<span class="string">''</span>, <span class="string">''</span>, {<span class="variable">interface</span>: <span class="string">'ping'</span>})
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Handy method to check whether the response was an error or not</p>
+
+<p> Usage: <code>if (db.error(response)) { ... }</code></p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Boolean</em>  true if it's an Error</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">error</span> = <span class="keyword">function</span>(<span class="variable">response</span>) {
+  <span class="keyword">return</span> <span class="variable">response</span> <span class="variable">instanceof</span> <span class="class">Error</span>
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Convenience method to help construct a <code>Mapper</code> object to achieve a chainable Map/Reduce-API,
+initializing it with one or more <em>map</em> phases</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Mapper</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">map</span> = <span class="keyword">function</span>(<span class="variable">phase</span>, <span class="variable">args</span>) {
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Mapper</span>(<span class="variable">utils</span>.<span class="variable">makePhases</span>(&<span class="variable">quot</span>;<span class="variable">map</span>&<span class="variable">quot</span>;, <span class="variable">phase</span>, <span class="variable">args</span>), <span class="this">this</span>)
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Convenience method to help construct a <code>Mapper</code> object to achieve a chainable Map/Reduce-API,
+initializing it with one or more <em>reduce</em> phases</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Mapper</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">reduce</span> = <span class="keyword">function</span>(<span class="variable">phase</span>, <span class="variable">args</span>) {
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Mapper</span>(<span class="variable">utils</span>.<span class="variable">makePhases</span>(&<span class="variable">quot</span>;<span class="variable">reduce</span>&<span class="variable">quot</span>;, <span class="variable">phase</span>, <span class="variable">args</span>), <span class="this">this</span>)
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Convenience method to help construct a <code>Mapper</code> object to achieve a chainable Map/Reduce-API,
+initializing it with one or more <em>link</em> phases</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Mapper</em> </p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Riak</span>.<span class="variable">prototype</span>.<span class="variable">link</span> = <span class="keyword">function</span>(<span class="variable">phase</span>) {
+  <span class="keyword">return</span> <span class="keyword">new</span> <span class="class">Mapper</span>(<span class="variable">utils</span>.<span class="variable">makePhases</span>(&<span class="variable">quot</span>;<span class="variable">link</span>&<span class="variable">quot</span>;, <span class="variable">phase</span>), <span class="this">this</span>)
+}</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="../lib/mapper.js"><a href="#">mapper</a></h2></td><td>../lib/mapper.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Add one or more <em>map</em> phases to the Map/Reduce job</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  One (function, string, or object containing <code>source</code>, <code>name</code>, <code>args</code>, etc) or more phases (each one contained in an Array)</p></li><li><p><strong>return</strong>: <em>Mapper</em>  To be able to chain until <code>#run()</code> is called</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Mapper</span>.<span class="variable">prototype</span>.<span class="variable">map</span> = <span class="keyword">function</span>(<span class="variable">phase</span>, <span class="variable">args</span>) {
+  <span class="this">this</span>.<span class="variable">addPhases</span>(<span class="variable">utils</span>.<span class="variable">makePhases</span>(&<span class="variable">quot</span>;<span class="variable">map</span>&<span class="variable">quot</span>;, <span class="variable">phase</span>, <span class="variable">args</span>))
+  <span class="keyword">return</span> <span class="this">this</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Add one or more <em>reduce</em> phases to the Map/Reduce job</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  One (function, string, or object containing <code>source</code>, <code>name</code>, <code>args</code>, etc) or more phases (each one contained in an Array)</p></li><li><p><strong>return</strong>: <em>Mapper</em>  To be able to chain until <code>#run()</code> is called</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Mapper</span>.<span class="variable">prototype</span>.<span class="variable">reduce</span> = <span class="keyword">function</span>(<span class="variable">phase</span>, <span class="variable">args</span>) {
+  <span class="this">this</span>.<span class="variable">addPhases</span>(<span class="variable">utils</span>.<span class="variable">makePhases</span>(&<span class="variable">quot</span>;<span class="variable">reduce</span>&<span class="variable">quot</span>;, <span class="variable">phase</span>, <span class="variable">args</span>))
+  <span class="keyword">return</span> <span class="this">this</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Add one or more <em>link</em> phases to the Map/Reduce job</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  One (function, string, or object containing <code>source</code>, <code>name</code>, <code>args</code>, etc) or more phases (each one contained in an Array)</p></li><li><p><strong>return</strong>: <em>Mapper</em>  To be able to chain until <code>#run()</code> is called</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Mapper</span>.<span class="variable">prototype</span>.<span class="variable">link</span> = <span class="keyword">function</span>(<span class="variable">phase</span>) {
+  <span class="this">this</span>.<span class="variable">addPhases</span>(<span class="variable">utils</span>.<span class="variable">makePhases</span>(&<span class="variable">quot</span>;<span class="variable">link</span>&<span class="variable">quot</span>;, <span class="variable">phase</span>))
+  <span class="keyword">return</span> <span class="this">this</span>;
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Run the Map/Reduce job</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Array</em>  for a list of <code>[bucket, key]</code>, or {String} for a bucket name (<em>warning</em>: it has to list the bucket's keys)</p></li><li><p><strong>return</strong>: <em>Function</em>  A function that takes a callback as its only input</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Mapper</span>.<span class="variable">prototype</span>.<span class="variable">run</span> = <span class="keyword">function</span>(<span class="variable">inputs</span>, <span class="variable">options</span>) {
+  <span class="variable">options</span> = <span class="variable">utils</span>.<span class="variable">ensure</span>(<span class="variable">options</span>);
+  <span class="variable">options</span>.<span class="variable">interface</span> = <span class="string">'mapred'</span>;
+  <span class="variable">options</span>.<span class="variable">method</span> = <span class="string">'POST'</span>;
+
+  <span class="this">this</span>.<span class="variable">phases</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">phase</span>) {
+    <span class="keyword">for</span> (<span class="variable">p</span> <span class="keyword">in</span> <span class="variable">phase</span>) { <span class="comment">// map, reduce or link</span>
+      <span class="keyword">if</span> (<span class="variable">phase</span>[<span class="variable">p</span>].<span class="variable">language</span> === <span class="variable">undefined</span>) {
+        <span class="variable">phase</span>[<span class="variable">p</span>].<span class="variable">language</span> = <span class="string">'javascript'</span>;
+      };
+    }
+  })
+  
+  <span class="variable">options</span>.<span class="variable">data</span> = {
+    <span class="variable">inputs</span>: <span class="variable">inputs</span>,
+    <span class="variable">query</span>: <span class="this">this</span>.<span class="variable">phases</span>
+  }
+
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">riak</span>.<span class="variable">execute</span>(<span class="string">''</span>, <span class="variable">options</span>);
+}</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="../lib/meta.js"><a href="#">meta</a></h2></td><td>../lib/meta.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'./utils'</span>)</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Removes a link from the current list of links</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  Link, such as <code>{bucket: 'bucket', key: 'mykey'}</code></p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Meta</span>.<span class="variable">prototype</span>.<span class="variable">removeLink</span> = <span class="keyword">function</span>(<span class="variable">link</span>) {
+  <span class="this">this</span>.<span class="variable">headers</span>.<span class="variable">link</span> = <span class="this">this</span>.<span class="variable">makeLinks</span>(<span class="this">this</span>.<span class="variable">links</span>.<span class="variable">filter</span>(<span class="keyword">function</span>(<span class="variable">n</span>) {
+    <span class="keyword">return</span> <span class="variable">n</span>.<span class="variable">bucket</span> !== <span class="variable">link</span>.<span class="variable">bucket</span> || <span class="variable">n</span>.<span class="variable">key</span> !== <span class="variable">link</span>.<span class="variable">key</span>
+  }))
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Link getter</p>
+
+<h2></h2>
+
+<ul><li><p><strong>return</strong>: <em>Array</em>  All the links in the current list of links</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Meta</span>.<span class="variable">prototype</span>.<span class="variable">__defineGetter__</span>(<span class="string">'links'</span>, <span class="keyword">function</span>() {
+  <span class="keyword">return</span> <span class="variable">utils</span>.<span class="variable">stringToLinks</span>(<span class="this">this</span>.<span class="variable">headers</span>.<span class="variable">link</span>)
+})</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Link setter (one, or more in an Array)</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  {Array} Link(s)</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Meta</span>.<span class="variable">prototype</span>.<span class="variable">__defineSetter__</span>(<span class="string">'links'</span>, <span class="keyword">function</span>(<span class="variable">links</span>) {
+  <span class="keyword">if</span> (!<span class="variable">utils</span>.<span class="variable">isArray</span>(<span class="variable">links</span>)) <span class="variable">links</span> = [<span class="variable">links</span>]
+  <span class="this">this</span>.<span class="variable">headers</span>.<span class="variable">link</span> = (<span class="this">this</span>.<span class="variable">headers</span>.<span class="variable">link</span> ? <span class="this">this</span>.<span class="variable">headers</span>.<span class="variable">link</span> + &<span class="variable">quot</span>;, &<span class="variable">quot</span>; : &<span class="variable">quot</span>;&<span class="variable">quot</span>;) + <span class="this">this</span>.<span class="variable">makeLinks</span>(<span class="variable">links</span>)
+})</code></pre>
+</td>
+</tr>	</body>
+</html></tbody></table>

@@ -5,7 +5,6 @@ Wishlist
 * Spawning 4 workers with `spark` is enough to have 4 parallel HTTP clients hammering Riak?
 * Provide an accurate clientId, bound to user/machine (even in the browser?) - randomizing it on client init is a bad solution
 
-=> dox
 => vows / merge airline tests and introduce fake passengers with faker
 => check possible merge with technoweenie/nori
 => issue 6 / test jquery version / transporter for jquery
@@ -20,6 +19,7 @@ DONE
 => links uri-unescape
 => added `db.error` convenience function to check for errors - still don't like node's `function(err, response)` standard
 => working "keys" (http://github.com/visionmedia/keys) implementation
+=> API docs via dox
 
 0.2.3 / 2010-06-21
 ------------------
