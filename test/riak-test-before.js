@@ -77,7 +77,7 @@ module.exports = {
           assert.equal(meta.links.length, 3)
           meta.removeLink({bucket: bucket, key: 'KLM-8098'})
           assert.equal(meta.links.length, 2)
-          meta.addLinks([{bucket: bucket, key: 'KLM-6024'}, {bucket: bucket, key: 'KLM-1012'}])
+          meta.links = [{bucket: bucket, key: 'KLM-6024'}, {bucket: bucket, key: 'KLM-1012'}]
           db.save(bucket, 'link-test', '', { links: meta.links, returnbody: true })(
             function(response, meta) {
               assert.equal(meta.links.length, 4)

@@ -15,7 +15,7 @@ DONE
 => modularize code, use require()
 => docs: getAll(where)
 => changed license to MIT
-=> Meta prototype.__defineGetter__('links', function() {}) // change your calls from meta.links() to meta.links
+=> Added getter/setter for links // change your calls from meta.links() to meta.links, and meta.addLinks([...]) to meta.links = [...]
 => many of the headers should go in the defaults, instead of so much setup
 => links uri-unescape
 => added `db.error` convenience function to check for errors - still don't like node's `function(err, response)` standard
