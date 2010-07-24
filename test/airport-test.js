@@ -65,6 +65,12 @@ var from = 'EZE', before = 'Wed, 14 Jul 2010',
 
 // map/reduce
 
+// error example
+db.reduce(undefined).run(flight_bucket)(function(response, meta) {
+  // this will return a 4xx error, because we're passing undefined
+  assert.ok(db.error(response))
+})
+
 db
   .map(map, {from: from, before: before})
   .run(flight_bucket)(function(response) {

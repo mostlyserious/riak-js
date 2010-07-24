@@ -1,18 +1,14 @@
 Wishlist
 --------
 
-* Auto-reconnect to several hosts
-* Update and enhance tests (`airline-test.js` to simulate real-world behaviour, add people from Faker.js to flights)
-* Specify timeouts
-* Provide an accurate clientId, bound to user/machine (even in the browser)
+* Resilent to crashes, network errors, etc; auto-reconnect to several hosts
+* Spawning 4 workers with `spark` is enough to have 4 parallel HTTP clients hammering Riak?
+* Provide an accurate clientId, bound to user/machine (even in the browser?) - randomizing it on client init is a bad solution
 
+=> "keys" support
 => dox
 => vows / merge airline tests and introduce fake passengers with faker
-=> search for err & throws, go for node like api function(err, resp, meta)
-=> links uri-unescape
-=> "keys" support
 => check possible merge with technoweenie/nori
-=> one client enough for parallel?
 => issue 6 / test jquery version / transporter for jquery
 
 DONE
@@ -21,6 +17,9 @@ DONE
 => changed license to MIT
 => Meta prototype.__defineGetter__('links', function() {}) // change your calls from meta.links() to meta.links
 => many of the headers should go in the defaults, instead of so much setup
+=> links uri-unescape
+=> added `db.error` convenience function to check for errors - still don't like node's `function(err, response)` standard
+
 
 0.2.3 / 2010-06-21
 ------------------

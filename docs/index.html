@@ -108,9 +108,11 @@ var db = new Riak();
 
         <p>Here we introduce the callback mechanism, and the <code>meta</code> variable, that contains associated information to the retrieved document and the response.</p>
         
-        <p>Operations always return a function whose only parameter is a function – this is where we provide our callback (but we're not obliged to do so).
+        <p>Operations always return a function whose only parameter is a function. This is where we provide our callback &mdash; but we're not obliged to do so.
           It gives us back the document as the first parameter, and <code>meta</code> as the second.
-          Things do go wrong, unfortunately, and so if we want to check for errors we do <code>if (flight instanceof Error)</code>.</p>
+        </p>
+        <p>
+          Things do go wrong, unfortunately, and so if we want to check for errors we do <code>if (db.error(flight))</code> (with <code>flight</code>'s type being <code>Error</code>). This gets returned whenever there's a client error, or when the server returns an HTTP status >= 400.</p>
         <p>The <code>meta</code> object could look something like:</p>
         
 <pre><code>{ headers: 
