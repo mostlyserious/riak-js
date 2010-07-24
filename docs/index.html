@@ -69,8 +69,10 @@
 <code>db.save('airlines', 'KLM', {fleet: 111, alliance: 'SkyTeam'}, { links:
   [{ bucket: 'flights', key: 'KLM-8098', tag: 'cargo' },
    { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
-})()</code></pre>
-        
+})()
+
+db.getAll('flights', { where: { ready: true }})()  // Riak 0.12+
+</code></pre>
 
         <ul> 
           <li>Focused on developer experience – clean API with added sugar</li> 
@@ -196,7 +198,7 @@ var db = new Riak();
         
       </div>
       
-      <div class="footer">riak-js is supported by <a href="http://widescript.com">widescript</a></div>
+      <div class="footer">riak-js is <a href="http://opensource.org/licenses/mit-license.php">MIT-licensed</a> and supported by <a href="http://widescript.com">widescript</a></div>
       
     </div>
     
