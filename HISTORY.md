@@ -4,11 +4,11 @@ Wishlist
 * Resilent to crashes, network errors, etc; auto-reconnect to several hosts
 * Spawning 4 workers with `spark` is enough to have 4 parallel HTTP clients hammering Riak?
 * Provide an accurate clientId, bound to user/machine (even in the browser?) - randomizing it on client init is a bad solution
+* Check possible merge with technoweenie/nori
 
+TODO
 => vows / merge airline tests and introduce fake passengers with faker
-=> check possible merge with technoweenie/nori
 => issue 6 / test jquery version / transporter for jquery
-=> clean up npm registry with old versions
 
 DONE
 => modularize code, use require()
