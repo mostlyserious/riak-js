@@ -74,14 +74,14 @@ module.exports = {
         headers: { link: '</riak/list/3>; riaktag="next"' }
       })(
         function(response, meta) {
-          assert.equal(meta.links().length, 3)
+          assert.equal(meta.links.length, 3)
           meta.removeLink({bucket: bucket, key: 'KLM-8098'})
-          assert.equal(meta.links().length, 2)
+          assert.equal(meta.links.length, 2)
           meta.addLinks([{bucket: bucket, key: 'KLM-6024'}, {bucket: bucket, key: 'KLM-1012'}])
-          db.save(bucket, 'link-test', '', { links: meta.links(), returnbody: true })(
+          db.save(bucket, 'link-test', '', { links: meta.links, returnbody: true })(
             function(response, meta) {
-              assert.equal(meta.links().length, 4)
-              assert.ok(meta.links().every(function(n) { return n.bucket !== bucket || n.key !== 'KLM-8098' }))
+              assert.equal(meta.links.length, 4)
+              assert.ok(meta.links.every(function(n) { return n.bucket !== bucket || n.key !== 'KLM-8098' }))
             }
           )
         }
