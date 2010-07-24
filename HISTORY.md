@@ -8,7 +8,6 @@ Wishlist
 
 => dox
 => vows / merge airline tests and introduce fake passengers with faker
-=> many of the headers should go in the defaults, instead of so much setup
 => search for err & throws, go for node like api function(err, resp, meta)
 => links uri-unescape
 => "keys" support
@@ -21,6 +20,7 @@ DONE
 => docs: getAll(where)
 => changed license to MIT
 => Meta prototype.__defineGetter__('links', function() {}) // change your calls from meta.links() to meta.links
+=> many of the headers should go in the defaults, instead of so much setup
 
 0.2.3 / 2010-06-21
 ------------------
