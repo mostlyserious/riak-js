@@ -1,6 +1,4 @@
-require.paths.unshift("../lib");
-
-var Riak = require('riak-node'),
+var Riak = require('../lib/riak-node'),
   assert = require('assert');
 
 var db = new Riak(),
