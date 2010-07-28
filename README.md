@@ -1,8 +1,8 @@
 # riak-js
 
-[Riak](http://riak.basho.com) Javascript library that runs on [node.js](http://nodejs.org/) and [jQuery](http://jquery.com/).
+[Riak](http://riak.basho.com) Javascript library for [node.js](http://nodejs.org/).
 
-## PLEASE NOTE: I am currently refactoring the client and jQuery version doesn't work - will fix that asap
+[jQuery](http://jquery.com/) support is currently not working and will probably be dropped. E-mail me if you have strong feelings about it.
 
 ### Installation
 
