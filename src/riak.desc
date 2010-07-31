@@ -1,8 +1,8 @@
 
-Ä
+š
 
 
-riak.protoriak"/
+riak.proto"/
 RpbErrorResp
 errmsg (
 errcode ("'
@@ -16,23 +16,23 @@ riak.protoriak"/
 	RpbGetReq
 bucket (
 key (	
-r ("?
+r (":
 
-RpbGetResp!
-content (2.riak.RpbContent
-vclock ("‡
+RpbGetResp
+content (2.RpbContent
+vclock ("‚
 	RpbPutReq
 bucket (
 key (
-vclock (!
-content (2.riak.RpbContent	
+vclock (
+content (2.RpbContent	
 w (
 
 dw (
-return_body ("@
+return_body (":
 
-RpbPutResp"
-contents (2.riak.RpbContent
+RpbPutResp
+content (2.RpbContent
 vclock ("4
 	RpbDelReq
 bucket (
@@ -47,38 +47,38 @@ RpbPutResp"
 keys (
 done ("!
 RpbGetBucketReq
-bucket ("7
-RpbGetBucketResp#
-props (2.riak.RpbBucketProps"F
+bucket ("2
+RpbGetBucketResp
+props (2.RpbBucketProps"A
 RpbSetBucketReq
-bucket (#
-props (2.riak.RpbBucketProps"5
+bucket (
+props (2.RpbBucketProps"5
 RpbMapRedReq
 request (
 content_type (">
 RpbMapRedResp
 phase (
 response (
-done ("3
-RpbBucketProps
-n_val (
-
-allow_mult ("Ó
+done ("É
 
 RpbContent
 value (
 content_type (
 charset (
 content_encoding (
-vtag (
-links (2.riak.RpbLink
+vtag (
+links (2.RpbLink
 last_mod (
-last_mod_usecs (
-usermeta	 (2.riak.RpbPair"%
+last_mod_usecs (
+usermeta	 (2.RpbPair"%
 RpbPair
 key (
 value ("3
 RpbLink
 bucket (
 key (
-tag (
+tag ("3
+RpbBucketProps
+n_val (
+
+allow_mult (
