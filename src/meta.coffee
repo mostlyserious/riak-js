@@ -8,15 +8,18 @@ class Meta
   #
   # @api private
   constructor: (key, options) ->
-    @key          = key
-    @options      = options || {}
-    @type         = @popKey @options, 'type'
-    @vclock       = @popKey @options, 'vclock'
-    @etag         = @popKey @options, 'etag'
-    @lastModified = @popKey @options, 'lastModified'
-    @interface    = @popKey @options, 'interface'
-    @statusCode   = @popKey @options, 'statusCode'
-    @links        = @popKey(@options, 'links') || []
+    @key             = key
+    @options         = options || {}
+    @type            = @popKey @options, 'type'
+    @vclock          = @popKey @options, 'vclock'
+    @etag            = @popKey @options, 'etag'
+    @lastModified    = @popKey @options, 'lastModified'
+    @interface       = @popKey @options, 'interface'
+    @vtag            = @popKey @options, 'vtag'
+    @charset         = @popKey @options, 'charset'
+    @contentEncoding = @popKey @options, 'contentEncoding'
+    @statusCode      = @popKey @options, 'statusCode'
+    @links           = @popKey(@options, 'links') || []
 
   # Fills in a full content type based on a few defaults
   guessType: (type) ->
