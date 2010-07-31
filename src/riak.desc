@@ -1,0 +1,84 @@
+
+Ä
+
+
+riak.protoriak"/
+RpbErrorResp
+errmsg (
+errcode ("'
+RpbGetClientIdResp
+	client_id ("&
+RpbSetClientIdReq
+	client_id ("<
+RpbGetServerInfoResp
+node (
+server_version ("3
+	RpbGetReq
+bucket (
+key (	
+r ("?
+
+RpbGetResp!
+content (2.riak.RpbContent
+vclock ("‡
+	RpbPutReq
+bucket (
+key (
+vclock (!
+content (2.riak.RpbContent	
+w (
+
+dw (
+return_body ("@
+
+RpbPutResp"
+contents (2.riak.RpbContent
+vclock ("4
+	RpbDelReq
+bucket (
+key (
+
+rw ("%
+RpbListBucketsResp
+buckets (" 
+RpbListKeysReq
+bucket ("-
+RpbListKeysResp
+keys (
+done ("!
+RpbGetBucketReq
+bucket ("7
+RpbGetBucketResp#
+props (2.riak.RpbBucketProps"F
+RpbSetBucketReq
+bucket (#
+props (2.riak.RpbBucketProps"5
+RpbMapRedReq
+request (
+content_type (">
+RpbMapRedResp
+phase (
+response (
+done ("3
+RpbBucketProps
+n_val (
+
+allow_mult ("Ó
+
+RpbContent
+value (
+content_type (
+charset (
+content_encoding (
+vtag (
+links (2.riak.RpbLink
+last_mod (
+last_mod_usecs (
+usermeta	 (2.riak.RpbPair"%
+RpbPair
+key (
+value ("3
+RpbLink
+bucket (
+key (
+tag (

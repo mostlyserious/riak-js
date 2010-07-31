@@ -1,0 +1,161 @@
+// https://wiki.basho.com/display/RIAK/PBC+API
+package riak;
+
+// 0
+message RpbErrorResp {
+    required bytes errmsg = 1;
+    required uint32 errcode = 2;
+}
+
+// 1
+// RpbPingReq
+
+// 2
+// RpbPingResp
+
+// 3
+// RpbGetClientIdReq
+
+// 4
+message RpbGetClientIdResp {
+    required bytes client_id = 1; // Client id in use for this connection
+}
+
+// 5
+message RpbSetClientIdReq {
+    required bytes client_id = 1; // Client id to use for this connection
+}
+
+// 6
+// RpbSetClientIdResp
+
+// 7
+// RpbGetServerInfoReq
+
+// 8 
+message RpbGetServerInfoResp {
+    optional bytes node = 1;
+    optional bytes server_version = 2;
+}
+
+// 9
+message RpbGetReq {
+    required bytes bucket = 1;
+    required bytes key = 2;
+    optional uint32 r = 3;
+}
+
+// 10
+message RpbGetResp {
+    repeated RpbContent content = 1;
+    optional bytes vclock = 2;
+}
+
+// 11
+message RpbPutReq {
+    required bytes bucket = 1;
+    required bytes key = 2;
+    optional bytes vclock = 3;
+    required RpbContent content = 4;
+    optional uint32 w = 5;
+    optional uint32 dw = 6;
+    optional bool return_body = 7;
+}
+
+// 12
+message RpbPutResp {
+    repeated RpbContent contents = 1;
+    optional bytes vclock = 2; // the opaque vector clock for the object
+}
+
+// 13
+message RpbDelReq {
+    required bytes bucket = 1;
+    required bytes key = 2;
+    optional uint32 rw = 3;
+}
+
+// 14
+// RpbDelResp
+
+// 15
+// RpbListBucketsReq
+
+// 16
+message RpbListBucketsResp {
+    repeated bytes buckets = 1;
+}
+
+// 17
+message RpbListKeysReq {
+    required bytes bucket = 1;
+}
+
+// 18
+message RpbListKeysResp {
+    repeated bytes keys = 1;
+    optional bool done = 2;
+}
+
+// 19
+message RpbGetBucketReq {
+    required bytes bucket = 1;
+}
+
+// 20
+message RpbGetBucketResp {
+    required RpbBucketProps props = 1;
+}
+
+// 21
+message RpbSetBucketReq {
+    required bytes bucket = 1;
+    required RpbBucketProps props = 2;
+}
+
+// 22
+// RpbSetBucketResp
+
+// 23
+message RpbMapRedReq {
+    required bytes request = 1;
+    required bytes content_type = 2;
+}
+
+// 24
+message RpbMapRedResp {
+    optional uint32 phase = 1;
+    optional bytes response = 2;
+    optional bool done = 3;
+}
+
+message RpbBucketProps {
+    optional uint32 n_val = 1;
+    optional bool allow_mult = 2;
+}
+
+// Content message included in get/put responses
+message RpbContent {
+    required bytes value = 1;
+    optional bytes content_type = 2;     // the media type/format
+    optional bytes charset = 3;
+    optional bytes content_encoding = 4;
+    optional bytes vtag = 5;
+    repeated RpbLink links = 6;          // links to other resources
+    optional uint32 last_mod = 7;
+    optional uint32 last_mod_usecs = 8;
+    repeated RpbPair usermeta = 9;  // user metadata stored with the object
+}
+
+// Key/value pair - used for user metadata
+message RpbPair {
+    required bytes key = 1;
+    optional bytes value = 2;
+}
+
+// Link metadata
+message RpbLink {
+    optional bytes bucket = 1;
+    optional bytes key = 2;
+    optional bytes tag = 3;
+}
