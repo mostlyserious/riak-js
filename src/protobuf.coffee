@@ -2,6 +2,179 @@ sys      = require 'sys'
 net      = require 'net'
 fs       = require 'fs'
 Buffer   = require('buffer').Buffer
+Riak     = {}
+
+# Keeps a pool of Riak socket connections.
+class Riak.Pool
+  constructor: (options) ->
+    @running = true
+    @pool    = []
+    @active  = {}
+    @options = options || {}
+    @options.port ||= 8087
+    @options.host ||= '127.0.0.1'
+    @options.max  ||= 10
+
+  # Public: Returns a Riak.Connection instance from the pool.
+  #
+  # callback - Optional Function callback is called with the Riak.Connection
+  #            instance when it is ready to send connections.
+  #
+  # Returns a Riak.Connection instance if the Pool is active, or null.
+  start: (callback) ->
+    return null if !@running
+    conn = @pool.pop() || new Riak.Connection(this)
+    if conn.writable
+      @active[conn.client_id] = conn
+      callback conn if conn
+    else
+      riak = this
+      conn.on 'connect', ->
+        conn.send('GetClientIdReq') (data) ->
+          conn.clientId              = data.clientId
+          riak.active[conn.clientId] = data.clientId
+          callback conn if callback
+    conn
+
+  # Public: Returns the Riak.Connection back to the Pool.  If the Pool is
+  # inactive, disconnect the Riak.Connection.
+  #
+  # conn - Riak.Connection instance.
+  #
+  # Returns nothing.
+  finish: (conn) ->
+    pos  = @active[conn.client_id]
+    delete @active[pos]
+    if @running
+      @pool.push conn if @pool.length < @options.max
+    else
+      conn.end()
+
+  # Public: Disconnects all Riak.Connection instances in the Pool.
+  #
+  # Returns nothing.
+  end: ->
+    @running = false
+    @pool.forEach (conn) ->
+      conn.end()
+    riak = this
+
+# A single Riak socket connection.
+class Riak.Connection
+  constructor: (pool) ->
+    @conn = net.createConnection pool.options.port, pool.options.host
+    @pool = pool
+
+    riak = this
+    @conn.on 'data', (chunk) ->
+      if data = riak.receive chunk
+        riak.callback data if riak.callback
+        if pool.running then riak.reset() else riak.end()
+
+    @reset()
+
+  # Sends a given message to Riak.
+  #
+  #   conn.send("SetClientIdReq", clientId: 'abc') (data) ->
+  #     sys.puts sys.inspect(data)
+  #
+  # name - String Riak message type, without the Rpb prefix. (ex: 'PingReq')
+  # data - Object data to be serialized.
+  #
+  # Returns anonymous function that takes a single callback.
+  send: (name, data) ->
+    riak    = this
+    payload = @prepare name, data
+    (callback) ->
+      riak.callback = callback
+      riak.conn.write payload
+
+  # Public: Releases this Riak.Connection back to the pool.
+  #
+  # Returns nothing.
+  finish: ->
+    @pool.finish this
+
+  # Public: Disconnects from Riak.
+  #
+  # Returns nothing.
+  end: ->
+    @conn.end()
+
+  # Public: Attaches an event listener to the socket connection.
+  #
+  # event    - String event name.
+  # listener - Function that is called when the event is emitted.
+  #
+  # Returns this Riak.Connection instance.
+  on: (event, listener) ->
+    @conn.on event, listener
+    this
+
+  # Converts the outgoing data into an appropriate Riak message.
+  #
+  # name - String Riak message type, without the Rpb prefix. (ex: 'PingReq')
+  # data - Object data to be serialized.
+  #
+  # Returns a Buffer that is ready to be sent to Riak.
+  prepare: (name, data) ->
+    type = ProtoBuf[name]
+    if data
+      buf = type.serialize(data)
+      len = buf.length + 1
+    else
+      len = 1
+    msg    = new Buffer(len + 4)
+    msg[0] = len >>>  24
+    msg[1] = len >>>  16
+    msg[2] = len >>>   8
+    msg[3] = len &   255
+    msg[4] = type.riak_code
+    if buf
+      buf.copy msg, 5, 0
+    msg
+
+  # Parses the received data from Riak.
+  #
+  # chunk    - A Buffer sent from Riak.
+  # starting - The starting point in the buffer to read from.
+  #
+  # Returns the deserialized Object if the full response has been read, or 
+  # null.
+  receive: (chunk, starting) ->
+    # is a response buffer created?  if so, read for data
+    if @receiving
+      chunk_len  = chunk.length
+      starting ||= 0 # starting point on the chunk to read
+      chunk.copy @resp, @read, starting, chunk_len
+      @read     += chunk_len - starting
+
+      # are we there yet?
+      @type.parse @resp if @read == @length
+
+    else
+      @length = (chunk[0] << 24) + 
+                (chunk[1] << 16) +
+                (chunk[2] <<  8) +
+                 chunk[3]  -  1
+      @type = ProtoBuf.type chunk[4]
+      @resp = new Buffer(@length)
+      @receive chunk, 5
+
+  # Resets the state of this Riak.Connection for the next request.
+  #
+  # Returns nothing.
+  reset: ->
+    @type   = null
+    @resp   = null
+    @read   = 0
+    @length = 0
+
+Riak.Connection.prototype.__defineGetter__ 'receiving', ->
+  @resp
+
+Riak.Connection.prototype.__defineGetter__ 'writable',  ->
+  @conn.writable
 
 ProtoBuf = 
   types: ["ErrorResp", "PingReq", "PingResp", "GetClientIdReq", 
@@ -27,8 +200,13 @@ ProtoBuf.types.forEach (name) ->
     if @[cached_name]
       @[cached_name]
     else
+      code = ProtoBuf.types.indexOf(name)
       if sch = ProtoBuf.schema["Rpb#name"]
-        sch.riak_code  = ProtoBuf.types.indexOf(name)
+        sch.riak_code  = code
         @[cached_name] = sch
       else
-        @[cached_name] = {}
+        @[cached_name] = 
+          riak_code: code
+          parse: -> true
+
+module.exports = Riak.Pool
