@@ -24,9 +24,11 @@ ProtoBuf.types.forEach (name) ->
   cached_name = "_#name"
 
   ProtoBuf.__defineGetter__ name, ->
-    if this[cached_name]
-      this[cached_name]
+    if @[cached_name]
+      @[cached_name]
     else
-      sch  = ProtoBuf.schema["Rpb#name"]
-      sch.riak_code     = ProtoBuf.types.indexOf(name)
-      this[cached_name] = sch
+      if sch = ProtoBuf.schema["Rpb#name"]
+        sch.riak_code  = ProtoBuf.types.indexOf(name)
+        @[cached_name] = sch
+      else
+        @[cached_name] = {}
