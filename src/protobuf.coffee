@@ -14,7 +14,6 @@ class Riak.Pool
     @options.max       ||= 10
     @running             = 0
     @pool                = []
-    @active              = {}
     @events              = new events.EventEmitter()
 
   # Public: Returns a Riak.Connection instance from the pool.
@@ -28,14 +27,10 @@ class Riak.Pool
 
     @next (conn) =>
       if conn.writable
-        @active[conn.client_id] = conn
         callback conn if callback
       else
         conn.on 'connect', =>
-          conn.send('GetClientIdReq') (data) =>
-            conn.clientId          = data.clientId
-            @active[conn.clientId] = data.clientId
-            callback conn if callback
+          callback conn if callback
 
     true
 
@@ -49,8 +44,6 @@ class Riak.Pool
     if @running?
       @running -= 1
       @events.emit 'finish'
-      pos  = @active[conn.client_id]
-      delete @active[pos]
       @pool.push conn if @pool.length < @options.max
     else
       conn.end()
