@@ -7,13 +7,13 @@ Riak     = {}
 # Keeps a pool of Riak socket connections.
 class Riak.Pool
   constructor: (options) ->
-    @running = true
-    @pool    = []
-    @active  = {}
-    @options = options || {}
-    @options.port ||= 8087
-    @options.host ||= '127.0.0.1'
-    @options.max  ||= 10
+    @options = options ||  {}
+    @options.port      ||= 8087
+    @options.host      ||= '127.0.0.1'
+    @options.max       ||= 10
+    @running             = true
+    @pool                = []
+    @active              = {}
 
   # Public: Returns a Riak.Connection instance from the pool.
   #
@@ -26,7 +26,7 @@ class Riak.Pool
     conn = @pool.pop() || new Riak.Connection(this)
     if conn.writable
       @active[conn.client_id] = conn
-      callback conn if conn
+      callback conn if callback
     else
       riak = this
       conn.on 'connect', ->
