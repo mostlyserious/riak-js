@@ -1,6 +1,7 @@
 sys      = require 'sys'
 net      = require 'net'
 fs       = require 'fs'
+events   = require 'events'
 Buffer   = require('buffer').Buffer
 Riak     = {}
 
@@ -14,6 +15,7 @@ class Riak.Pool
     @running             = 0
     @pool                = []
     @active              = {}
+    @events              = new events.EventEmitter()
 
   # Public: Returns a Riak.Connection instance from the pool.
   #
@@ -44,9 +46,11 @@ class Riak.Pool
   #
   # Returns nothing.
   finish: (conn) ->
-    pos  = @active[conn.client_id]
-    delete @active[pos]
     if @running?
+      @running -= 1
+      @events.emit 'finish'
+      pos  = @active[conn.client_id]
+      delete @active[pos]
       @pool.push conn if @pool.length < @options.max
     else
       conn.end()
@@ -59,10 +63,27 @@ class Riak.Pool
     @pool.forEach (conn) ->
       conn.end()
 
+  # Fetches a Riak.Connection from the pool and calls the given callback with
+  # it.
+  #
+  # callback - Function that is called with a Riak.Connection.
+  #
+  # Returns nothing.
   next: (callback) ->
-    callback @getConnection()
+    if @running >= @options.max
+      @events.on 'finish', (cb = =>
+        if @running < @options.max
+          callback @getConnection()
+          @events.removeListener 'finish', cb
+      )
+    else
+      callback @getConnection()
 
+  # Pops a fresh Riak.Connection from the pool.
+  #
+  # Returns a Riak.Connection instance.
   getConnection: ->
+    @running += 1
     @pool.pop() || new Riak.Connection(this)
 
 # A single Riak socket connection.
