@@ -16,7 +16,9 @@ class Riak.Pool
     @pool                = []
     @events              = new events.EventEmitter()
 
-  # Public: Returns a Riak.Connection instance from the pool.
+  # Public: Returns a Riak.Connection instance from the pool.  Socket 
+  # connections should be used for synchronous options.  If you want to run
+  # things in parallel, use Riak.Pool#send instead.
   #
   # callback - Optional Function callback is called with the Riak.Connection
   #            instance when it is ready to send connections.
@@ -25,7 +27,7 @@ class Riak.Pool
   start: (callback) ->
     return false if !@running?
 
-    @next (conn) =>
+    @next (conn) ->
       if conn.writable
         callback conn if callback
       else
@@ -33,6 +35,30 @@ class Riak.Pool
           callback conn if callback
 
     true
+
+  # Public: Shortcut for getting a connection from the pool, sending a message,
+  # and releasing it back to the pool.  These two operations are the same:
+  #
+  #   pool.start (conn) ->
+  #     conn.send('PingReq') (data) ->
+  #       sys.puts data
+  #       conn.finish()
+  #
+  #   pool.send('PingReq') (data) ->
+  #     sys.puts data
+  #
+  # name - String Riak message type, without the Rpb prefix. (ex: 'PingReq')
+  # data - Object data to be serialized.
+  #
+  # Returns anonymous function that takes a single callback.
+  send: (name, data) ->
+    (callback) =>
+      @start (conn) ->
+        conn.send(name, data) (resp) ->
+          try
+            callback resp
+          finally
+            conn.finish()
 
   # Public: Returns the Riak.Connection back to the Pool.  If the Pool is
   # inactive, disconnect the Riak.Connection.
