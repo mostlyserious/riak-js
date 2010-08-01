@@ -20,21 +20,22 @@ class Riak.Pool
   # callback - Optional Function callback is called with the Riak.Connection
   #            instance when it is ready to send connections.
   #
-  # Returns a Riak.Connection instance if the Pool is active, or null.
+  # Returns a true if the Pool is active, or false if it isn't.
   start: (callback) ->
-    return null if !@running
-    conn = @pool.pop() || new Riak.Connection(this)
-    if conn.writable
-      @active[conn.client_id] = conn
-      callback conn if callback
-    else
-      riak = this
-      conn.on 'connect', ->
-        conn.send('GetClientIdReq') (data) ->
-          conn.clientId              = data.clientId
-          riak.active[conn.clientId] = data.clientId
-          callback conn if callback
-    conn
+    return false if !@running
+
+    @next (conn) =>
+      if conn.writable
+        @active[conn.client_id] = conn
+        callback conn if callback
+      else
+        conn.on 'connect', =>
+          conn.send('GetClientIdReq') (data) =>
+            conn.clientId              = data.clientId
+            @active[conn.clientId] = data.clientId
+            callback conn if callback
+
+    true
 
   # Public: Returns the Riak.Connection back to the Pool.  If the Pool is
   # inactive, disconnect the Riak.Connection.
@@ -57,7 +58,12 @@ class Riak.Pool
     @running = false
     @pool.forEach (conn) ->
       conn.end()
-    riak = this
+
+  next: (callback) ->
+    callback @getConnection()
+
+  getConnection: ->
+    @pool.pop() || new Riak.Connection(this)
 
 # A single Riak socket connection.
 class Riak.Connection
@@ -65,11 +71,10 @@ class Riak.Connection
     @conn = net.createConnection pool.options.port, pool.options.host
     @pool = pool
 
-    riak = this
-    @conn.on 'data', (chunk) ->
-      if data = riak.receive chunk
-        riak.callback data if riak.callback
-        if pool.running then riak.reset() else riak.end()
+    @conn.on 'data', (chunk) =>
+      if data = @receive chunk
+        @callback data if @callback
+        if pool.running then @reset() else @end()
 
     @reset()
 
@@ -83,11 +88,10 @@ class Riak.Connection
   #
   # Returns anonymous function that takes a single callback.
   send: (name, data) ->
-    riak    = this
     payload = @prepare name, data
-    (callback) ->
-      riak.callback = callback
-      riak.conn.write payload
+    (callback) =>
+      @callback = callback
+      @conn.write payload
 
   # Public: Releases this Riak.Connection back to the pool.
   #
