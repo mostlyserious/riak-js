@@ -11,7 +11,7 @@ class Riak.Pool
     @options.port      ||= 8087
     @options.host      ||= '127.0.0.1'
     @options.max       ||= 10
-    @running             = true
+    @running             = 0
     @pool                = []
     @active              = {}
 
@@ -22,7 +22,7 @@ class Riak.Pool
   #
   # Returns a true if the Pool is active, or false if it isn't.
   start: (callback) ->
-    return false if !@running
+    return false if !@running?
 
     @next (conn) =>
       if conn.writable
@@ -31,7 +31,7 @@ class Riak.Pool
       else
         conn.on 'connect', =>
           conn.send('GetClientIdReq') (data) =>
-            conn.clientId              = data.clientId
+            conn.clientId          = data.clientId
             @active[conn.clientId] = data.clientId
             callback conn if callback
 
@@ -46,7 +46,7 @@ class Riak.Pool
   finish: (conn) ->
     pos  = @active[conn.client_id]
     delete @active[pos]
-    if @running
+    if @running?
       @pool.push conn if @pool.length < @options.max
     else
       conn.end()
@@ -55,7 +55,7 @@ class Riak.Pool
   #
   # Returns nothing.
   end: ->
-    @running = false
+    @running = null
     @pool.forEach (conn) ->
       conn.end()
 
@@ -74,7 +74,7 @@ class Riak.Connection
     @conn.on 'data', (chunk) =>
       if data = @receive chunk
         @callback data if @callback
-        if pool.running then @reset() else @end()
+        if pool.running? then @reset() else @end()
 
     @reset()
 
