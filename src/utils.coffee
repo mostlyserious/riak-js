@@ -9,7 +9,7 @@ module.exports =
     
   toQuery: (query, riak) ->
     # use boolean strings since riak expects those
-    for k in query
+    for k of query
       if typeof query[k] is 'boolean'
         query[k] = String(query[k])
     riak.stringifyQuery(query)
@@ -21,20 +21,22 @@ module.exports =
     
     phase.map (p) ->
       temp = {}
-      temp[type] = switch typeof p
-        when 'function' then {source: p.toString(), arg: args}
-        when 'string' then {name: p, arg: args}
-        when 'object' then p
-      temp
-    
+      if p
+        temp[type] = switch typeof p
+          when 'function' then {source: p.toString(), arg: args}
+          when 'string' then {name: p, arg: args}
+          when 'object' then p
+        temp
+   
   stringToLinks: (links) ->
     result = []
     if links
       links.split(',').forEach (link) ->
         r = link.trim().match(/^<\/(.*)\/(.*)\/(.*)>;\sriaktag="(.*)"$/)
-        result.push({bucket: decodeURIComponent(r[2]), key: decodeURIComponent(r[3]), tag: decodeURIComponent(r[4])}) if r
+        for i of r then r[i] = decodeURIComponent(r[i])
+        result.push {bucket: r[2], key: r[3], tag: r[4]} if r
     result
-    
+        
   mixin: `function() {
       // copy reference to target object
       var target = arguments[0] || {}, i = 1, length = arguments.length, deep = false, source;
