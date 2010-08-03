@@ -10,8 +10,7 @@ module.exports =
   toQuery: (query, riak) ->
     # use boolean strings since riak expects those
     for k of query
-      if typeof query[k] is 'boolean'
-        query[k] = String(query[k])
+      query[k] = String(query[k]) if typeof query[k] is 'boolean'
     riak.stringifyQuery(query)
         
   ensure: (obj) -> obj or {}
@@ -33,7 +32,7 @@ module.exports =
     if links
       links.split(',').forEach (link) ->
         r = link.trim().match(/^<\/(.*)\/(.*)\/(.*)>;\sriaktag="(.*)"$/)
-        for i of r then r[i] = decodeURIComponent(r[i])
+        for i of r then r[i] = decodeURIComponent(r[i]) if r
         result.push {bucket: r[2], key: r[3], tag: r[4]} if r
     result
         
