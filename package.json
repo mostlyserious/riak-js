@@ -1,6 +1,6 @@
 {
    "name": "riak-js",
-   "version": "0.2.2e",
+   "version": "0.2.2f",
    "description": "Riak Javascript client (node + jquery)",
    "keywords": [
        "riak",
