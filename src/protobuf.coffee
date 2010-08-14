@@ -2,6 +2,7 @@ sys      = require 'sys'
 net      = require 'net'
 fs       = require 'fs'
 events   = require 'events'
+path     = require 'path'
 Buffer   = require('buffer').Buffer
 
 # Keeps a pool of Riak socket connections.
@@ -231,9 +232,12 @@ ProtoBuf =
   type: (num) ->
     @[@types[num]]
 
+  schemaFile: path.join path.dirname(module.filename), 'riak.desc'
+
 # lazily load protobuf schema
 ProtoBuf.__defineGetter__ 'schema', ->
-  @_schema ||= new (require('protobuf_for_node').Schema)(fs.readFileSync('./riak.desc'))
+  @_schema ||= new (require('protobuf_for_node').Schema)(
+    fs.readFileSync(ProtoBuf.schemaFile))
 
 # lazily load protobuf types
 ProtoBuf.types.forEach (name) ->
