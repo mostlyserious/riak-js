@@ -3,10 +3,9 @@ net      = require 'net'
 fs       = require 'fs'
 events   = require 'events'
 Buffer   = require('buffer').Buffer
-Riak     = {}
 
 # Keeps a pool of Riak socket connections.
-class Riak.Pool
+class Pool
   constructor: (options) ->
     @options = options ||  {}
     @options.port      ||= 8087
@@ -16,11 +15,11 @@ class Riak.Pool
     @pool                = []
     @events              = new events.EventEmitter()
 
-  # Public: Returns a Riak.Connection instance from the pool.  Socket 
+  # Public: Returns a Connection instance from the pool.  Socket 
   # connections should be used for synchronous options.  If you want to run
-  # things in parallel, use Riak.Pool#send instead.
+  # things in parallel, use Pool#send instead.
   #
-  # callback - Optional Function callback is called with the Riak.Connection
+  # callback - Optional Function callback is called with the Connection
   #            instance when it is ready to send connections.
   #
   # Returns a true if the Pool is active, or false if it isn't.
@@ -60,10 +59,10 @@ class Riak.Pool
           finally
             conn.finish()
 
-  # Public: Returns the Riak.Connection back to the Pool.  If the Pool is
-  # inactive, disconnect the Riak.Connection.
+  # Public: Returns the Connection back to the Pool.  If the Pool is
+  # inactive, disconnect the Connection.
   #
-  # conn - Riak.Connection instance.
+  # conn - Connection instance.
   #
   # Returns nothing.
   finish: (conn) ->
@@ -74,7 +73,7 @@ class Riak.Pool
     else
       conn.end()
 
-  # Public: Disconnects all Riak.Connection instances in the Pool.
+  # Public: Disconnects all Connection instances in the Pool.
   #
   # Returns nothing.
   end: ->
@@ -82,10 +81,10 @@ class Riak.Pool
     @pool.forEach (conn) ->
       conn.end()
 
-  # Fetches a Riak.Connection from the pool and calls the given callback with
+  # Fetches a Connection from the pool and calls the given callback with
   # it.
   #
-  # callback - Function that is called with a Riak.Connection.
+  # callback - Function that is called with a Connection.
   #
   # Returns nothing.
   next: (callback) ->
@@ -98,15 +97,15 @@ class Riak.Pool
     else
       callback @getConnection()
 
-  # Pops a fresh Riak.Connection from the pool.
+  # Pops a fresh Connection from the pool.
   #
-  # Returns a Riak.Connection instance.
+  # Returns a Connection instance.
   getConnection: ->
     @running += 1
-    @pool.pop() || new Riak.Connection(this)
+    @pool.pop() || new Connection(this)
 
 # A single Riak socket connection.
-class Riak.Connection
+class Connection
   constructor: (pool) ->
     @conn = net.createConnection pool.options.port, pool.options.host
     @pool = pool
@@ -133,7 +132,7 @@ class Riak.Connection
       @callback = callback
       @conn.write payload
 
-  # Public: Releases this Riak.Connection back to the pool.
+  # Public: Releases this Connection back to the pool.
   #
   # Returns nothing.
   finish: ->
@@ -150,7 +149,7 @@ class Riak.Connection
   # event    - String event name.
   # listener - Function that is called when the event is emitted.
   #
-  # Returns this Riak.Connection instance.
+  # Returns this Connection instance.
   on: (event, listener) ->
     @conn.on event, listener
     this
@@ -205,7 +204,7 @@ class Riak.Connection
       @resp = new Buffer(@length)
       @receive chunk, 5
 
-  # Resets the state of this Riak.Connection for the next request.
+  # Resets the state of this Connection for the next request.
   #
   # Returns nothing.
   reset: ->
@@ -214,10 +213,10 @@ class Riak.Connection
     @read   = 0
     @length = 0
 
-Riak.Connection.prototype.__defineGetter__ 'receiving', ->
+Connection.prototype.__defineGetter__ 'receiving', ->
   @resp
 
-Riak.Connection.prototype.__defineGetter__ 'writable',  ->
+Connection.prototype.__defineGetter__ 'writable',  ->
   @conn.writable
 
 ProtoBuf = 
@@ -253,4 +252,4 @@ ProtoBuf.types.forEach (name) ->
           riak_code: code
           parse: -> true
 
-module.exports = Riak.Pool
+module.exports = Pool
