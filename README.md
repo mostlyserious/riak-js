@@ -38,3 +38,7 @@ In my mind, there are three main types of tests in riak-js.  The simplest kind i
 The second type is the high level integration tests for both client libs.  These make sure that common operations between the HTTP and PBC clients behave identically.  I've started on this in `test/protobuf_client_test.coffee`, but I want to move the common tests to a central spot.  
 
 The third type is a set of client-specific tests.  There are a few methods on the PBC API that aren't really in the HTTP API.  I still want to support them, even if there isn't any support in the HTTP API.
+
+I had a few issues with the default bitcask backend.  It might've just been a buggy early version of my code, but I switched to the riak ETS backend anyway.  This backend is in-memory, so it's much faster.  If I want to clear out any data, I can just restart riak.  It's really easy to swap out the backend if you want:
+
+https://wiki.basho.com/display/RIAK/Configuration+Files#ConfigurationFiles-storagebackend
