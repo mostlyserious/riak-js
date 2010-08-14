@@ -31,7 +31,7 @@ class Pool
       if conn.writable
         callback conn if callback
       else
-        conn.on 'connect', =>
+        conn.on 'connect', ->
           callback conn if callback
 
     true
@@ -219,6 +219,8 @@ Connection.prototype.__defineGetter__ 'receiving', ->
 
 Connection.prototype.__defineGetter__ 'writable',  ->
   @conn.writable
+
+Pool.Connection = Connection
 
 ProtoBuf = 
   types: ["ErrorResp", "PingReq", "PingResp", "GetClientIdReq", 

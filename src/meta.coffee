@@ -1,4 +1,3 @@
-sys = require 'sys'
 # Stores the meta data for a riak object.
 class Meta
   constructor: (bucket, key, options) ->

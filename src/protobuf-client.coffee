@@ -4,21 +4,21 @@ Meta   = require './meta'
 
 class ProtoBufClient extends Client
   get: (bucket, key, options) ->
-    meta = new Meta bucket, key, options
     (callback) =>
+      meta = new Meta bucket, key, options
       @pool.send("GetReq", meta) (data) =>
         callback @processValueResponse(meta, data), meta
 
   save: (bucket, key, data, options) ->
-    meta = new Meta bucket, key, options
-    meta.content = 
-      value:           meta.encode data
-      contentType:     meta.contentType
-      charset:         meta.charset
-      contentEncoding: meta.contentEncoding
-      # links
-      # usermeta
     (callback) =>
+      meta = new Meta bucket, key, options
+      meta.content = 
+        value:           meta.encode data
+        contentType:     meta.contentType
+        charset:         meta.charset
+        contentEncoding: meta.contentEncoding
+        # links
+        # usermeta
       @pool.send("PutReq", meta) (data) =>
         callback @processValueResponse(meta, data), meta
 
