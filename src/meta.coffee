@@ -1,3 +1,4 @@
+sys = require 'sys'
 # Stores the meta data for a riak object.
 class Meta
   constructor: (bucket, key, options) ->
@@ -7,6 +8,12 @@ class Meta
     Meta.riakProperties.forEach (key) =>
       this[key] = @popKey(key) || 
         Meta.riakPropertyDefaults[key]
+
+  decode: (value) ->
+    if dec = Meta.decoders[@contentType]
+      dec value
+    else
+      value
 
   # Fills in a full content type based on a few defaults
   guessType: (type) ->
@@ -34,6 +41,10 @@ Meta.riakProperties = ['contentType', 'vclock', 'lastMod', 'lastModUsecs',
 Meta.riakPropertyDefaults =
   links:        []
   contentType: 'json'
+
+Meta.decoders =
+  "application/json": (s) ->
+    JSON.parse s
 
 Meta.prototype.__defineGetter__ 'contentType', () ->
   @_type
