@@ -12,7 +12,7 @@ class Meta
   guessType: (type) ->
     switch type
       when 'json'               then 'application/json'
-      when 'xml', 'plain'       then "text/" + type
+      when 'xml', 'plain'       then "text/"  + type
       when 'jpeg', 'gif', 'png' then "image/" + type
       when 'binary'             then 'application/octet-stream'
       else                           type
@@ -26,18 +26,19 @@ class Meta
 
 # Any set properties that aren't in this array are assumed to be custom 
 # headers for a riak value.
-Meta.riakProperties = ['type', 'vclock', 'etag', 'lastModified', 'interface',
-  'vtag', 'charset', 'contentEncoding', 'statusCode', 'links']
+Meta.riakProperties = ['content_type', 'vclock', 'last_mod', 'last_mod_usecs',
+  'vtag', 'charset', 'contentEncoding', 'statusCode', 'links', 'client_id',
+  'etag', 'r', 'w', 'dw', 'return_body', 'rw']
 
 # Defaults for Meta properties.
 Meta.riakPropertyDefaults =
-  links: []
-  type:  'json'
+  links:        []
+  content_type: 'json'
 
-Meta.prototype.__defineGetter__ 'type', () ->
+Meta.prototype.__defineGetter__ 'content_type', () ->
   @_type
 
-Meta.prototype.__defineSetter__ 'type', (type) ->
+Meta.prototype.__defineSetter__ 'content_type', (type) ->
   @_type = @guessType(type || 'json')
   if @_type.match(/octet/) || @_type.match(/^image/)
     @binary = true
