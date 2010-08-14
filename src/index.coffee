@@ -11,6 +11,12 @@
 exports.__defineGetter__ 'ProtoBufClient', ->
   @_pbcClient ||= require './protobuf-client'
 
+exports.defaultAPI = 'http'
+
+exports.getClient = (options) ->
+  options.api ||= exports.defaultAPI
+  exports[options.api] options
+
 # Gets a new client instance using the HTTP REST api.
 exports.http = (options) ->
 

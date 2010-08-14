@@ -35,7 +35,6 @@ LOAD 'protobuf', RIAKJS_CLIENT_TEST_DATA, ->
       assert.ok meta.vclock?
       end()
 
-  # looks like the save() call and keys() call are killing each other
   test (db, end) ->
     db.keys('riakjs_airports') (keys) ->
       calls += 1
