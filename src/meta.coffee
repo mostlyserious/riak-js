@@ -27,8 +27,8 @@ class Meta
 # Any set properties that aren't in this array are assumed to be custom 
 # headers for a riak value.
 Meta.riakProperties = ['content_type', 'vclock', 'last_mod', 'last_mod_usecs',
-  'vtag', 'charset', 'contentEncoding', 'statusCode', 'links', 'client_id',
-  'etag', 'r', 'w', 'dw', 'return_body', 'rw']
+  'vtag', 'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
+  'r', 'w', 'dw', 'return_body', 'rw']
 
 # Defaults for Meta properties.
 Meta.riakPropertyDefaults =
