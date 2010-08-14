@@ -17,7 +17,7 @@ assert.equal 'bucket',    full.bucket
 assert.equal 'full',      full.key
 assert.equal 123,         full.vclock
 assert.equal 'image/png', full.contentType
-assert.equal 'abc',       full.options.custom
+assert.equal 'abc',       full.usermeta.custom
 assert.equal true,        full.binary
 
 full.contentType = 'xml'

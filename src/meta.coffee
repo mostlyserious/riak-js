@@ -5,20 +5,39 @@ class Meta
     @key    = key
     @load     options
 
+  # Parses a Riak value into a Javascript object.  Set custom decoders on 
+  # Meta.decoders:
+  #
+  #   # parse all JSON data
+  #   Meta.decoders['application/json'] = (string) ->
+  #     JSON.parse string
+  #
+  #   meta.decode("{\"a\":1}") # => {a: 1}
   decode: (value) ->
     if dec = Meta.decoders[@contentType]
       dec value
     else
       value
 
+  # Encodes a Javascript object into a Riak value.  Set custom encoders on 
+  # Meta.encoders:
+  #
+  #   # Convert JSON data
+  #   Meta.encoders['application/json'] = (value) ->
+  #     JSON.stringify value
+  #
+  #   meta.encode({a: 1}) # => "{\"a\":1}"
   encode: (value) ->
     if dec = Meta.encoders[@contentType]
       dec value
     else
       value.toString()
 
+  # Loads the given options into this Meta object.  Any Riak properties are set
+  # on the object directly. Anything custom is assumed to be custom Riak 
+  # userdata, and will live on meta.usermeta.
   load: (options) ->
-    @options = options || {}
+    @usermeta = options || {}
     Meta.riakProperties.forEach (key) =>
       value = @popKey(key) || 
         Meta.riakPropertyDefaults[key]
@@ -39,8 +58,8 @@ class Meta
   # Pull the value at the given key from the given object, and then removes
   # it from the object.
   popKey: (key) ->
-    value = @options[key]
-    delete  @options[key]
+    value = @usermeta[key]
+    delete  @usermeta[key]
     value
 
 # Any set properties that aren't in this array are assumed to be custom 
