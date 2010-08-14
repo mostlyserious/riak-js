@@ -7,6 +7,11 @@ class ProtoBufClient extends Client
       @pool.send('PingReq') (data) ->
         callback data
 
+  serverInfo: ->
+    (callback) =>
+      @pool.send('GetServerInfoReq') (data) ->
+        callback data
+
   end: ->
     @pool.end()
 
