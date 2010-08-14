@@ -14,6 +14,15 @@ test (db, end) ->
     assert.ok data.serverVersion.match(/\d+\.\d+/)
     end()
 
+# Doing crappy sys.puts debugging until enough of the api is fleshed out
+# to actually insert fixture data and do some actual tests :)
+test (db, end) ->
+  db.get('airlines', 'KLM') (flight, meta) ->
+    calls += 1
+    sys.puts sys.inspect(flight)
+    sys.puts sys.inspect(meta)
+    end()
+
 test (db, end) ->
   db.buckets() (buckets) ->
     calls += 1
@@ -27,4 +36,4 @@ test (db, end) ->
     end()
 
 process.on 'exit', ->
-  assert.equal 4, calls
+  assert.equal 5, calls

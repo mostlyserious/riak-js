@@ -1,7 +1,24 @@
 Client = require './client'
 Pool   = require './protobuf'
-sys = require 'sys'
+Meta   = require './meta'
+
 class ProtoBufClient extends Client
+  get: (bucket, key, options) ->
+    options      ||= {}
+    options.bucket = bucket
+    options.key    = key
+    (callback) =>
+      @pool.send("GetReq", options) (data) ->
+        content = data.content[0]
+        if content? and data.vclock?
+          value = content.value
+          delete  content.value
+          meta = new Meta bucket, key, content
+          meta.vclock = data.clock
+          callback meta.decode(value), meta
+        else
+          callback()
+
   buckets: ->
     (callback) =>
       @pool.send('ListBucketsReq') (data) ->
