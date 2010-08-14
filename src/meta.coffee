@@ -26,19 +26,19 @@ class Meta
 
 # Any set properties that aren't in this array are assumed to be custom 
 # headers for a riak value.
-Meta.riakProperties = ['content_type', 'vclock', 'last_mod', 'last_mod_usecs',
+Meta.riakProperties = ['contentType', 'vclock', 'lastMod', 'lastModUsecs',
   'vtag', 'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
-  'r', 'w', 'dw', 'return_body', 'rw']
+  'r', 'w', 'dw', 'returnBody', 'rw']
 
 # Defaults for Meta properties.
 Meta.riakPropertyDefaults =
   links:        []
-  content_type: 'json'
+  contentType: 'json'
 
-Meta.prototype.__defineGetter__ 'content_type', () ->
+Meta.prototype.__defineGetter__ 'contentType', () ->
   @_type
 
-Meta.prototype.__defineSetter__ 'content_type', (type) ->
+Meta.prototype.__defineSetter__ 'contentType', (type) ->
   @_type = @guessType(type || 'json')
   if @_type.match(/octet/) || @_type.match(/^image/)
     @binary = true
