@@ -36,10 +36,22 @@ LOAD 'protobuf', RIAKJS_CLIENT_TEST_DATA, ->
       end()
 
   test (db, end) ->
+    db.get('riakjs_flights', 'IBE_4418') (flight) ->
+      assert.equal 'JFK', flight.from
+
+      db.remove('riakjs_flights', 'IBE_4418') (data) ->
+        assert.ok data
+
+        db.get('riakjs_flights', 'IBE_4418') (flight) ->
+          assert.equal undefined, flight
+          calls += 1
+          end()
+
+  test (db, end) ->
     db.keys('riakjs_airports') (keys) ->
       calls += 1
       assert.equal 'AMS', keys.sort()[0]
       end()
 
 process.on 'exit', ->
-  assert.equal 5, calls
+  assert.equal 6, calls

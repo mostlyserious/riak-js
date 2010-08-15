@@ -15,6 +15,8 @@ class Meta extends CoreMeta
     this
 
 class ProtoBufClient extends Client
+  ## CORE Riak-JS methods
+
   get: (bucket, key, options) ->
     (callback) =>
       meta = new Meta bucket, key, options
@@ -27,6 +29,13 @@ class ProtoBufClient extends Client
       @pool.send("PutReq", meta.withContent(body)) (data) =>
         callback @processValueResponse(meta, data), meta
 
+  remove: (bucket, key, options) ->
+    (callback) =>
+      meta = new Meta bucket, key, options
+      @pool.send("DelReq", meta) (data) ->
+        callback data
+
+  
   buckets: ->
     (callback) =>
       @pool.send('ListBucketsReq') (data) ->
@@ -41,6 +50,11 @@ class ProtoBufClient extends Client
         if data.done
           callback allKeys
 
+  end: ->
+    @pool.end()
+
+  ## PBC Specific Riak-JS methods.
+
   ping: ->
     (callback) =>
       @pool.send('PingReq') (data) ->
@@ -51,6 +65,8 @@ class ProtoBufClient extends Client
       @pool.send('GetServerInfoReq') (data) ->
         callback data
 
+  ## PRIVATE
+
   processValueResponse: (meta, data) ->
     delete meta.content
     if data.content? and data.content[0]? and data.vclock?
@@ -59,9 +75,6 @@ class ProtoBufClient extends Client
       meta.load     data.content[0]
       meta.vclock = data.vclock
       meta.decode   value
-
-  end: ->
-    @pool.end()
 
 ProtoBufClient.prototype.__defineGetter__ 'pool', ->
   @_pool ||= new Pool(@options)

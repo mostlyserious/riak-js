@@ -82,13 +82,15 @@ global.RIAKJS_CLIENT_TEST_DATA =
     IBE: [{name: 'Iberia',                fleet: 183, alliance: 'One World', european: true}]
     CPA: [{name: 'Cathay Pacific',        fleet: 127, alliance: 'One World', european: false}]
     KLM:
-      [{name: 'KLM', fleet: 111, alliance: 'SkyTeam', european: true}
-      {links:
-        [
-          {bucket: "riakjs_client_test_flights", key: 'KLM-8098', tag: 'flight'}
-          {bucket: "riakjs_client_test_flights", key: 'KLM-1196', tag: 'flight'}
-        ]
-      }]
+      [
+        {name: 'KLM', fleet: 111, alliance: 'SkyTeam', european: true}
+        {links:
+          [
+            {bucket: "riakjs_client_test_flights", key: 'KLM-8098', tag: 'flight'}
+            {bucket: "riakjs_client_test_flights", key: 'KLM-1196', tag: 'flight'}
+          ]
+        }
+      ]
 
   riakjs_flights:
     KLM_8098: [{code: 'KLM-8098', to: 'JFK', from: 'AMS', departure: 'Mon, 05 Jul 2010 17:05:00 GMT'}]
@@ -102,4 +104,5 @@ global.RIAKJS_CLIENT_TEST_DATA =
     KLM_1196: [{code: 'KLM-1196', to: 'AMS', from: 'CDG', departure: 'Fri, 20 Aug 2010 14:59:00 GMT'}]
     CPA_729:  [{code: 'CPA-729',  to: 'CDG', from: 'HKK', departure: 'Thu, 19 Aug 2010 07:30:00 GMT'}]
     ARG_909:  [{code: 'ARG-909',  to: 'AMS', from: 'EZE', departure: 'Tue, 24 Aug 2010 15:25:00 GMT'}]
+    # EXPENDABLE
     IBE_4418: [{code: 'IBE-4418', to: 'BCN', from: 'JFK', departure: 'Sat, 24 Jul 2010 12:00:00 GMT'}]
