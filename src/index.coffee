@@ -22,4 +22,4 @@ exports.http = (options) ->
 
 # Gets a new client instance using the protocol buffer api.
 exports.protobuf = (options) ->
-  new exports.ProtoBufClient(options)
+  new exports.ProtoBufClient options

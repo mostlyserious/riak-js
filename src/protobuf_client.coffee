@@ -1,6 +1,18 @@
-Client = require './client'
-Pool   = require './protobuf'
-Meta   = require './meta'
+Client   = require './client'
+Pool     = require './protobuf'
+CoreMeta = require './meta'
+
+class Meta extends CoreMeta
+  # Adds a RpbContent structure, see RpbPutReq for usage.
+  withContent: (body) ->
+    @content = 
+      value:           @encode body
+      contentType:     @contentType
+      charset:         @charset
+      contentEncoding: @contentEncoding
+      # links
+      # usermeta
+    this
 
 class ProtoBufClient extends Client
   get: (bucket, key, options) ->
@@ -9,17 +21,10 @@ class ProtoBufClient extends Client
       @pool.send("GetReq", meta) (data) =>
         callback @processValueResponse(meta, data), meta
 
-  save: (bucket, key, data, options) ->
+  save: (bucket, key, body, options) ->
     (callback) =>
       meta = new Meta bucket, key, options
-      meta.content = 
-        value:           meta.encode data
-        contentType:     meta.contentType
-        charset:         meta.charset
-        contentEncoding: meta.contentEncoding
-        # links
-        # usermeta
-      @pool.send("PutReq", meta) (data) =>
+      @pool.send("PutReq", meta.withContent(body)) (data) =>
         callback @processValueResponse(meta, data), meta
 
   buckets: ->
@@ -47,6 +52,7 @@ class ProtoBufClient extends Client
         callback data
 
   processValueResponse: (meta, data) ->
+    delete meta.content
     if data.content? and data.content[0]? and data.vclock?
       value       = data.content[0].value
       delete        data.content[0].value
@@ -60,4 +66,5 @@ class ProtoBufClient extends Client
 ProtoBufClient.prototype.__defineGetter__ 'pool', ->
   @_pool ||= new Pool(@options)
 
-module.exports = ProtoBufClient
+ProtoBufClient.Meta = Meta
+module.exports      = ProtoBufClient
