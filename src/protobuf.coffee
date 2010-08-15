@@ -110,17 +110,7 @@ class Connection
   constructor: (pool) ->
     @conn = net.createConnection pool.options.port, pool.options.host
     @pool = pool
-
-    @conn.on 'data', (chunk) =>
-      if data = @receive chunk
-        if data.errmsg? and data.errcode?
-          code = data.errcode
-          data = new Error data.errmsg
-          data.errcode = code
-
-        @callback data if @callback
-        if pool.running? then @reset() else @end()
-
+    @conn.on 'data', (chunk) => @receive chunk
     @reset()
 
   # Sends a given message to Riak.
@@ -133,10 +123,9 @@ class Connection
   #
   # Returns anonymous function that takes a single callback.
   send: (name, data) ->
-    payload = @prepare name, data
     (callback) =>
       @callback = callback
-      @conn.write payload
+      @conn.write @prepare(name, data)
 
   # Public: Releases this Connection back to the pool.
   #
@@ -183,41 +172,74 @@ class Connection
       buf.copy msg, 5, 0
     msg
 
-  # Parses the received data from Riak.
+  # Parses the received chunk for one or more messages.  If there is no data
+  # from a Riak response left to read from the chunk, release this connection
+  # to the pool.
   #
-  # chunk    - A Buffer sent from Riak.
-  # starting - The starting point in the buffer to read from.
+  # Returns nothing.
+  receive: (chunk) ->
+    @chunk = chunk
+    if @attempt_parse()
+      if @pool.running? then @reset() else @end()
+
+  # Attempts to parse the received data from Riak.  If a response is returned
+  # from parse(), pass it to the callback and then check if there is more 
+  # data in the current chunk.
+  #
+  # Returns true if the chunk has been parsed and no data is expected, or 
+  # null if there is more data to be read.
+  attempt_parse: ->
+    if data = @parse()
+      if data.errmsg? and data.errcode?
+        code = data.errcode
+        data = new Error data.errmsg
+        data.errcode = code
+      @callback data if @callback
+
+      # if there's more to be read, keep reading
+      if @chunk_pos < @chunk.length
+        @resp = null
+        @attempt_parse()
+      else
+        true
+
+  # Parses the received data from Riak.
   #
   # Returns the deserialized Object if the full response has been read, or 
   # null.
-  receive: (chunk, starting) ->
+  parse: ->
     # is a response buffer created?  if so, read for data
     if @receiving
-      chunk_len  = chunk.length
-      starting ||= 0 # starting point on the chunk to read
-      chunk.copy @resp, @read, starting, chunk_len
-      @read     += chunk_len - starting
+      ending      = @resp_len + @chunk_pos
+      ending      = @chunk.length if ending > @chunk.length
+      bytes_read  = ending - @chunk_pos
+      @chunk.copy @resp, @resp_pos, @chunk_pos, ending
+      @resp_pos  += bytes_read
+      @chunk_pos += bytes_read
 
       # are we there yet?
-      @type.parse @resp if @read == @length
-
+      @type.parse @resp if @resp_pos == @resp_len
     else
-      @length = (chunk[0] << 24) + 
-                (chunk[1] << 16) +
-                (chunk[2] <<  8) +
-                 chunk[3]  -  1
-      @type = ProtoBuf.type chunk[4]
-      @resp = new Buffer(@length)
-      @receive chunk, 5
+      @resp_len = (@chunk[@chunk_pos + 0] << 24) + 
+                  (@chunk[@chunk_pos + 1] << 16) +
+                  (@chunk[@chunk_pos + 2] <<  8) +
+                   @chunk[@chunk_pos + 3]  -  1
+      @type       = ProtoBuf.type @chunk[@chunk_pos + 4]
+      @resp       = new Buffer(@resp_len)
+      @resp_pos   = 0
+      @chunk_pos += 5
+      @parse()
 
   # Resets the state of this Connection for the next request.
   #
   # Returns nothing.
   reset: ->
-    @type   = null
-    @resp   = null
-    @read   = 0
-    @length = 0
+    @type      = null
+    @resp      = null
+    @chunk     = null
+    @chunk_pos = 0 # byte position of the chunk buffer
+    @resp_pos  = 0 # byte position of the response buffer
+    @resp_len  = 0 # expected response length
 
 Connection.prototype.__defineGetter__ 'receiving', ->
   @resp
