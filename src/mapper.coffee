@@ -49,8 +49,8 @@ class Mapper
   # @api public
   #
   run: (inputs, options) ->
-    @riak.execute '', @job(inputs, options)
-  
+    @riak.runJob @job(inputs, options)
+
   #
   # @api private
   #

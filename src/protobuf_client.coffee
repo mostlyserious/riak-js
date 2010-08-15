@@ -1,6 +1,7 @@
 Client   = require './client'
 Pool     = require './protobuf'
 CoreMeta = require './meta'
+Mapper   = require './mapper'
 
 class Meta extends CoreMeta
   # Adds a RpbContent structure, see RpbPutReq for usage.
@@ -35,6 +36,15 @@ class ProtoBufClient extends Client
       @pool.send("DelReq", meta) (data) ->
         callback data
 
+  map: (phase, args) ->
+    new Mapper this, 'map', phase, args
+  
+  reduce: (phase, args) ->
+    new Mapper this, 'reduce', phase, args
+  
+  link: (phase) ->
+    new Mapper this, 'link', phase
+
   ping: ->
     (callback) =>
       @pool.send('PingReq') (data) ->
@@ -65,6 +75,17 @@ class ProtoBufClient extends Client
         callback data
 
   ## PRIVATE
+
+  runJob: (job) ->
+    (callback) =>
+      body = request: JSON.stringify(job.data), contentType: 'application/json'
+      resp = phases: []
+      @pool.send("MapRedReq", body) (data) ->
+        if data.phase
+          resp.phases.push data.phase
+          resp[data.phase] = JSON.parse data.response
+        if data.done
+          callback resp
 
   processValueResponse: (meta, data) ->
     delete meta.content
