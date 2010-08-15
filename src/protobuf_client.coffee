@@ -35,7 +35,16 @@ class ProtoBufClient extends Client
       @pool.send("DelReq", meta) (data) ->
         callback data
 
-  
+  ping: ->
+    (callback) =>
+      @pool.send('PingReq') (data) ->
+        callback data
+
+  end: ->
+    @pool.end()
+
+  ## PBC Specific Riak-JS methods.
+
   buckets: ->
     (callback) =>
       @pool.send('ListBucketsReq') (data) ->
@@ -49,16 +58,6 @@ class ProtoBufClient extends Client
           data.keys.forEach (key) -> allKeys.push(key)
         if data.done
           callback allKeys
-
-  end: ->
-    @pool.end()
-
-  ## PBC Specific Riak-JS methods.
-
-  ping: ->
-    (callback) =>
-      @pool.send('PingReq') (data) ->
-        callback data
 
   serverInfo: ->
     (callback) =>
