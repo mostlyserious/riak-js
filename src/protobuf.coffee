@@ -113,6 +113,11 @@ class Connection
 
     @conn.on 'data', (chunk) =>
       if data = @receive chunk
+        if data.errmsg? and data.errcode?
+          code = data.errcode
+          data = new Error data.errmsg
+          data.errcode = code
+
         @callback data if @callback
         if pool.running? then @reset() else @end()
 
