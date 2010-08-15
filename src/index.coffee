@@ -9,7 +9,7 @@
 # db = riak.protobuf({host: '...'})
 #
 exports.__defineGetter__ 'ProtoBufClient', ->
-  @_pbcClient ||= require './protobuf-client'
+  @_pbcClient ||= require './protobuf_client'
 
 exports.defaultAPI = 'http'
 
