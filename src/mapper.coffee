@@ -8,7 +8,7 @@ utils = require './utils'
 #
 class Mapper
   constructor: (@riak, type, phase, args) ->
-    @phases =   []
+    @phases = []
     @makePhases type, phase, args if type? and phase?
 
   #

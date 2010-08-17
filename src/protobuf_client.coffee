@@ -64,6 +64,8 @@ class ProtoBufClient extends Client
     (callback) =>
       allKeys = []
       @pool.send('ListKeysReq', bucket: bucket) (data) ->
+        if data.errcode
+          callback data
         if data.keys
           data.keys.forEach (key) -> allKeys.push(key)
         if data.done
@@ -81,6 +83,8 @@ class ProtoBufClient extends Client
       body = request: JSON.stringify(job.data), contentType: 'application/json'
       resp = phases: []
       @pool.send("MapRedReq", body) (data) ->
+        if data.errcode
+          callback data
         if data.phase
           resp.phases.push data.phase
           resp[data.phase] = JSON.parse data.response

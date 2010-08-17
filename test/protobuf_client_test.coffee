@@ -49,6 +49,18 @@ LOAD 'protobuf', RIAKJS_CLIENT_TEST_DATA, ->
 
   test (db, end) ->
     db.
+      map(
+        (value) ->
+          this.should.raise.something
+      ).
+      run('riakjs_airlines') (response) ->
+        calls += 1
+        assert.ok response.message?
+        assert.ok response.errcode?
+        end()
+
+  test (db, end) ->
+    db.
       map('Riak.mapValuesJson').
       reduce(
         (values) ->
@@ -69,4 +81,4 @@ LOAD 'protobuf', RIAKJS_CLIENT_TEST_DATA, ->
       end()
   
 process.on 'exit', ->
-  assert.equal 7, calls
+  assert.equal 8, calls
