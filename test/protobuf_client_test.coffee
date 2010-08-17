@@ -61,7 +61,7 @@ LOAD 'protobuf', RIAKJS_CLIENT_TEST_DATA, ->
 
   test (db, end) ->
     db.
-      map('Riak.mapValuesJson').
+      map(name: 'Riak.mapValuesJson', keep: true).
       reduce(
         (values) ->
           values.reduce (acc, value) ->
@@ -70,7 +70,9 @@ LOAD 'protobuf', RIAKJS_CLIENT_TEST_DATA, ->
       ).
       run('riakjs_airlines') (response) ->
         calls += 1
-        assert.equal 1029, response[1]
+        assert.deepEqual [0, 1], response.phases.sort()
+        assert.equal      7,     response[0].length
+        assert.equal      1029,  response[1]
         end()
 
   test (db, end) ->
@@ -79,6 +81,44 @@ LOAD 'protobuf', RIAKJS_CLIENT_TEST_DATA, ->
       assert.equal 8,     keys.length
       assert.equal 'AMS', keys.sort()[0]
       end()
-  
+
+
+test (db, end) ->
+  # test RpbListKeysResp error
+  keys = []
+  db.processKeysResponse {errcode: 1}, keys, (d) ->
+    assert.equal 1, d.errcode
+    calls += 1
+
+  # test multiple RpbListKeysResp messages
+  db.processKeysResponse {keys: [1]}, keys, (d) ->
+    calls += 1 # should never be called!
+    assert.fail true
+
+  db.processKeysResponse {keys: [2], done: true}, keys, (d) ->
+    calls += 1
+    assert.deepEqual [1,2], keys
+
+  # test RpbMapRedResp error
+  resp = phases: []
+  db.processMapReduceResponse {errcode: 1}, resp, (d) ->
+    assert.equal 1, d.errcode
+    calls += 1
+
+  # test multiple RpbMapRedResp messages
+  db.processMapReduceResponse {phase: 0, response: "[1]"}, resp, (d) ->
+    calls += 1 # should never be called!
+    assert.fail true
+  db.processMapReduceResponse {phase: 1, response: "[1]"}, resp, (d) ->
+    calls += 1 # should never be called!
+    assert.fail true
+  db.processMapReduceResponse {phase: 0, response: "[2]", done: true}, resp, (d) ->
+    calls += 1
+    assert.deepEqual [0, 1], resp.phases
+    assert.deepEqual [1, 2], resp[0]
+    assert.deepEqual [1],    resp[1]
+
+  end()
+
 process.on 'exit', ->
-  assert.equal 8, calls
+  assert.equal 12, calls

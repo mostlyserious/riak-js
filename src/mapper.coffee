@@ -72,9 +72,10 @@ class Mapper
         temp[type] = switch typeof p
           when 'function' then {source: p.toString(), arg: args}
           when 'string'   then {name: p, arg: args}
-          when 'object'   then p
+          when 'object'
+            p.source = p.source.toString() if p.source?
+            p
         temp[type].language ||= Mapper.defaults.language
-        temp
         @phases.push temp
     this
 

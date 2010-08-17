@@ -62,14 +62,9 @@ class ProtoBufClient extends Client
 
   keys: (bucket) ->
     (callback) =>
-      allKeys = []
-      @pool.send('ListKeysReq', bucket: bucket) (data) ->
-        if data.errcode
-          callback data
-        if data.keys
-          data.keys.forEach (key) -> allKeys.push(key)
-        if data.done
-          callback allKeys
+      keys = []
+      @pool.send('ListKeysReq', bucket: bucket) (data) =>
+        @processKeysResponse data, keys, callback
 
   serverInfo: ->
     (callback) =>
@@ -82,14 +77,30 @@ class ProtoBufClient extends Client
     (callback) =>
       body = request: JSON.stringify(job.data), contentType: 'application/json'
       resp = phases: []
-      @pool.send("MapRedReq", body) (data) ->
-        if data.errcode
-          callback data
-        if data.phase
-          resp.phases.push data.phase
-          resp[data.phase] = JSON.parse data.response
-        if data.done
-          callback resp
+      @pool.send("MapRedReq", body) (data) =>
+        @processMapReduceResponse data, resp, callback
+
+  processKeysResponse: (data, keys, callback) ->
+    if data.errcode
+      callback data
+    if data.keys
+      data.keys.forEach (key) -> keys.push(key)
+    if data.done
+      callback keys
+
+  processMapReduceResponse: (data, resp, callback) ->
+    if data.errcode
+      callback data
+    if data.phase?
+      resp.phases.push data.phase if resp.phases.indexOf(data.phase) == -1
+      parsed = JSON.parse data.response
+      if resp[data.phase]? # if it exists, assume it's an array and APPEND
+        parsed.forEach (item) ->
+          resp[data.phase].push item
+      else
+        resp[data.phase] = parsed
+    if data.done
+      callback resp
 
   processValueResponse: (meta, data) ->
     delete meta.content
