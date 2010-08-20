@@ -265,8 +265,7 @@ ProtoBuf =
 
 # lazily load protobuf schema
 ProtoBuf.__defineGetter__ 'schema', ->
-  @_schema ||= new (require('protobuf_for_node').Schema)(
-    fs.readFileSync(ProtoBuf.schemaFile))
+  @_schema ||= new (require('protobuf_for_node').Schema)(fs.readFileSync(ProtoBuf.schemaFile))
 
 # lazily load protobuf types
 ProtoBuf.types.forEach (name) ->
