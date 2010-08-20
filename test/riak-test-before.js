@@ -1,6 +1,5 @@
 var assert = require('assert'),
-  Riak = require('../lib/riak-node'),
-  db = new Riak({debug: false}),
+  db = require('../lib').getClient({api: 'http', debug: false}),
   bucket = 'riak-js-test-bucket'
   
   sys = require('sys')
@@ -65,27 +64,27 @@ module.exports = {
       })
     },
     
-    'it should assert links work': function() {
-      db.save(bucket, 'link-test', '', { returnbody: true, links:
-        [{ bucket: bucket, key: 'KLM-8098', tag: 'flight' },
-        { bucket: bucket, key: 'KLM-1196', tag: 'flight' }],
-        headers: { link: '</riak/list/3>; riaktag="next"' }
-      })(
-        function(response, meta) {
-          assert.equal(meta.links.length, 3)
-          meta.removeLink({bucket: bucket, key: 'KLM-8098'})
-          assert.equal(meta.links.length, 2)
-          meta.links = [{bucket: bucket, key: 'KLM-6024'}, {bucket: bucket, key: 'KLM-1012'}]
-          db.save(bucket, 'link-test', '', { links: meta.links, returnbody: true })(
-            function(response, meta) {
-              assert.equal(meta.links.length, 4)
-              assert.ok(meta.links.every(function(n) { return n.bucket !== bucket || n.key !== 'KLM-8098' }))
-            }
-          )
-        }
-      )
-      
-    },
+    // 'it should assert links work': function() {
+    //   db.save(bucket, 'link-test', '', { returnbody: true, links:
+    //     [{ bucket: bucket, key: 'KLM-8098', tag: 'flight' },
+    //     { bucket: bucket, key: 'KLM-1196', tag: 'flight' }],
+    //     headers: { link: '</riak/list/3>; riaktag="next"' }
+    //   })(
+    //     function(response, meta) {
+    //       assert.equal(meta.links.length, 3)
+    //       meta.removeLink({bucket: bucket, key: 'KLM-8098'})
+    //       assert.equal(meta.links.length, 2)
+    //       meta.links = [{bucket: bucket, key: 'KLM-6024'}, {bucket: bucket, key: 'KLM-1012'}]
+    //       db.save(bucket, 'link-test', '', { links: meta.links, returnbody: true })(
+    //         function(response, meta) {
+    //           assert.equal(meta.links.length, 4)
+    //           assert.ok(meta.links.every(function(n) { return n.bucket !== bucket || n.key !== 'KLM-8098' }))
+    //         }
+    //       )
+    //     }
+    //   )
+    //   
+    // },
     
     'it should test content types': function() {
       db.save(bucket, 'content', "this is pure text", { type: 'text' })(
