@@ -1,84 +1,0 @@
-
-š
-
-
-riak.proto"/
-RpbErrorResp
-errmsg (
-errcode ("'
-RpbGetClientIdResp
-	client_id ("&
-RpbSetClientIdReq
-	client_id ("<
-RpbGetServerInfoResp
-node (
-server_version ("3
-	RpbGetReq
-bucket (
-key (	
-r (":
-
-RpbGetResp
-content (2.RpbContent
-vclock ("‚
-	RpbPutReq
-bucket (
-key (
-vclock (
-content (2.RpbContent	
-w (
-
-dw (
-return_body (":
-
-RpbPutResp
-content (2.RpbContent
-vclock ("4
-	RpbDelReq
-bucket (
-key (
-
-rw ("%
-RpbListBucketsResp
-buckets (" 
-RpbListKeysReq
-bucket ("-
-RpbListKeysResp
-keys (
-done ("!
-RpbGetBucketReq
-bucket ("2
-RpbGetBucketResp
-props (2.RpbBucketProps"A
-RpbSetBucketReq
-bucket (
-props (2.RpbBucketProps"5
-RpbMapRedReq
-request (
-content_type (">
-RpbMapRedResp
-phase (
-response (
-done ("É
-
-RpbContent
-value (
-content_type (
-charset (
-content_encoding (
-vtag (
-links (2.RpbLink
-last_mod (
-last_mod_usecs (
-usermeta	 (2.RpbPair"%
-RpbPair
-key (
-value ("3
-RpbLink
-bucket (
-key (
-tag ("3
-RpbBucketProps
-n_val (
-
-allow_mult (
