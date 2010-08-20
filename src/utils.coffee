@@ -12,8 +12,6 @@ module.exports =
     for k of query
       query[k] = String(query[k]) if typeof query[k] is 'boolean'
     riak.stringifyQuery(query)
-        
-  ensure: (obj) -> obj or {}
   
   makePhases: (type, phase, args) ->
     phase = [phase] if not this.isArray phase
