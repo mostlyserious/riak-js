@@ -37,7 +37,7 @@ global.LOAD ||= (api, items, callback) ->
   total    = queue.length
   inserted = 0
 
-  db_instance 'protobuf', callback, (db, end) ->
+  db_instance api, callback, (db, end) ->
     popQueue queue, db, end
 
 # db_instance 'protobuf', (db, end) ->
