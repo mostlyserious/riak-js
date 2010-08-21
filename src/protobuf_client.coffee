@@ -21,20 +21,19 @@ class ProtoBufClient extends Client
   get: (bucket, key, options) ->
     (callback) =>
       meta = new Meta bucket, key, options
-      @pool.send("GetReq", meta) (data) =>
+      @send("GetReq", meta) (data) =>
         callback @processValueResponse(meta, data), meta
 
   save: (bucket, key, body, options) ->
     (callback) =>
       meta = new Meta bucket, key, options
-      @pool.send("PutReq", meta.withContent(body)) (data) =>
+      @send("PutReq", meta.withContent(body)) (data) =>
         callback @processValueResponse(meta, data), meta
 
   remove: (bucket, key, options) ->
     (callback) =>
       meta = new Meta bucket, key, options
-      @pool.send("DelReq", meta) (data) ->
-        callback data
+      @send("DelReq", meta) callback
 
   map: (phase, args) ->
     new Mapper this, 'map', phase, args
@@ -47,29 +46,27 @@ class ProtoBufClient extends Client
 
   ping: ->
     (callback) =>
-      @pool.send('PingReq') (data) ->
-        callback data
+      @send('PingReq') callback
 
   end: ->
-    @pool.end()
+    @connection.end() if @connection
 
   ## PBC Specific Riak-JS methods.
 
   buckets: ->
     (callback) =>
-      @pool.send('ListBucketsReq') (data) ->
+      @send('ListBucketsReq') (data) ->
         callback data.buckets
 
   keys: (bucket) ->
     (callback) =>
       keys = []
-      @pool.send('ListKeysReq', bucket: bucket) (data) =>
+      @send('ListKeysReq', bucket: bucket) (data) =>
         @processKeysResponse data, keys, callback
 
   serverInfo: ->
     (callback) =>
-      @pool.send('GetServerInfoReq') (data) ->
-        callback data
+      @send('GetServerInfoReq') callback
 
   ## PRIVATE
 
@@ -77,8 +74,17 @@ class ProtoBufClient extends Client
     (callback) =>
       body = request: JSON.stringify(job.data), contentType: 'application/json'
       resp = phases: []
-      @pool.send("MapRedReq", body) (data) =>
+      @send("MapRedReq", body) (data) =>
         @processMapReduceResponse data, resp, callback
+
+  send: (name, data) ->
+    if @connection? && @connection.writable
+      @connection.send(name, data)
+    else
+      (callback) =>
+        @pool.start (conn) =>
+          @connection = conn
+          @connection.send(name, data)(callback)
 
   processKeysResponse: (data, keys, callback) ->
     if data.errcode
@@ -110,9 +116,6 @@ class ProtoBufClient extends Client
       meta.load     data.content[0]
       meta.vclock = data.vclock
       meta.decode   value
-
-ProtoBufClient.prototype.__defineGetter__ 'pool', ->
-  @_pool ||= new Pool(@options)
 
 ProtoBufClient.Meta = Meta
 module.exports      = ProtoBufClient

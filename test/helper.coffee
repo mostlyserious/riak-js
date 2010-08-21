@@ -35,7 +35,7 @@ db_instance = (api, callbacks...) ->
   callback     = callbacks.pop() # called with db instance
   end_callback = callbacks.pop() # called when ending
 
-  db = riak[api] max: 1
+  db = riak[api]()
   callback db, ->
     end_callback() if end_callback
     db.end()
@@ -63,3 +63,6 @@ module.exports = (api) ->
     db_instance api, callback
   test.api = api
   test
+
+process.on 'uncaughtException', (err) ->
+  sys.puts err.stack

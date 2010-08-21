@@ -44,30 +44,29 @@ global.RIAKJS_CLIENT_TEST_DATA =
     IBE_4418: [{code: 'IBE-4418', to: 'BCN', from: 'JFK', departure: 'Sat, 24 Jul 2010 12:00:00 GMT'}]
 
 module.exports = (test) ->
-  calls = 0
+  calls = 
+    ping:     null
+    buckets:  null
+    get:      null
+    del:      null
+    mapError: null
+    map:      null
+    keys:     null
   process.on 'exit', ->
-    assert.equal 7, calls, "#{calls} out of 7 core Riak tests for #{test.api}"
+    for all key, title of calls
+      title ||= "db.#{key}()"
+      sys.puts "#{title} had problems."
 
   LOAD test.api, RIAKJS_CLIENT_TEST_DATA, ->
     test (db, end) ->
       db.ping() (data) ->
-        calls += 1
+        delete calls.ping
         assert.equal true, data
         end()
 
     test (db, end) ->
-      db.buckets() (buckets) ->
-        calls += 1
-        assert.deepEqual [
-            'riakjs_airlines'
-            'riakjs_airports'
-            'riakjs_flights'
-          ], buckets.sort()
-        end()
-
-    test (db, end) ->
       db.get('riakjs_airlines', 'KLM') (air, meta) ->
-        calls += 1
+        delete calls.get
         assert.equal 'riakjs_airlines',  meta.bucket
         assert.equal 'KLM',              meta.key
         assert.equal 'application/json', meta.contentType
@@ -84,7 +83,7 @@ module.exports = (test) ->
 
           db.get('riakjs_flights', 'IBE_4418') (flight) ->
             assert.equal undefined, flight
-            calls += 1
+            delete calls.del
             end()
 
     test (db, end) ->
@@ -94,7 +93,7 @@ module.exports = (test) ->
             this.should.raise.something
         ).
         run('riakjs_airlines') (response) ->
-          calls += 1
+          delete calls.mapError
           assert.ok response.message?
           assert.ok response.errcode?
           end()
@@ -109,15 +108,25 @@ module.exports = (test) ->
             , 0
         ).
         run('riakjs_airlines') (response) ->
-          calls += 1
+          delete calls.map
           assert.deepEqual [0, 1], response.phases.sort()
           assert.equal      7,     response[0].length
           assert.equal      1029,  response[1]
           end()
 
     test (db, end) ->
+      db.buckets() (buckets) ->
+        delete calls.buckets
+        assert.deepEqual [
+            'riakjs_airlines'
+            'riakjs_airports'
+            'riakjs_flights'
+          ], buckets.sort()
+        end()
+
+    test (db, end) ->
       db.keys('riakjs_airports') (keys) ->
-        calls += 1
+        delete calls.keys
         assert.equal 8,     keys.length
         assert.equal 'AMS', keys.sort()[0]
         end()

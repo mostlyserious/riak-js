@@ -4,9 +4,9 @@ calls = 0
 test (db, end) ->
   db.serverInfo() (data) ->
     calls += 1
+    end()
     assert.equal 'riak@127.0.0.1', data.node
     assert.ok data.serverVersion.match(/\d+\.\d+/)
-    end()
 
 test (db, end) ->
   # test RpbListKeysResp error
@@ -48,4 +48,4 @@ test (db, end) ->
 require('./core_riak_tests') test
 
 process.on 'exit', ->
-  assert.equal calls, 5, "#calls out of 5 protobuf-specific client tests"
+  assert.equal calls, 5, "#{calls} out of 5 protobuf-specific client tests"
