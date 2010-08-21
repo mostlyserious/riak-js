@@ -1,5 +1,5 @@
 assert = require 'assert'
-Meta   = require('../src/meta')
+Meta   = require('../lib/meta')
 
 empty = new Meta 'bucket', 'empty'
 assert.equal 'bucket',           empty.bucket

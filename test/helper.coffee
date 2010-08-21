@@ -1,7 +1,7 @@
 # evil globals for tests only.  beware, kids
 global.sys    ||= require 'sys'
 global.assert ||= require 'assert'
-global.riak   ||= require '../src/index'
+global.riak   ||= require '../lib/index'
 
 # tiny test helper that returns a unique riak db instance.  Calling this
 # multiple times should let you run tests concurrently.

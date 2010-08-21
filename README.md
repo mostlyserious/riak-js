@@ -12,6 +12,12 @@
 
 [http://riakjs.org](http://riakjs.org)
 
+### Development
+
+Run this in the main directory to compile coffeescript to javascript as you go:
+
+    coffee -wc -o lib --no-wrap src/**/*.coffee
+
 ### Refactoring
 
 There are two main objects in Riak-JS: Client and Meta.  Clients are instantiated the same way as before:
