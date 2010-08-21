@@ -15,16 +15,28 @@ global.RIAKJS_CLIENT_TEST_DATA =
     AMX: [{name: 'Aeroméxico',            fleet: 43,  alliance: 'SkyTeam', european: false}]
     ARG: [{name: 'Aerolíneas Argentinas', fleet: 40,  european: false}]
     DLH: [{name: 'Lufthansa',             fleet: 262, alliance: 'Star Alliance', european: true}]
-    IBE: [{name: 'Iberia',                fleet: 183, alliance: 'One World', european: true}]
-    CPA: [{name: 'Cathay Pacific',        fleet: 127, alliance: 'One World', european: false}]
+    IBE: 
+      [
+        {name: 'Iberia', fleet: 183, alliance: 'One World', european: true}
+        {abc: 1, def: 2}
+      ]
+    CPA: 
+      [
+        {name: 'Cathay Pacific', fleet: 127, alliance: 'One World', european: false}
+        {
+          links: {bucket: "riakjs_client_test_flights", key: "CPA-729", tag: "flight"}
+        }
+      ]
     KLM:
       [
         {name: 'KLM', fleet: 111, alliance: 'SkyTeam', european: true}
-        {links:
-          [
-            {bucket: "riakjs_client_test_flights", key: 'KLM-8098', tag: 'flight'}
-            {bucket: "riakjs_client_test_flights", key: 'KLM-1196', tag: 'flight'}
-          ]
+        {
+          links:
+            [
+              {bucket: "riakjs_client_test_flights", key: 'KLM-8098', tag: 'flight'}
+              {bucket: "riakjs_client_test_flights", key: 'KLM-1196', tag: 'flight'}
+            ]
+          abc: 1
         }
       ]
 
@@ -45,13 +57,15 @@ global.RIAKJS_CLIENT_TEST_DATA =
 
 module.exports = (test) ->
   calls = 
-    ping:     null
-    buckets:  null
-    get:      null
-    del:      null
-    mapError: null
-    map:      null
-    keys:     null
+    ping:         null
+    buckets:      null
+    get:          null
+    get_usermeta: null
+    get_links:    null
+    del:          null
+    mapError:     null
+    map:          null
+    keys:         null
   process.on 'exit', ->
     for all key, title of calls
       title ||= "db.#{key}()"
@@ -60,19 +74,42 @@ module.exports = (test) ->
   LOAD test.api, RIAKJS_CLIENT_TEST_DATA, ->
     test (db, end) ->
       db.ping() (data) ->
-        delete calls.ping
-        assert.equal true, data
         end()
+        assert.equal true, data
+        delete calls.ping
 
     test (db, end) ->
       db.get('riakjs_airlines', 'KLM') (air, meta) ->
-        delete calls.get
+        end()
         assert.equal 'riakjs_airlines',  meta.bucket
         assert.equal 'KLM',              meta.key
         assert.equal 'application/json', meta.contentType
+        assert.equal 1,                  meta.usermeta.abc
         assert.equal 111,                air.fleet
         assert.ok meta.vclock?
+        delete calls.get
+
+    test (db, end) ->
+      db.get('riakjs_airlines', 'IBE') (air, meta) ->
         end()
+        assert.equal 'riakjs_airlines',  meta.bucket
+        assert.equal 'IBE',              meta.key
+        assert.equal 'application/json', meta.contentType
+        assert.equal 1,                  meta.usermeta.abc
+        assert.equal 2,                  meta.usermeta.def
+        assert.equal 183,                air.fleet
+        assert.ok meta.vclock?
+        delete calls.get_usermeta
+
+    test (db, end) ->
+      db.get('riakjs_airlines', 'CPA') (air, meta) ->
+        end()
+        assert.equal 'riakjs_airlines',  meta.bucket
+        assert.equal 'CPA',              meta.key
+        assert.equal 'application/json', meta.contentType
+        assert.equal 127,                air.fleet
+        assert.ok meta.vclock?
+        delete calls.get_links
 
     test (db, end) ->
       db.get('riakjs_flights', 'IBE_4418') (flight) ->
@@ -82,9 +119,9 @@ module.exports = (test) ->
           assert.ok data
 
           db.get('riakjs_flights', 'IBE_4418') (flight) ->
+            end()
             assert.equal undefined, flight
             delete calls.del
-            end()
 
     test (db, end) ->
       db.
@@ -93,10 +130,10 @@ module.exports = (test) ->
             this.should.raise.something
         ).
         run('riakjs_airlines') (response) ->
-          delete calls.mapError
+          end()
           assert.ok response.message?
           assert.ok response.errcode?
-          end()
+          delete calls.mapError
 
     test (db, end) ->
       db.
@@ -108,25 +145,25 @@ module.exports = (test) ->
             , 0
         ).
         run('riakjs_airlines') (response) ->
-          delete calls.map
+          end()
           assert.deepEqual [0, 1], response.phases.sort()
           assert.equal      7,     response[0].length
           assert.equal      1029,  response[1]
-          end()
+          delete calls.map
 
     test (db, end) ->
       db.buckets() (buckets) ->
-        delete calls.buckets
+        end()
         assert.deepEqual [
             'riakjs_airlines'
             'riakjs_airports'
             'riakjs_flights'
           ], buckets.sort()
-        end()
+        delete calls.buckets
 
     test (db, end) ->
       db.keys('riakjs_airports') (keys) ->
-        delete calls.keys
+        end()
         assert.equal 8,     keys.length
         assert.equal 'AMS', keys.sort()[0]
-        end()
+        delete calls.keys

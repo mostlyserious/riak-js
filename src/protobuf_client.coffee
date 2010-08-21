@@ -11,9 +11,18 @@ class Meta extends CoreMeta
       contentType:     @contentType
       charset:         @charset
       contentEncoding: @contentEncoding
+      usermeta:        @parseUsermeta @usermeta
       # links
       # usermeta
+    delete @usermeta
+    delete @links
     this
+
+  parseUsermeta: (data) ->
+    parsed = []
+    for all key, value of data
+      parsed.push key: key, value: value
+    parsed
 
 class ProtoBufClient extends Client
   ## CORE Riak-JS methods
@@ -111,11 +120,19 @@ class ProtoBufClient extends Client
   processValueResponse: (meta, data) ->
     delete meta.content
     if data.content? and data.content[0]? and data.vclock?
-      value       = data.content[0].value
-      delete        data.content[0].value
-      meta.load     data.content[0]
+      [content, value] = @processValue data.content[0]
+      meta.load     content
       meta.vclock = data.vclock
       meta.decode   value
+
+  processValue: (content) ->
+    value = content.value
+    if content.usermeta?.forEach?
+      content.usermeta.forEach (pair) ->
+        content[pair.key] = pair.value
+    delete content.value
+    delete content.usermeta
+    [content, value]
 
 ProtoBufClient.Meta = Meta
 module.exports      = ProtoBufClient
