@@ -2,6 +2,7 @@ Client   = require './client'
 Pool     = require './protobuf'
 CoreMeta = require './meta'
 Mapper   = require './mapper'
+utils    = require './utils'
 
 class Meta extends CoreMeta
   # Adds a RpbContent structure, see RpbPutReq for usage.
@@ -11,14 +12,23 @@ class Meta extends CoreMeta
       contentType:     @contentType
       charset:         @charset
       contentEncoding: @contentEncoding
-      usermeta:        @parseUsermeta @usermeta
+      links:           @encodeLinks   @links
+      usermeta:        @encodeUsermeta @usermeta
       # links
       # usermeta
     delete @usermeta
     delete @links
     this
 
-  parseUsermeta: (data) ->
+  encodeLinks: (links) ->
+    parsed = []
+    if links && !utils.isArray(links)
+      links = [links]
+    links.forEach (link) ->
+      parsed.push link
+    parsed
+
+  encodeUsermeta: (data) ->
     parsed = []
     for all key, value of data
       parsed.push key: key, value: value

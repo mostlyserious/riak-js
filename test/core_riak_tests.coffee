@@ -81,11 +81,18 @@ module.exports = (test) ->
     test (db, end) ->
       db.get('riakjs_airlines', 'KLM') (air, meta) ->
         end()
-        assert.equal 'riakjs_airlines',  meta.bucket
-        assert.equal 'KLM',              meta.key
-        assert.equal 'application/json', meta.contentType
-        assert.equal 1,                  meta.usermeta.abc
-        assert.equal 111,                air.fleet
+        assert.equal 'riakjs_airlines',            meta.bucket
+        assert.equal 'KLM',                        meta.key
+        assert.equal 'application/json',           meta.contentType
+        assert.equal 1,                            meta.usermeta.abc
+        assert.equal 2,                            meta.links.length
+        assert.equal 'riakjs_client_test_flights', meta.links[0].bucket
+        assert.equal 'riakjs_client_test_flights', meta.links[1].bucket
+        assert.equal 'KLM-8098',                   meta.links[0].key
+        assert.equal 'KLM-1196',                   meta.links[1].key
+        assert.equal 'flight',                     meta.links[0].tag
+        assert.equal 'flight',                     meta.links[1].tag
+        assert.equal 111,                          air.fleet
         assert.ok meta.vclock?
         delete calls.get
 
@@ -104,10 +111,14 @@ module.exports = (test) ->
     test (db, end) ->
       db.get('riakjs_airlines', 'CPA') (air, meta) ->
         end()
-        assert.equal 'riakjs_airlines',  meta.bucket
-        assert.equal 'CPA',              meta.key
-        assert.equal 'application/json', meta.contentType
-        assert.equal 127,                air.fleet
+        assert.equal 'riakjs_airlines',            meta.bucket
+        assert.equal 'CPA',                        meta.key
+        assert.equal 'application/json',           meta.contentType
+        assert.equal 1,                            meta.links.length
+        assert.equal 'riakjs_client_test_flights', meta.links[0].bucket
+        assert.equal 'CPA-729',                    meta.links[0].key
+        assert.equal 'flight',                     meta.links[0].tag
+        assert.equal 127,                          air.fleet
         assert.ok meta.vclock?
         delete calls.get_links
 
