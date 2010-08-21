@@ -56,7 +56,7 @@ class Mapper
   #
 
   job: (inputs, options) ->
-    options ||= {}
+    options           ||= {}
     options.interface ||= Mapper.defaults.interface
     options.method    ||= Mapper.defaults.method
     options.data        = 
