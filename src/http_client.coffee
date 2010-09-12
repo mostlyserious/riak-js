@@ -10,7 +10,6 @@ class HttpClient extends Client
       port: 8098
       host: 'localhost'
       clientId: 'riak-js'  # fix default clientId
-      method: 'GET'
       interface: 'riak'
       headers:
         'Host': @options?.host or 'localhost'
@@ -33,14 +32,13 @@ class HttpClient extends Client
   get: (bucket, key, options) ->
     (callback) =>
       meta = new Meta bucket, key, options
-      @execute(meta) (data, meta) =>
+      @execute('GET', meta) (data, meta) =>
         callback data, meta
   
   save: (bucket, key, data, options) ->
     (callback) =>
-      [data, options] = [data or {}, options or {}]
-      if not options.method
-        options.method = if key then 'PUT' else 'POST'
+      data or= {}
+      options or= {}
       
       meta = new Meta bucket, key, options
       meta.content = 
@@ -50,15 +48,14 @@ class HttpClient extends Client
         contentEncoding: meta.contentEncoding
         # links
         # usermeta
-      @execute(meta) (data, meta) =>
+      @execute((if key then 'PUT' else 'POST'), meta) (data, meta) =>
         callback data, meta
   
   remove: (bucket, key, options) ->
     (callback) =>
       options or= {}
-      options.method = 'DELETE'
       meta = new Meta bucket, key, options
-      @execute(meta) (data, meta) =>
+      @execute('DELETE', meta) (data, meta) =>
         callback data, meta
 
   map: (phase, args) ->
@@ -74,7 +71,7 @@ class HttpClient extends Client
     (callback) =>
       options = { interface: 'ping', method: 'head' }
       meta = new Meta '', '', options
-      @execute(meta) (data, meta) =>
+      @execute('GET', meta) (data, meta) =>
         callback meta.statusCode, meta
   
   end: ->
@@ -82,12 +79,13 @@ class HttpClient extends Client
         
   # private
   
-  execute: (meta) ->
+  execute: (verb, meta) ->
     
     (callback) =>
     
       url = Utils.path meta.bucket, meta.key
       options = Utils.mixin true, {}, @defaults, meta.usermeta
+      verb = verb.toUpperCase()
       # p options
       query = null #  var query = utils.toQuery(queryProperties, self);
       path = "/#{options.interface}/#{url}#{if query then '?' + query else ''}"
@@ -110,14 +108,14 @@ class HttpClient extends Client
       
       # include query properties / riakProperties
      
-      @log "#{options.method.toUpperCase()} #{path}"
+      @log "#{verb} #{path}"
      
       ##
       
       if meta?.content?.value
         options.headers.Connection = 'close'
           
-      @pool.request options.method.toUpperCase(), path, options.headers, (request) =>
+      @pool.request verb, path, options.headers, (request) =>
 
         if meta?.content?.value
           request.write meta.content.value, meta.contentEncoding
@@ -127,9 +125,7 @@ class HttpClient extends Client
         request.on 'response', (response) ->
           response.on 'data', (chunk) -> buffer += chunk
           response.on 'end', =>
-            meta = new Meta '', '', response.headers
-            meta.contentType = response.headers['content-type']
-            meta.statusCode = response.statusCode
+            meta = new Meta meta.bucket, meta.key, response.headers, response.statusCode
             buffer = if buffer is not '' then meta.decode(buffer) else buffer
             callback buffer, meta
             
@@ -137,9 +133,11 @@ class HttpClient extends Client
 
 class Meta extends CoreMeta
   
-  constructor: (bucket, key, options) ->
+  constructor: (bucket, key, options, statusCode) ->
     super bucket, key, @convertOptions options
+    @statusCode = statusCode
     
+  # adapt headers so that @load can make them into meta props
   convertOptions: (options) ->
     return {} unless options
     options.contentType = options['content-type']
