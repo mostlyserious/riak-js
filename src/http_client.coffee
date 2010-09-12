@@ -1,5 +1,5 @@
 Client   = require './client'
-Meta     = require './meta'
+CoreMeta     = require './meta'
 Utils    = require './utils'
 HttpPool = require './http_pool'
 p = require('sys').p
@@ -134,5 +134,19 @@ class HttpClient extends Client
             callback buffer, meta
             
         request.end()
+
+class Meta extends CoreMeta
+  
+  constructor: (bucket, key, options) ->
+    super bucket, key, @convertOptions options
+    
+  convertOptions: (options) ->
+    return {} unless options
+    options.contentType = options['content-type']
+    options.vclock = options['x-riak-vclock']
+    options.lastMod = options['last-modified']
+    # build links
+    # and others
+    options
 
 module.exports = HttpClient
