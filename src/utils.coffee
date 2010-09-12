@@ -83,3 +83,15 @@ module.exports =
       // Return the modified object
       return target;
     }`
+    
+    # mixin: (a, b) ->
+    #   if not b then return a
+    #   target = a
+    # 
+    #   for key, value of b
+    #     if typeof value is 'object'
+    #       target = this.mixin (target[key] or= {}), value
+    #     else
+    #       target[key] = value
+    # 
+    #   return a
