@@ -57,8 +57,6 @@ class Mapper
 
   job: (inputs, options) ->
     options           ||= {}
-    options.interface ||= Mapper.defaults.interface
-    options.method    ||= Mapper.defaults.method
     options.data        = 
       inputs: inputs
       query:  @phases
@@ -80,8 +78,6 @@ class Mapper
     this
 
 Mapper.defaults =
-  interface: 'mapred'
-  method:    'POST'
   language:  'javascript'
 
 # exports
