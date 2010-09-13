@@ -1,5 +1,7 @@
 TODO
 
+ * Make callbacks node-standard ... last arg callback, err first arg of the callback: (a, b..., callback) -> callback([c,d] = b)
+ * Add "inputs" step in Map/Reduce building - and just run(callback)
  * Deal with vclocks, exposing and solving conflicts
  * Resilent to crashes, network errors, etc; auto-reconnect to several hosts
  * Provide an accurate clientId, bound to environment? - randomizing it on client init is a bad solution
