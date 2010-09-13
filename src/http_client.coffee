@@ -1,8 +1,9 @@
 Client   = require './client'
 CoreMeta     = require './meta'
+Mapper = require './mapper'
 Utils    = require './utils'
 HttpPool = require './http_pool'
-p = require('sys').p
+querystring = require 'querystring'
 
 class HttpClient extends Client
   constructor: (options) ->
@@ -10,9 +11,7 @@ class HttpClient extends Client
       port: 8098
       host: 'localhost'
       clientId: 'riak-js'  # fix default clientId
-      interface: 'riak'
-      headers:
-        'Host': @options?.host or 'localhost'
+      host: @options?.host or 'localhost'
       debug: true
       callback: (response, meta) =>
           @log response, { json: meta?.contentType is 'application/json'}
@@ -28,6 +27,15 @@ class HttpClient extends Client
     if string
       string = JSON.stringify string if options.json
       console.log string if console and (@defaults.debug or options.debug)
+      
+  keys: (bucket, options) ->
+    (callback) =>
+      options or= {}
+      options.keys = true
+      meta = new Meta bucket, '', options
+      
+      @execute('GET', meta) (data, meta) =>
+        callback data.keys, meta
     
   get: (bucket, key, options) ->
     (callback) =>
@@ -37,18 +45,16 @@ class HttpClient extends Client
   
   save: (bucket, key, data, options) ->
     (callback) =>
+      
       data or= {}
       options or= {}
-      
+
       meta = new Meta bucket, key, options
-      meta.content = 
-        value:           meta.encode data
-        contentType:     meta.contentType
-        charset:         meta.charset
-        contentEncoding: meta.contentEncoding
-        # links
-        # usermeta
-      @execute((if key then 'PUT' else 'POST'), meta) (data, meta) =>
+      meta.data = data
+      
+      # usermeta?
+      verb = if key then 'PUT' else 'POST'
+      @execute(verb, meta) (data, meta) =>
         callback data, meta
   
   remove: (bucket, key, options) ->
@@ -67,12 +73,17 @@ class HttpClient extends Client
   link: (phase) ->
     new Mapper this, 'link', phase
     
+  runJob: (options) ->
+    (callback) =>
+      options.raw = 'mapred'
+      @save('', '', options.data, options)(callback)
+
   ping: ->
     (callback) =>
-      options = { interface: 'ping', method: 'head' }
+      options = { raw: 'ping' }
       meta = new Meta '', '', options
-      @execute('GET', meta) (data, meta) =>
-        callback meta.statusCode, meta
+      @execute('HEAD', meta) (data, meta) =>
+        callback true, meta
   
   end: ->
     @pool.end()
@@ -83,68 +94,103 @@ class HttpClient extends Client
     
     (callback) =>
     
-      url = Utils.path meta.bucket, meta.key
+      url = "/#{meta.raw}/#{meta.bucket}/#{meta.key or ''}"
       options = Utils.mixin true, {}, @defaults, meta.usermeta
       verb = verb.toUpperCase()
-      # p options
-      query = null #  var query = utils.toQuery(queryProperties, self);
-      path = "/#{options.interface}/#{url}#{if query then '?' + query else ''}"
+      queryProps = {}
+      
+      ['r', 'w', 'dw', 'keys', 'props', 'vtag', 'nocache', 'returnbody'].forEach (prop) ->
+        queryProps[prop] = options[prop] unless options[prop] is undefined
+      
+      query = @stringifyQuery queryProps
+      path = "#{url}#{if query then '?' + query else ''}"
       callback = callback or @defaults.callback
-    
-      # set headers
-      options.headers =
-        Host: 'localhost'
-        'content-type': meta.contentType
-        'If-None-Match': options.etag
-        'If-Modified-Since': options.lastModified
-        
-      if options.headers['X-Riak-Vclock']
-        options.headers['X-Riak-ClientId'] = options.clientId
       
-      # handle links, merging those set in the header with those set via the shortcut
-      # if Utils.isArray options.links
-      #   hl = if options.headers.link then ", #{options.headers.link}" else ""
-      #   options.headers.link = new Meta({}, self.defaults.interface).makeLinks(options.links) + hl
+      headers = meta.toHeaders()
       
-      # include query properties / riakProperties
-     
       @log "#{verb} #{path}"
      
       ##
       
-      if meta?.content?.value
-        options.headers.Connection = 'close'
+      if verb isnt 'GET'
+        headers.Connection = 'close'
           
-      @pool.request verb, path, options.headers, (request) =>
+      @pool.request verb, path, headers, (request) =>
 
-        if meta?.content?.value
-          request.write meta.content.value, meta.contentEncoding
+        if meta.data
+          request.write meta.encode(meta.data), meta.contentEncoding
+          delete meta.data
 
         buffer = new String
 
         request.on 'response', (response) ->
           response.on 'data', (chunk) -> buffer += chunk
           response.on 'end', =>
-            meta = new Meta meta.bucket, meta.key, response.headers, response.statusCode
-            buffer = if buffer is not '' then meta.decode(buffer) else buffer
+            # this logic should belong to our custom Meta?
+            meta.load meta.convertOptions(response.headers)
+            meta.statusCode = response.statusCode
+            
+            buffer = meta.decode(buffer) if buffer.length > 0
+            if meta.statusCode is 404 then buffer = undefined # to be sync with pbc
+            
             callback buffer, meta
             
         request.end()
 
-class Meta extends CoreMeta
-  
-  constructor: (bucket, key, options, statusCode) ->
-    super bucket, key, @convertOptions options
-    @statusCode = statusCode
+  # http client utils
+
+  stringifyQuery: (query) ->
+    for key, value of query
+      query[key] = String(value) if typeof value is 'boolean' # stringify booleans
+    querystring.stringify(query)
     
-  # adapt headers so that @load can make them into meta props
+
+class Meta extends CoreMeta
+
+  # to be only used in execute / deserialize
   convertOptions: (options) ->
     return {} unless options
     options.contentType = options['content-type']
     options.vclock = options['x-riak-vclock']
     options.lastMod = options['last-modified']
-    # build links
+    options.links = @stringToLinks options['link']
     # and others
     options
+    
+  toHeaders: () ->
+    # defaults should go somewhere else
+    headers =
+      'Host': @usermeta.host or 'localhost'
+      'content-type': @contentType
+      'If-None-Match': @etag
+      'If-Modified-Since': @lastMod
+      # merge links *already* set in the header (as not to overwrite them)
+      'link': @linksToString()
+      
+    if headers['X-Riak-Vclock'] then headers['X-Riak-ClientId'] = meta.clientId or 'riak-js'
+    
+    return headers
+    
+  ##
+    
+  stringToLinks: (links) ->
+    result = []
+    if links
+      links.split(',').forEach (link) ->
+        captures = link.trim().match /^<\/(.*)\/(.*)\/(.*)>;\sriaktag="(.*)"$/
+        if captures
+          for i of captures then captures[i] = decodeURIComponent(captures[i])
+          result.push new Link({bucket: captures[2], key: captures[3], tag: captures[4]})
+    result
+    
+  linksToString: () ->
+    @links.map((link) => "</#{@raw}/#{link.bucket}/#{link.key}>; riaktag=\"#{link.tag || "_"}\"").join ", "
+
+class Link
+  
+  constructor: (options) ->
+    @bucket = options.bucket
+    @key = options.key
+    @tag = options.tag
 
 module.exports = HttpClient

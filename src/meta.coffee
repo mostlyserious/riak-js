@@ -1,6 +1,7 @@
+Utils = require './utils'
 # Stores the meta data for a riak object.
 class Meta
-  constructor: (bucket, key, options) ->
+  constructor: (bucket, key, options, data) ->
     @bucket = bucket
     @key    = key
     @load     options
@@ -39,9 +40,9 @@ class Meta
   load: (options) ->
     @usermeta = options || {}
     Meta.riakProperties.forEach (key) =>
-      value = @popKey(key) || 
-        Meta.riakPropertyDefaults[key]
+      value = @popKey(key) || Meta.riakPropertyDefaults[key]
       if value
+        value = [value] if key is 'links' and not Utils.isArray value
         this[key] = value
       else
         delete this[key]
@@ -66,12 +67,13 @@ class Meta
 # headers for a riak value.
 Meta.riakProperties = ['contentType', 'vclock', 'lastMod', 'lastModUsecs',
   'vtag', 'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
-  'r', 'w', 'dw', 'returnBody', 'rw']
+  'r', 'w', 'dw', 'returnBody', 'rw', 'raw']
 
 # Defaults for Meta properties.
 Meta.riakPropertyDefaults =
   links:        []
   contentType: 'json'
+  raw: 'riak'
 
 Meta.decoders =
   "application/json": (s) ->
