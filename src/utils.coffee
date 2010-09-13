@@ -1,38 +1,10 @@
 module.exports =
   
-  path: (bucket, key) -> "#{bucket}/#{if key then key else ''}"
-  
   isArray: (obj) -> !!(obj and obj.concat and obj.unshift and not obj.callee)
   
   toJSON: (data) -> JSON.stringify data, (key, val) ->
     if typeof val is 'function' then val.toString() else val
-    
-  toQuery: (query, riak) ->
-    # use boolean strings since riak expects those
-    for k of query
-      query[k] = String(query[k]) if typeof query[k] is 'boolean'
-    riak.stringifyQuery(query)
-  
-  makePhases: (type, phase, args) ->
-    phase = [phase] if not this.isArray phase
-    
-    phase.map (p) ->
-      temp = {}
-      if p
-        temp[type] = switch typeof p
-          when 'function' then {source: p.toString(), arg: args}
-          when 'string' then {name: p, arg: args}
-          when 'object' then p
-        temp
-   
-  stringToLinks: (links) ->
-    result = []
-    if links
-      links.split(',').forEach (link) ->
-        r = link.trim().match(/^<\/(.*)\/(.*)\/(.*)>;\sriaktag="(.*)"$/)
-        for i of r then r[i] = decodeURIComponent(r[i]) if r
-        result.push {bucket: r[2], key: r[3], tag: r[4]} if r
-    result
+
         
   mixin: `function() {
       // copy reference to target object
