@@ -2,7 +2,7 @@ test = require('./helper') 'protobuf'
 calls = 0
 
 test (db, end) ->
-  db.serverInfo (data) ->
+  db.serverInfo (err, data) ->
     calls += 1
     end()
     assert.equal 'riak@127.0.0.1', data.node
@@ -11,42 +11,43 @@ test (db, end) ->
 test (db, end) ->
   # test RpbListKeysResp error
   keys = []
-  db.processKeysResponse {errcode: 1}, keys, (d) ->
+  meta = {}
+  db.processKeysResponse {errcode: 1}, keys, meta, (err, d) ->
     assert.equal 1, d.errcode
     calls += 1
 
   # test multiple RpbListKeysResp messages
-  db.processKeysResponse {keys: [1]}, keys, (d) ->
+  db.processKeysResponse {keys: [1]}, keys, meta, (err, d) ->
     calls += 1 # should never be called!
     assert.fail true
 
-  db.processKeysResponse {keys: [2], done: true}, keys, (d) ->
+  db.processKeysResponse {keys: [2], done: true}, keys, meta, (err, d) ->
     calls += 1
-    assert.deepEqual [1,2], keys
+    assert.deepEqual [1,2], d
 
   # test RpbMapRedResp error
   resp = phases: []
-  db.processMapReduceResponse {errcode: 1}, resp, (d) ->
+  db.processMapReduceResponse {errcode: 1}, resp, meta, (err, d) ->
     assert.equal 1, d.errcode
     calls += 1
 
   # test multiple RpbMapRedResp messages
-  db.processMapReduceResponse {phase: 0, response: "[1]"}, resp, (d) ->
+  db.processMapReduceResponse {phase: 0, response: "[1]"}, resp, meta, (err, d) ->
     calls += 1 # should never be called!
     assert.fail true
-  db.processMapReduceResponse {phase: 1, response: "[1]"}, resp, (d) ->
+  db.processMapReduceResponse {phase: 1, response: "[1]"}, resp, meta, (err, d) ->
     calls += 1 # should never be called!
     assert.fail true
-  db.processMapReduceResponse {phase: 0, response: "[2]", done: true}, resp, (d) ->
+  db.processMapReduceResponse {phase: 0, response: "[2]", done: true}, resp, meta, (err, d) ->
     calls += 1
-    assert.deepEqual [0, 1], resp.phases
-    assert.deepEqual [1, 2], resp[0]
-    assert.deepEqual [1],    resp[1]
+    assert.deepEqual [0, 1], d.phases
+    assert.deepEqual [1, 2], d[0]
+    assert.deepEqual [1],    d[1]
 
   end()
 
 test (db, end) -> 
-  db.buckets (buckets) ->
+  db.buckets (err, buckets) ->
     calls += 1
     end()
     assert.deepEqual [

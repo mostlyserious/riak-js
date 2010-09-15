@@ -3,15 +3,17 @@ calls = 0
 
 test (db, end) ->
   calls += 1
-  db.get 'users', 'ftreacy@gmail.com', (data, meta) ->
+  db.get 'users', 'ftreacy@gmail.com', (err, data, meta) ->
     end()
+    console.log err
     console.dir data
     # console.dir meta
 
 test (db, end) ->
   calls += 1
-  db.keys 'users', (data, meta) ->
+  db.keys 'users', (err, data, meta) ->
     end()
+    console.log err
     console.dir data
     # console.dir meta
 
