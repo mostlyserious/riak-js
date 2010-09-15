@@ -102,9 +102,6 @@ class ProtoBufClient extends Client
         @pool.start (conn) =>
           @connection = conn
           @connection.send(name, data)(callback)
-          
-  executeCallback: (data, meta, callback) ->
-    callback(data instanceof Error, data, meta)
 
   processKeysResponse: (data, keys, meta, callback) ->
     if data.errcode

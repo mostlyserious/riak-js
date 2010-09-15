@@ -14,12 +14,6 @@ class HttpClient extends Client
     CoreMeta.defaults = Utils.mixin true, CoreMeta.defaults, options
 
     @pool or= HttpPool.createPool options?.port or port, options?.host or host
-    
-  log: (string, options) ->
-    options or= {}
-    if string
-      string = JSON.stringify string if options.json
-      console.log string if console and (CoreMeta.defaults.debug or options.debug)
       
   keys: (bucket, options..., callback) ->
     options = options[0] or keys: true
@@ -112,9 +106,6 @@ class HttpClient extends Client
             callback buffer, meta
             
         request.end()
-
-  executeCallback: (data, meta, callback) ->
-    callback(data instanceof Error, data, meta)
 
   # http client utils
 
