@@ -25,13 +25,13 @@ class HttpClient extends Client
     options = options[0] or keys: true
     meta = new Meta bucket, '', options
     @execute('GET', meta) (data, meta) =>
-      callback data.keys, meta
+      @executeCallback data.keys, meta, callback
     
   get: (bucket, key, options..., callback) ->
     options = options[0]
     meta = new Meta bucket, key, options
     @execute('GET', meta) (data, meta) =>
-      callback data, meta
+      @executeCallback data, meta, callback
   
   save: (bucket, key, data, options..., callback) ->      
     options = options[0]
@@ -39,17 +39,16 @@ class HttpClient extends Client
 
     meta = new Meta bucket, key, options
     meta.data = data
-    
-    # usermeta?
+
     verb = if key then 'PUT' else 'POST'
     @execute(verb, meta) (data, meta) =>
-      callback data, meta
+      @executeCallback data, meta, callback
   
   remove: (bucket, key, options..., callback) ->
     options = options[0]
     meta = new Meta bucket, key, options
     @execute('DELETE', meta) (data, meta) =>
-      callback data, meta
+      @executeCallback data, meta, callback
 
   map: (phase, args) ->
     new Mapper this, 'map', phase, args
@@ -67,7 +66,7 @@ class HttpClient extends Client
   ping: (callback) ->
     meta = new Meta '', '', raw: 'ping'
     @execute('HEAD', meta) (data, meta) =>
-      callback true, meta
+      @executeCallback true, meta, callback
   
   end: ->
     @pool.end()
@@ -113,6 +112,9 @@ class HttpClient extends Client
             callback buffer, meta
             
         request.end()
+
+  executeCallback: (data, meta, callback) ->
+    callback(data instanceof Error, data, meta)
 
   # http client utils
 

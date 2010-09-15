@@ -41,18 +41,19 @@ class ProtoBufClient extends Client
     options = options[0]
     meta = new Meta bucket, key, options
     @send("GetReq", meta) (data) =>
-      callback @processValueResponse(meta, data), meta
+      @executeCallback @processValueResponse(meta, data), meta, callback
 
   save: (bucket, key, body, options..., callback) ->
     options = options[0]
     meta = new Meta bucket, key, options
     @send("PutReq", meta.withContent(body)) (data) =>
-      callback @processValueResponse(meta, data), meta
+      @executeCallback @processValueResponse(meta, data), meta, callback
 
-  remove: (bucket, key, options, callback) ->
+  remove: (bucket, key, options..., callback) ->
     options = options[0]
     meta = new Meta bucket, key, options
-    @send("DelReq", meta) callback
+    @send("DelReq", meta) (data, meta) =>
+      @executeCallback data, meta, callback
 
   map: (phase, args) ->
     new Mapper this, 'map', phase, args
@@ -64,7 +65,8 @@ class ProtoBufClient extends Client
     new Mapper this, 'link', phase
 
   ping: (callback) ->
-    @send('PingReq') callback
+    @send('PingReq') (data, meta) =>
+      @executeCallback data, meta, callback
 
   end: ->
     @connection.end() if @connection
@@ -72,24 +74,25 @@ class ProtoBufClient extends Client
   ## PBC Specific Riak-JS methods.
 
   buckets: (callback) ->
-    @send('ListBucketsReq') (data) ->
-      callback data.buckets
+    @send('ListBucketsReq') (data, meta) =>
+      @executeCallback data.buckets, meta, callback
 
   keys: (bucket, callback) ->
     keys = []
-    @send('ListKeysReq', bucket: bucket) (data) =>
-      @processKeysResponse data, keys, callback
+    @send('ListKeysReq', bucket: bucket) (data, meta) =>
+      @processKeysResponse data, keys, meta, callback
 
   serverInfo: (callback) ->
-    @send('GetServerInfoReq') callback
+    @send('GetServerInfoReq') (data, meta) =>
+      @executeCallback data, meta, callback
 
   ## PRIVATE
 
   runJob: (job, callback) ->
     body = request: JSON.stringify(job.data), contentType: 'application/json'
     resp = phases: []
-    @send("MapRedReq", body) (data) =>
-      @processMapReduceResponse data, resp, callback
+    @send("MapRedReq", body) (data, meta) =>
+      @processMapReduceResponse data, resp, meta, callback
 
   send: (name, data) ->
     if @connection? && @connection.writable
@@ -99,18 +102,21 @@ class ProtoBufClient extends Client
         @pool.start (conn) =>
           @connection = conn
           @connection.send(name, data)(callback)
+          
+  executeCallback: (data, meta, callback) ->
+    callback(data instanceof Error, data, meta)
 
-  processKeysResponse: (data, keys, callback) ->
+  processKeysResponse: (data, keys, meta, callback) ->
     if data.errcode
-      callback data
+      @executeCallback data, meta, callback
     if data.keys
       data.keys.forEach (key) -> keys.push(key)
     if data.done
-      callback keys
+      @executeCallback keys, meta, callback
 
-  processMapReduceResponse: (data, resp, callback) ->
+  processMapReduceResponse: (data, resp, meta, callback) ->
     if data.errcode
-      callback data
+      @executeCallback data, meta, callback
     if data.phase?
       resp.phases.push data.phase if resp.phases.indexOf(data.phase) == -1
       parsed = JSON.parse data.response
@@ -120,7 +126,7 @@ class ProtoBufClient extends Client
       else
         resp[data.phase] = parsed
     if data.done
-      callback resp
+      @executeCallback resp, meta, callback
 
   processValueResponse: (meta, data) ->
     delete meta.content
@@ -139,5 +145,4 @@ class ProtoBufClient extends Client
     delete content.usermeta
     [content, value]
 
-ProtoBufClient.Meta = Meta
 module.exports      = ProtoBufClient
