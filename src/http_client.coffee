@@ -7,33 +7,25 @@ querystring = require 'querystring'
 
 class HttpClient extends Client
   constructor: (options) ->
-    @defaults =
-      port: 8098
-      host: 'localhost'
-      clientId: 'riak-js'  # fix default clientId
-      host: @options?.host or 'localhost'
-      debug: true
-      callback: (response, meta) =>
-          @log response, { json: meta?.contentType is 'application/json'}
+    # client-specific defaults
+    [host, port] = ['localhost', 8098]
     
-    @defaults = Utils.mixin {}, @defaults, options
-    @pool or= HttpPool.createPool @defaults.port, @defaults.host
-    
-    delete @defaults.host
-    delete @defaults.port
+    # upon initialization, core meta should merge user-provided defaults for the session
+    CoreMeta.defaults = Utils.mixin true, CoreMeta.defaults, options
+
+    @pool or= HttpPool.createPool options?.port or port, options?.host or host
     
   log: (string, options) ->
     options or= {}
     if string
       string = JSON.stringify string if options.json
-      console.log string if console and (@defaults.debug or options.debug)
+      console.log string if console and (CoreMeta.defaults.debug or options.debug)
       
   keys: (bucket, options) ->
     (callback) =>
       options or= {}
       options.keys = true
       meta = new Meta bucket, '', options
-      
       @execute('GET', meta) (data, meta) =>
         callback data.keys, meta
     
@@ -80,7 +72,7 @@ class HttpClient extends Client
 
   ping: ->
     (callback) =>
-      options = { raw: 'ping' }
+      options = raw: 'ping'
       meta = new Meta '', '', options
       @execute('HEAD', meta) (data, meta) =>
         callback true, meta
@@ -94,18 +86,15 @@ class HttpClient extends Client
     
     (callback) =>
     
-      url = "/#{meta.raw}/#{meta.bucket}/#{meta.key or ''}"
-      options = Utils.mixin true, {}, @defaults, meta.usermeta
+      url = "/#{meta.raw}/#{meta.bucket}/#{meta.key or ''}"      
       verb = verb.toUpperCase()
       queryProps = {}
       
       ['r', 'w', 'dw', 'keys', 'props', 'vtag', 'nocache', 'returnbody'].forEach (prop) ->
-        queryProps[prop] = options[prop] unless options[prop] is undefined
+        queryProps[prop] = meta[prop] unless meta[prop] is undefined
       
       query = @stringifyQuery queryProps
       path = "#{url}#{if query then '?' + query else ''}"
-      callback = callback or @defaults.callback
-      
       headers = meta.toHeaders()
       
       @log "#{verb} #{path}"
@@ -120,19 +109,15 @@ class HttpClient extends Client
         if meta.data
           request.write meta.encode(meta.data), meta.contentEncoding
           delete meta.data
-
+        
         buffer = new String
 
         request.on 'response', (response) ->
           response.on 'data', (chunk) -> buffer += chunk
           response.on 'end', =>
-            # this logic should belong to our custom Meta?
-            meta.load meta.convertOptions(response.headers)
-            meta.statusCode = response.statusCode
-            
+            meta = meta.loadHeaders response.headers, response.statusCode
             buffer = meta.decode(buffer) if buffer.length > 0
-            if meta.statusCode is 404 then buffer = undefined # to be sync with pbc
-            
+            if meta.statusCode is 404 then buffer = undefined # to be in sync with pbc
             callback buffer, meta
             
         request.end()
@@ -146,29 +131,38 @@ class HttpClient extends Client
     
 
 class Meta extends CoreMeta
+  
+  mappings:
+    contentType: 'content-type'
+    vclock: 'x-riak-vclock'
+    lastMod: 'last-modified'
+    etag: 'etag' # but send ['If-None-Match'] if etag present!
+    links: 'link'
+    host: 'host'
+    clientId: 'x-riak-clientid'
 
-  # to be only used in execute / deserialize
-  convertOptions: (options) ->
-    return {} unless options
-    options.contentType = options['content-type']
-    options.vclock = options['x-riak-vclock']
-    options.lastMod = options['last-modified']
-    options.links = @stringToLinks options['link']
-    # and others
-    options
+  loadHeaders: (headers, statusCode) ->
+    options = {}
+    for k,v of @mappings when v
+      if v is 'link'
+        options[k] = @stringToLinks headers[v]
+      else
+        options[k] = headers[v]
+
+    # load destroys usermeta, so pass it in again
+    @load Utils.mixin true, @usermeta, options
+    @statusCode = statusCode
+    
+    return this
     
   toHeaders: () ->
-    # defaults should go somewhere else
-    headers =
-      'Host': @usermeta.host or 'localhost'
-      'content-type': @contentType
-      'If-None-Match': @etag
-      'If-Modified-Since': @lastMod
-      # merge links *already* set in the header (as not to overwrite them)
-      'link': @linksToString()
-      
-    if headers['X-Riak-Vclock'] then headers['X-Riak-ClientId'] = meta.clientId or 'riak-js'
-    
+    headers = {}
+    for k,v of @mappings
+      if k is 'links'
+        headers[v] = @linksToString()
+      else
+        headers[v] = this[k] if this[k]
+
     return headers
     
   ##

@@ -38,9 +38,9 @@ class Meta
   # on the object directly. Anything custom is assumed to be custom Riak 
   # userdata, and will live on meta.usermeta.
   load: (options) ->
-    @usermeta = options || {}
+    @usermeta = Utils.mixin true, @defaults, options
     Meta.riakProperties.forEach (key) =>
-      value = @popKey(key) || Meta.riakPropertyDefaults[key]
+      value = @popKey(key) || Meta.defaults[key]
       if value
         value = [value] if key is 'links' and not Utils.isArray value
         this[key] = value
@@ -67,13 +67,17 @@ class Meta
 # headers for a riak value.
 Meta.riakProperties = ['contentType', 'vclock', 'lastMod', 'lastModUsecs',
   'vtag', 'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
-  'r', 'w', 'dw', 'returnBody', 'rw', 'raw']
+  'r', 'w', 'dw', 'returnBody', 'rw', 'raw', 'keys', 'nocache', 'clientId',
+  'data', 'host']
 
 # Defaults for Meta properties.
-Meta.riakPropertyDefaults =
+Meta.defaults =
   links:        []
   contentType: 'json'
   raw: 'riak'
+  clientId: 'riak-js'  # fix default clientId
+  debug: true
+  host: 'localhost'
 
 Meta.decoders =
   "application/json": (s) ->
