@@ -20,13 +20,46 @@ class HttpClient extends Client
     meta = new Meta bucket, '', options
     @execute('GET', meta) (data, meta) =>
       @executeCallback data.keys, meta, callback
+      
+  head: (bucket, key, options..., callback) ->
+    options = options[0]
+    meta = new Meta bucket, key, options
+    @execute('HEAD', meta) (data, meta) =>
+      @executeCallback data, meta, callback
     
   get: (bucket, key, options..., callback) ->
     options = options[0]
     meta = new Meta bucket, key, options
     @execute('GET', meta) (data, meta) =>
       @executeCallback data, meta, callback
+      
+  getAll: (bucket, options..., callback) ->
+    options = options[0] or {}
+    mapfunc = 'Riak.mapValues'
+    limiter = null
+    
+    if options.where
+      limiter = options.where
+      mapfunc = 'Riak.mapByFields'
+    
+    if options.withId
+      map = (v) -> [[v.key, v.values[0].data]]
+    
+    @map(mapfunc, limiter).run(bucket, callback)
   
+  count: (bucket, options..., callback) ->
+    options or= {}
+    @map('Riak.mapValues').reduce((v) -> [v.length]).run(bucket, callback)
+    
+  walk: (bucket, key, spec, options..., callback) ->
+    options = options[0]
+    linkPhases = spec.map (unit) ->
+      bucket: unit[0] or '_', tag: unit[1] or '_', keep: !!unit[2]
+    
+    @link(linkPhases).reduce(language: 'erlang', module: 'riak_kv_mapreduce', function: 'reduce_set_union')
+      .map('Riak.mapValuesJson')
+      .run((if key then [[bucket, key]] else bucket), options)
+      
   save: (bucket, key, data, options..., callback) ->      
     options = options[0]
     data or= {}
@@ -43,6 +76,8 @@ class HttpClient extends Client
     meta = new Meta bucket, key, options
     @execute('DELETE', meta) (data, meta) =>
       @executeCallback data, meta, callback
+      
+  # removeAll is deprecated -- i don't want to provide that hack
 
   map: (phase, args) ->
     new Mapper this, 'map', phase, args
