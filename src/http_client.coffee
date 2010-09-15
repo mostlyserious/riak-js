@@ -58,7 +58,7 @@ class HttpClient extends Client
     
     @link(linkPhases).reduce(language: 'erlang', module: 'riak_kv_mapreduce', function: 'reduce_set_union')
       .map('Riak.mapValuesJson')
-      .run((if key then [[bucket, key]] else bucket), options)
+      .run((if key then [[bucket, key]] else bucket), options, callback)
       
   save: (bucket, key, data, options..., callback) ->      
     options = options[0]
