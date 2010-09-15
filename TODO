@@ -1,6 +1,7 @@
 TODO
 
- * Implement link-walking
+ * HTTP-specific tests + documentation (copy from riak.js)
+ * Incorporate ideas from http://github.com/jamesaduncan/riak-js
  * Add "inputs" step in Map/Reduce building - and just run(callback)
  * Deal with vclocks, exposing and solving conflicts
  * Update in node wiki
