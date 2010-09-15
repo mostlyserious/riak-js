@@ -58,7 +58,6 @@ global.RIAKJS_CLIENT_TEST_DATA =
 module.exports = (test) ->
   calls = 
     ping:         null
-    buckets:      null
     get:          null
     get_usermeta: null
     get_links:    null
@@ -170,15 +169,3 @@ module.exports = (test) ->
         assert.equal 8,     keys.length
         assert.equal 'AMS', keys.sort()[0]
         delete calls.keys
-
-    # -- ONLY PROTOBUF
-
-    # test (db, end) -> 
-      # db.buckets() (buckets) ->
-      #   end()
-      #   assert.deepEqual [
-      #       'riakjs_airlines'
-      #       'riakjs_airports'
-      #       'riakjs_flights'
-      #     ], buckets.sort()
-      #   delete calls.buckets

@@ -45,7 +45,17 @@ test (db, end) ->
 
   end()
 
+test (db, end) -> 
+  db.buckets() (buckets) ->
+    calls += 1
+    end()
+    assert.deepEqual [
+        'riakjs_airlines'
+        'riakjs_airports'
+        'riakjs_flights'
+      ], buckets.sort()
+
 require('./core_riak_tests') test
 
 process.on 'exit', ->
-  assert.equal calls, 5, "#{calls} out of 5 protobuf-specific client tests"
+  assert.equal calls, 6, "#{calls} out of 5 protobuf-specific client tests"

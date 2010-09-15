@@ -1,6 +1,12 @@
 test = require('./helper') 'http'
 calls = 0
 
+test (db, end) ->
+  db.get('users', 'ftreacy@gmail.com', {host: 'localhost2'}) (data, meta) ->
+    end()
+    console.dir data
+    console.dir meta
+
 # fill with http-specific tests
 
 require('./core_riak_tests') test
