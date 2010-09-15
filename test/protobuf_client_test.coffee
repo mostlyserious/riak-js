@@ -2,7 +2,7 @@ test = require('./helper') 'protobuf'
 calls = 0
 
 test (db, end) ->
-  db.serverInfo() (data) ->
+  db.serverInfo (data) ->
     calls += 1
     end()
     assert.equal 'riak@127.0.0.1', data.node
@@ -46,7 +46,7 @@ test (db, end) ->
   end()
 
 test (db, end) -> 
-  db.buckets() (buckets) ->
+  db.buckets (buckets) ->
     calls += 1
     end()
     assert.deepEqual [
@@ -58,4 +58,5 @@ test (db, end) ->
 require('./core_riak_tests') test
 
 process.on 'exit', ->
-  assert.equal calls, 6, "#{calls} out of 5 protobuf-specific client tests"
+  total = 6
+  assert.equal calls, total, "#{calls} out of #{total} protobuf-specific client tests"

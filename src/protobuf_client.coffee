@@ -37,22 +37,22 @@ class Meta extends CoreMeta
 class ProtoBufClient extends Client
   ## CORE Riak-JS methods
 
-  get: (bucket, key, options) ->
-    (callback) =>
-      meta = new Meta bucket, key, options
-      @send("GetReq", meta) (data) =>
-        callback @processValueResponse(meta, data), meta
+  get: (bucket, key, options..., callback) ->
+    options = options[0]
+    meta = new Meta bucket, key, options
+    @send("GetReq", meta) (data) =>
+      callback @processValueResponse(meta, data), meta
 
-  save: (bucket, key, body, options) ->
-    (callback) =>
-      meta = new Meta bucket, key, options
-      @send("PutReq", meta.withContent(body)) (data) =>
-        callback @processValueResponse(meta, data), meta
+  save: (bucket, key, body, options..., callback) ->
+    options = options[0]
+    meta = new Meta bucket, key, options
+    @send("PutReq", meta.withContent(body)) (data) =>
+      callback @processValueResponse(meta, data), meta
 
-  remove: (bucket, key, options) ->
-    (callback) =>
-      meta = new Meta bucket, key, options
-      @send("DelReq", meta) callback
+  remove: (bucket, key, options, callback) ->
+    options = options[0]
+    meta = new Meta bucket, key, options
+    @send("DelReq", meta) callback
 
   map: (phase, args) ->
     new Mapper this, 'map', phase, args
@@ -63,38 +63,33 @@ class ProtoBufClient extends Client
   link: (phase) ->
     new Mapper this, 'link', phase
 
-  ping: ->
-    (callback) =>
-      @send('PingReq') callback
+  ping: (callback) ->
+    @send('PingReq') callback
 
   end: ->
     @connection.end() if @connection
 
   ## PBC Specific Riak-JS methods.
 
-  buckets: ->
-    (callback) =>
-      @send('ListBucketsReq') (data) ->
-        callback data.buckets
+  buckets: (callback) ->
+    @send('ListBucketsReq') (data) ->
+      callback data.buckets
 
-  keys: (bucket) ->
-    (callback) =>
-      keys = []
-      @send('ListKeysReq', bucket: bucket) (data) =>
-        @processKeysResponse data, keys, callback
+  keys: (bucket, callback) ->
+    keys = []
+    @send('ListKeysReq', bucket: bucket) (data) =>
+      @processKeysResponse data, keys, callback
 
-  serverInfo: ->
-    (callback) =>
-      @send('GetServerInfoReq') callback
+  serverInfo: (callback) ->
+    @send('GetServerInfoReq') callback
 
   ## PRIVATE
 
-  runJob: (job) ->
-    (callback) =>
-      body = request: JSON.stringify(job.data), contentType: 'application/json'
-      resp = phases: []
-      @send("MapRedReq", body) (data) =>
-        @processMapReduceResponse data, resp, callback
+  runJob: (job, callback) ->
+    body = request: JSON.stringify(job.data), contentType: 'application/json'
+    resp = phases: []
+    @send("MapRedReq", body) (data) =>
+      @processMapReduceResponse data, resp, callback
 
   send: (name, data) ->
     if @connection? && @connection.writable

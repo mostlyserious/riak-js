@@ -21,40 +21,35 @@ class HttpClient extends Client
       string = JSON.stringify string if options.json
       console.log string if console and (CoreMeta.defaults.debug or options.debug)
       
-  keys: (bucket, options) ->
-    (callback) =>
-      options or= {}
-      options.keys = true
-      meta = new Meta bucket, '', options
-      @execute('GET', meta) (data, meta) =>
-        callback data.keys, meta
+  keys: (bucket, options..., callback) ->
+    options = options[0] or keys: true
+    meta = new Meta bucket, '', options
+    @execute('GET', meta) (data, meta) =>
+      callback data.keys, meta
     
-  get: (bucket, key, options) ->
-    (callback) =>
-      meta = new Meta bucket, key, options
-      @execute('GET', meta) (data, meta) =>
-        callback data, meta
+  get: (bucket, key, options..., callback) ->
+    options = options[0]
+    meta = new Meta bucket, key, options
+    @execute('GET', meta) (data, meta) =>
+      callback data, meta
   
-  save: (bucket, key, data, options) ->
-    (callback) =>
-      
-      data or= {}
-      options or= {}
+  save: (bucket, key, data, options..., callback) ->      
+    options = options[0]
+    data or= {}
 
-      meta = new Meta bucket, key, options
-      meta.data = data
-      
-      # usermeta?
-      verb = if key then 'PUT' else 'POST'
-      @execute(verb, meta) (data, meta) =>
-        callback data, meta
+    meta = new Meta bucket, key, options
+    meta.data = data
+    
+    # usermeta?
+    verb = if key then 'PUT' else 'POST'
+    @execute(verb, meta) (data, meta) =>
+      callback data, meta
   
-  remove: (bucket, key, options) ->
-    (callback) =>
-      options or= {}
-      meta = new Meta bucket, key, options
-      @execute('DELETE', meta) (data, meta) =>
-        callback data, meta
+  remove: (bucket, key, options..., callback) ->
+    options = options[0]
+    meta = new Meta bucket, key, options
+    @execute('DELETE', meta) (data, meta) =>
+      callback data, meta
 
   map: (phase, args) ->
     new Mapper this, 'map', phase, args
@@ -65,17 +60,14 @@ class HttpClient extends Client
   link: (phase) ->
     new Mapper this, 'link', phase
     
-  runJob: (options) ->
-    (callback) =>
-      options.raw = 'mapred'
-      @save('', '', options.data, options)(callback)
+  runJob: (options, callback) ->
+    options.raw = 'mapred'
+    @save '', '', options.data, options, callback
 
-  ping: ->
-    (callback) =>
-      options = raw: 'ping'
-      meta = new Meta '', '', options
-      @execute('HEAD', meta) (data, meta) =>
-        callback true, meta
+  ping: (callback) ->
+    meta = new Meta '', '', raw: 'ping'
+    @execute('HEAD', meta) (data, meta) =>
+      callback true, meta
   
   end: ->
     @pool.end()

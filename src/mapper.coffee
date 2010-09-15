@@ -48,8 +48,9 @@ class Mapper
   # @return {Function} A function that takes a callback as its only input
   # @api public
   #
-  run: (inputs, options) ->
-    @riak.runJob @job(inputs, options)
+  run: (inputs, options..., callback) ->
+    options = options[0]
+    @riak.runJob @job(inputs, options), callback
 
   #
   # @api private

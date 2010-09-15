@@ -1,9 +1,9 @@
 TODO
 
- * Make callbacks node-standard ... last arg callback, err first arg of the callback: (a, b..., callback) -> callback([c,d] = b)
+ * Implement link-walking
  * Add "inputs" step in Map/Reduce building - and just run(callback)
  * Deal with vclocks, exposing and solving conflicts
- * Publish in node wiki
+ * Update in node wiki
  * Resilent to crashes, network errors, etc; auto-reconnect to several hosts
  * Provide an accurate clientId, bound to environment? - randomizing it on client init is a bad solution
  * Test with vows / merge airline tests and introduce fake passengers with faker
