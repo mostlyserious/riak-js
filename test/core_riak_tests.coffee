@@ -162,12 +162,14 @@ module.exports = (test) ->
            assert.equal      7,     response[0].length
            assert.equal      1029,  response[1]
            delete calls.map
-      
-    test (db, end) ->
-      db.walk 'riakjs_airlines', 'KLM', [["_", "flight"]], (err, response, meta) ->
-        end()
-        assert.equal response.length, 2
-        # print 'em out           
+
+    # walk is ONLY HTTP for now
+    
+    # test (db, end) ->
+    #   db.walk 'riakjs_airlines', 'KLM', [["_", "flight"]], (err, response, meta) ->
+    #     end()
+    #     assert.equal response.length, 2
+    #     # print 'em out           
 
     test (db, end) ->
       db.keys 'riakjs_airports', (err, keys) ->
