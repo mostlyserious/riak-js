@@ -9,7 +9,8 @@
 # db = riak.protobuf({host: '...'})
 #
 exports.getClient = (options) ->
-  options.api ||= exports.defaults.api
+  options or= {}
+  options.api or= exports.defaults.api
   exports[options.api] options
 
 # Gets a new client instance using the HTTP REST api.
