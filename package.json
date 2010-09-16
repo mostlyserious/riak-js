@@ -1,7 +1,7 @@
 {
    "name": "riak-js",
-   "version": "0.2.2e",
-   "description": "Riak Javascript client (node + jquery)",
+   "version": "0.3.0beta",
+   "description": "Riak client for node (HTTP + protobufs)",
    "keywords": [
        "riak",
        "node",
@@ -14,7 +14,11 @@
            "name": "Francisco Treacy",
            "email": "francisco.treacy@gmail.com",
            "web": "http://franciscotreacy.com" 
-       } 
+       },
+       {
+           "name": "rick (technoweenie)",
+           "web": "http://techno-weenie.net" 
+       }       
    ],
    "bugs": {
        "web": "http://github.com/frank06/riak-js/issues" 
