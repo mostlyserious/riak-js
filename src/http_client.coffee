@@ -46,7 +46,7 @@ class HttpClient extends Client
       mapfunc = 'Riak.mapByFields'
     
     if options.withId
-      map = (v) -> [[v.key, v.values[0].data]]
+      mapfunc = (v) -> [[v.key, v.values[0].data]]
     
     @map(mapfunc, limiter).run(bucket, callback)
   
