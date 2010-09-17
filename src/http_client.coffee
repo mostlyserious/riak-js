@@ -96,6 +96,11 @@ class HttpClient extends Client
     meta = new Meta '', '', raw: 'ping'
     @execute('HEAD', meta) (data, meta) =>
       @executeCallback true, meta, callback
+      
+  stats: (callback) ->
+    meta = new Meta '', '', raw: 'stats'
+    @execute('GET', meta) (data, meta) =>
+      @executeCallback data, meta, callback
   
   end: ->
     @pool.end()
