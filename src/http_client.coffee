@@ -35,8 +35,11 @@ class HttpClient extends Client
       
   getAll: (bucket, options..., callback) ->
     options = options[0] or {}
-    mapfunc = 'Riak.mapValues'
+    mapfunc = 'Riak.mapValuesJson'
     limiter = null
+    
+    if options.raw
+      mapfunc = 'Riak.mapValues'
     
     if options.where
       limiter = options.where
