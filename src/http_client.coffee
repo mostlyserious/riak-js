@@ -138,14 +138,20 @@ class HttpClient extends Client
           request.write meta.encode(meta.data), meta.contentEncoding
           delete meta.data
         
-        buffer = new String
+        buffer = ''
 
         request.on 'response', (response) ->
           response.on 'data', (chunk) -> buffer += chunk
           response.on 'end', =>
             meta = meta.loadHeaders response.headers, response.statusCode
-            buffer = meta.decode(buffer) if buffer.length > 0
+            
+            buffer = try
+              if buffer.length > 0 then meta.decode(buffer) else undefined
+            catch e
+              new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
+            
             if meta.statusCode is 404 then buffer = undefined # to be in sync with pbc
+            
             callback buffer, meta
             
         request.end()

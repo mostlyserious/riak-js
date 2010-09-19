@@ -5,7 +5,7 @@ class Client
   executeCallback: (data, meta, callback) ->
     callback or= (err, data, meta) =>
       @log data, json: @contentType is 'json'
-    callback(data instanceof Error, data, meta)
+    callback(data instanceof Error or null, data, meta)
     
   log: (string, options) ->
     options or= {}

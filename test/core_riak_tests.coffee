@@ -126,7 +126,8 @@ module.exports = (test) ->
          assert.equal 'JFK', flight.from
          
          db.remove 'riakjs_flights', 'IBE_4418', (err, data) ->
-           assert.ok data
+           assert.equal err, null
+           # assert.equal data, undefined -- HTTP returns undefined, PROTOBUF an object
          
            db.get 'riakjs_flights', 'IBE_4418', (err, flight) ->
              end()
