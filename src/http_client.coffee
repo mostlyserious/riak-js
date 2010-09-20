@@ -46,11 +46,11 @@ class HttpClient extends Client
       limiter = options.where
       mapfunc = 'Riak.mapByFields'
         
-    @map(mapfunc, limiter).run(bucket, callback)
+    @add(bucket).map(mapfunc, limiter).run callback
   
   count: (bucket, options...) ->
     [options, callback] = @ensure options
-    @map((v) -> if v.not_found then [] else [1]).reduce((v) -> [v.length]).run(bucket, callback)
+    @add(bucket).map((v) -> if v.not_found then [] else [1]).reduce((v) -> [v.length]).run callback
     
   walk: (bucket, key, spec, options...) ->
     [options, callback] = @ensure options
@@ -77,17 +77,10 @@ class HttpClient extends Client
     meta = new Meta bucket, key, options
     @execute('DELETE', meta) (data, meta) =>
       @executeCallback data, meta, callback
-      
-  # removeAll is deprecated -- i don't want to provide that hack
 
-  map: (phase, args) ->
-    new Mapper this, 'map', phase, args
+  # map/reduce
 
-  reduce: (phase, args) ->
-    new Mapper this, 'reduce', phase, args
-
-  link: (phase) ->
-    new Mapper this, 'link', phase
+  add: (inputs) -> new Mapper this, inputs
     
   runJob: (options, callback) ->
     options.raw = 'mapred'

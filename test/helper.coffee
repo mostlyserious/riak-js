@@ -35,7 +35,7 @@ db_instance = (api, callbacks...) ->
   callback     = callbacks.pop() # called with db instance
   end_callback = callbacks.pop() # called when ending
 
-  db = riak[api]()
+  db = riak[api](debug: false)
   callback db, ->
     end_callback() if end_callback
     db.end()

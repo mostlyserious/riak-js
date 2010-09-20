@@ -136,12 +136,13 @@ module.exports = (test) ->
 
     
      test (db, end) ->
-       db.
-         map(
+       db
+         .add('riakjs_airlines')
+         .map(
            (value) ->
              this.should.raise.something
          ).
-         run 'riakjs_airlines', (err, response) ->
+         run (err, response) ->
            end()
            assert.ok response.message?
            # assert.ok response.errcode? -- ONLY PROTOBUF
@@ -149,6 +150,7 @@ module.exports = (test) ->
 
      test (db, end) ->
        db
+         .add('riakjs_airlines')
          .map(name: 'Riak.mapValuesJson', keep: true)
          .reduce(
            (values) ->
@@ -157,7 +159,7 @@ module.exports = (test) ->
              , 0
              ]
          )
-         .run 'riakjs_airlines', (err, response) ->
+         .run (err, response) ->
            end()
            # assert.deepEqual [0, 1], response.phases.sort()  -- ONLY PROTOBUF
            assert.equal      7,     response[0].length

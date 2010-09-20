@@ -7,10 +7,9 @@ utils = require './utils'
 # @api private
 #
 class Mapper
-  constructor: (@riak, type, phase, args) ->
+  constructor: (@riak, @inputs) ->
     @phases = []
-    @makePhases type, phase, args if type? and phase?
-
+    
   #
   # Add one or more *map* phases to the Map/Reduce job
   #
@@ -48,9 +47,9 @@ class Mapper
   # @return {Function} A function that takes a callback as its only input
   # @api public
   #
-  run: (inputs, options..., callback) ->
-    options = options[0]
-    @riak.runJob @job(inputs, options), callback
+  run: (options...) ->
+    [options, callback] = @riak.ensure options
+    @riak.runJob @job(@inputs, options), callback
 
   #
   # @api private

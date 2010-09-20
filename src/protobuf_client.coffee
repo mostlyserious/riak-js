@@ -54,15 +54,10 @@ class ProtoBufClient extends Client
     meta = new Meta bucket, key, options
     @send("DelReq", meta) (data, meta) =>
       @executeCallback data, meta, callback
+      
+  # map/reduce
 
-  map: (phase, args) ->
-    new Mapper this, 'map', phase, args
-  
-  reduce: (phase, args) ->
-    new Mapper this, 'reduce', phase, args
-  
-  link: (phase) ->
-    new Mapper this, 'link', phase
+  add: (inputs) -> new Mapper this, inputs
 
   ping: (callback) ->
     @send('PingReq') (data, meta) =>
