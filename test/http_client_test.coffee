@@ -2,8 +2,6 @@ test = require('./helper') 'http'
 calls = 0
 bucket = 'riakjs_http'
 
-# fill with *working-in-any-env* http-specific tests
-
 HTTP_TEST_DATA = {}
 HTTP_TEST_DATA[bucket] =
   'test1': [{name: 'Testing 1'}]
@@ -38,12 +36,15 @@ LOAD test.api, HTTP_TEST_DATA, ->
       [[key, { name: name }]] = elems
       assert.ok key.match(/^test/)
       assert.ok name.match(/^Testing/)
-    
-      for elem in elems
-        db.remove bucket, elem[0], (err, resp, meta) ->
-          assert.equal meta.statusCode, 204
 
-# require('./core_riak_tests') test
+  # need a way to do proper cleanup and assert deletions
+   
+  # test (db, end) ->
+  #   db.keys bucket, (err, keys) ->
+  #     for key in keys then db.remove bucket, key, (err, resp, meta) ->
+  #       assert.equal meta.statusCode, 204
+
+require('./core_riak_tests') test
 
 process.on 'exit', ->
   total = 4
