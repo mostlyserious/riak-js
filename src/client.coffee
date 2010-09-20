@@ -5,7 +5,14 @@ class Client
   executeCallback: (data, meta, callback) ->
     callback or= (err, data, meta) =>
       @log data, json: @contentType is 'json'
-    callback(data instanceof Error or null, data, meta)
+    callback((if data instanceof Error then data else null), data, meta)
+    
+  ensure: (options) ->
+    [options, callback] = options
+    if typeof options == 'function'
+      callback = options
+      options = undefined
+    return [options or {}, callback]
     
   log: (string, options) ->
     options or= {}

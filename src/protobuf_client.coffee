@@ -37,20 +37,20 @@ class Meta extends CoreMeta
 class ProtoBufClient extends Client
   ## CORE Riak-JS methods
 
-  get: (bucket, key, options..., callback) ->
-    options = options[0]
+  get: (bucket, key, options...) ->
+    [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @send("GetReq", meta) (data) =>
       @executeCallback @processValueResponse(meta, data), meta, callback
 
-  save: (bucket, key, body, options..., callback) ->
-    options = options[0]
+  save: (bucket, key, body, options...) ->
+    [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @send("PutReq", meta.withContent(body)) (data) =>
       @executeCallback @processValueResponse(meta, data), meta, callback
 
-  remove: (bucket, key, options..., callback) ->
-    options = options[0]
+  remove: (bucket, key, options...) ->
+    [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @send("DelReq", meta) (data, meta) =>
       @executeCallback data, meta, callback

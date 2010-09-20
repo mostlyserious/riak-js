@@ -14,27 +14,28 @@ class HttpClient extends Client
     CoreMeta.defaults = Utils.mixin true, CoreMeta.defaults, options
 
     @pool or= HttpPool.createPool options?.port or port, options?.host or host
-      
-  keys: (bucket, options..., callback) ->
-    options = options[0] or keys: true
+    
+  keys: (bucket, options...) ->
+    [options, callback] = @ensure options
+    options.keys = true
     meta = new Meta bucket, '', options
     @execute('GET', meta) (data, meta) =>
       @executeCallback data.keys, meta, callback
       
-  head: (bucket, key, options..., callback) ->
-    options = options[0]
+  head: (bucket, key, options...) ->
+    [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @execute('HEAD', meta) (data, meta) =>
       @executeCallback data, meta, callback
     
-  get: (bucket, key, options..., callback) ->
-    options = options[0]
+  get: (bucket, key, options...) ->
+    [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @execute('GET', meta) (data, meta) =>
       @executeCallback data, meta, callback
       
-  getAll: (bucket, options..., callback) ->
-    options = options[0] or {}
+  getAll: (bucket, options...) ->
+    [options, callback] = @ensure options
     mapfunc = if options.raw then 'Riak.mapValues' else 'Riak.mapValuesJson'
     limiter = null
     
@@ -47,12 +48,12 @@ class HttpClient extends Client
         
     @map(mapfunc, limiter).run(bucket, callback)
   
-  count: (bucket, options..., callback) ->
-    options or= {}
+  count: (bucket, options...) ->
+    [options, callback] = @ensure options
     @map((v) -> if v.not_found then [] else [1]).reduce((v) -> [v.length]).run(bucket, callback)
     
-  walk: (bucket, key, spec, options..., callback) ->
-    options = options[0]
+  walk: (bucket, key, spec, options...) ->
+    [options, callback] = @ensure options
     linkPhases = spec.map (unit) ->
       bucket: unit[0] or '_', tag: unit[1] or '_', keep: !!unit[2]
     
@@ -60,8 +61,8 @@ class HttpClient extends Client
       .map('Riak.mapValuesJson')
       .run((if key then [[bucket, key]] else bucket), options, callback)
       
-  save: (bucket, key, data, options..., callback) ->      
-    options = options[0]
+  save: (bucket, key, data, options...) ->
+    [options, callback] = @ensure options
     data or= {}
 
     meta = new Meta bucket, key, options
@@ -71,8 +72,8 @@ class HttpClient extends Client
     @execute(verb, meta) (data, meta) =>
       @executeCallback data, meta, callback
   
-  remove: (bucket, key, options..., callback) ->
-    options = options[0]
+  remove: (bucket, key, options...) ->
+    [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @execute('DELETE', meta) (data, meta) =>
       @executeCallback data, meta, callback
@@ -124,11 +125,9 @@ class HttpClient extends Client
       
       @log "#{verb} #{path}"
      
-      ##
-      
       if verb isnt 'GET'
         headers.Connection = 'close'
-          
+        
       @pool.request verb, path, headers, (request) =>
 
         if meta.data
@@ -159,7 +158,7 @@ class HttpClient extends Client
     for key, value of query
       query[key] = String(value) if typeof value is 'boolean' # stringify booleans
     querystring.stringify(query)
-    
+
 
 class Meta extends CoreMeta
   
