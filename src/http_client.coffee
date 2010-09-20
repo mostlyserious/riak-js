@@ -137,14 +137,21 @@ class HttpClient extends Client
         buffer = ''
 
         request.on 'response', (response) ->
+        
+          response.setEncoding meta.usermeta.responseEncoding or 'utf8'
+          
           response.on 'data', (chunk) -> buffer += chunk
           response.on 'end', =>
             meta = meta.loadHeaders response.headers, response.statusCode
             
-            buffer = try
-              if buffer.length > 0 then meta.decode(buffer) else undefined
-            catch e
-              new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
+            buffer =
+              if meta.usermeta.responseEncoding is 'binary'
+                new Buffer buffer, 'binary'
+              else
+                try
+                  if buffer.length > 0 then meta.decode(buffer) else undefined
+                catch e
+                  new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
             
             if meta.statusCode is 404 then buffer = undefined # to be in sync with pbc
             

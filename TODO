@@ -2,10 +2,10 @@ TODO -- temporary, will throw this onto github issues once we merge coffee > mas
 
  * Resilent to crashes, network errors, etc; auto-reconnect to several hosts; avoid race conditions, queue requests: http://github.com/mranney/node_redis/blob/master/index.js or felix's node-mysql
  * README DRIVEN DEVELOPMENT => website! also documentation (copy from riak.js) and update node wiki
- * Incorporate ideas from http://github.com/jamesaduncan/riak-js
  * Add "inputs" step in Map/Reduce building - and just run(callback)
  * Support new quorums: "Riak 0.12 also allows you to specify “symbolic” quorums, that is, “all” (N replies), “quorum” (N/2 + 1 replies), or “one” (1 reply)."
  * Deal with vclocks, exposing and solving conflicts (allow_mult, http://bitbucket.org/basho/wriaki) -- stable and meaningful (bound to env) clientId
+ * Support streaming API
  * Mapper (separate project) - see visionmedia/rapid, LearnBoost/mongoose, http://seancribbs.com/tech/2010/08/31/ripple-0-8-is-full-of-good-stuff/
  * Test with vows / merge airline tests and introduce fake passengers with faker
  * http://github.com/seancribbs/ripple/compare/4737d67...ed9a65e -- riak_kv_test_backend, awesome
