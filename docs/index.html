@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-    <title>riak-js | Riak Javascript library</title>
+    <title>riak-js | node.js riak client</title>
     <link href=' http://fonts.googleapis.com/css?family=Molengo' rel='stylesheet' type='text/css' />
     <link href=' http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz' rel='stylesheet' type='text/css' />
     <style type="text/css" media="screen">
@@ -17,7 +17,7 @@
       }
       
       h1, h2, h3 { font-family: 'Yanone Kaffeesatz', arial, serif; color: #FFC830; text-shadow: 1px 1px 1px #FA8103; }
-      h1 { text-align: center; font-size: 4em; }
+      h1 { text-align: center; font-size: 7em; margin: 0 auto; }
       h2 { font-size: 2em; }
       h3 { font-size: 1.7em; }
       h4 { font-size: 1.3em; }
@@ -63,126 +63,87 @@
       
       <h1>riak-js</h1>
       <div>
-        <h4>Extensible Javascript library for accessing Riak, with<br/> an implementation for <a href="http://nodejs.org">node.js</a> via HTTP.</h4>
-        
-        <em><small>The <a href="http://jquery.com">jQuery</a> client is on the verge of being dropped. It is becoming difficult to maintain and I stopped using it. Contact me and try to convince me why we should keep it. Basho provides one, anyway.</small></em>
+        <h4><a href="http://nodejs.org">Node.js</a> <a href="http://riak.basho.com">Riak</a> client with support for HTTP and Protocol Buffers.</h4>
         
                 <pre>
 <code>db.save('airlines', 'KLM', {fleet: 111, alliance: 'SkyTeam'}, { links:
   [{ bucket: 'flights', key: 'KLM-8098', tag: 'cargo' },
    { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
-})()
+})
 
-db.getAll('flights', { where: { ready: true }})()  // Riak 0.12+
+db.getAll('flights', { where: { ready: true }})
 </code></pre>
 
         <ul> 
           <li>Focused on developer experience – clean API with added sugar</li> 
-          <li>Features all basic HTTP operations, plus link walking and map/reduce with chainable phases</li> 
-          <li>Tested on Riak 0.10+, node.js 0.1.97+ and jQuery 1.4+</li>
+          <li>Features all basic commands, plus link walking and map/reduce with chainable phases</li> 
+          <li>Tested on Riak 0.12+ and node.js 0.2+</li>
         </ul>
         
         <ul> 
-          <li>Code: <a href="http://github.com/frank06/riak-js">frank06/riak-js</a></li> 
-          <li>Documentation: <a href="docs.html">API docs</a></li> 
+          <li>Code: <a href="http://github.com/frank06/riak-js">frank06/riak-js</a></li>
           <li>License: <a href="http://opensource.org/licenses/mit-license.php">MIT</a></li>
         </ul>
 
-        <h3>node.js setup</h3> 
+        <h3>Setup</h3>
 
         <pre>
 <code>// npm install riak-js  # @latest or @stable -- your pick
 var db = require('riak-js').getClient()
 
 // git clone git://github.com/frank06/riak-js.git  # or cloning the repo
-var db = require('/path/to/riak-js/lib').getClient()</code></pre> 
-
-        <h3>jQuery (browser) setup</h3> 
-
-        <pre>
-<code>&lt;script type="text/javascript" src="riak.js"&gt;&lt;/script&gt;
-&lt;script type="text/javascript" src="riak-jquery.js"&gt;&lt;/script&gt;
-
-var db = new Riak();
-</code></pre> 
+var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
         <h3>Guide by example</h3> 
 
         <pre>
-<code>db.get('flights', 'KLM-5034')(function(flight, meta) {
+<code>db.get('flights', 'KLM-5034', function(err, flight, meta) {
   flight.status = 'delayed'
-  db.save('flights', 'KLM-5034', flight)()
-});</code></pre> 
+  db.save('flights', 'KLM-5034', flight)
+})</code></pre> 
 
         <p>Here we introduce the callback mechanism, and the <code>meta</code> variable, that contains associated information to the retrieved document and the response.</p>
         
-        <p>Operations always return a function whose only parameter is a function. This is where we provide our callback &mdash; but we're not obliged to do so.
-          It gives us back the document as the first parameter, and <code>meta</code> as the second.
-        </p>
-        <p>
-          Things do go wrong, unfortunately, and so if we want to check for errors we do <code>if (db.error(flight))</code> (with <code>flight</code>'s type being <code>Error</code>). This gets returned whenever there's a client error, or when the server returns an HTTP status >= 400.</p>
         <p>The <code>meta</code> object could look something like:</p>
         
-<pre><code>{ headers: 
-   { 'x-riak-vclock': 'a85hYGBgymDKBVIsZlzOrhlMiYx5rAwPJu04ygcVtrBxLwIKMwOFFWcAhbMA'
-   , vary: 'Accept-Encoding'
-   , server: 'MochiWeb/1.1 WebMachine/1.6.1 (eat around the stinger)'
-   , link: '< /riak/crew/3428432407>; riaktag="_", < /riak/crew/4428132499>; riaktag="_", < /riak/users>; rel="up"'
-   , 'last-modified': 'Mon, 19 Jul 2010 09:34:25 GMT'
-   , etag: '6LnqO9nVDyCxvCIJk0QdUO'
-   , date: 'Mon, 19 Jul 2010 20:54:42 GMT'
-   , 'content-type': 'application/json'
-   , 'content-length': '511'
-   }
-, key: 'KLM-5034'
-, statusCode: 200
-, type: 'application/json'
-}</code></pre>
+<pre><code>// put an example</code></pre>
 
       <p>It also contains handy methods to deal with links, and shortcuts to certain headers.</p>
 
+<pre><code>// put an example</code></pre>
 
         <h4>Options</h4> 
 
         <p>riak-js aims to ship sensible defaults, which can of course be overriden. Using <a href="http://api.jquery.com/jQuery.extend/"><code>mixins</code></a> behind the scenes means we only have to supply the properties to override. This can be done during client instantiation, so that it applies to all requests:</p>
         
-        <pre><code>var db = require('riak-js').getClient({ host: '192.168.1.109', port: 9000, interface: 'backup', debug: false })</code></pre> 
+        <pre><code>var db = require('riak-js').getClient({ host: '192.168.1.109', port: 9000, raw: 'other', debug: false })</code></pre> 
           
         <p>But also tune them per-request. An example below saving an image:</p>
         
         <pre><code>fs.readFile("drunk-pilot.png", 'binary', function (err, image) {
   if (err) throw err;
-  db.save('evidence', 'pilot-smith-drunk', image, { type: 'jpeg', headers: { 'X-Whatever-Header': 'fire' } })()
-});</code></pre> 
+  db.save('evidence', 'pilot-smith-drunk', image, { type: 'jpeg', headers: { 'X-Corporate-Action': 'fire' } })
+});</code></pre>
            
         <p>And the defaults are:</p> 
 
-        <pre><code>{
-  clientId: 'riak-js', 
-  interface: 'riak',
-  headers: {},
-  debug: true,
-  callback: function(response, meta) {
-    if (response)
-      Riak.prototype.log(meta.type == 'application/json' ? JSON.stringify(response) : response)
-  }
-}</code></pre>
+        <pre><code>// fill in with new defaults</code></pre>
         
-        <p>Which means that if you don't provide a callback, the result will be logged to stdout. Note that you cannot change host or port once the client is instantiated.</p> 
-        
+        <p>Which means that if you don't provide a callback, the result will be logged to stdout. Note that you cannot change host or port once the client is instantiated.</p>
 
         <h4>Map/Reduce API</h4> 
 
-        <pre><code>db.map({name: 'Riak.mapValuesJson'}).run('albums')()</code></pre> 
+        <pre><code>db.add('albums').map({name: 'Riak.mapValuesJson'}).run()</code></pre> 
 
         <p>You can chain any number of phases or pass arrays, too:</p> 
 
         <pre>
 <code>db
+  .add('airlines')
   .link({ bucket: 'flights', keep: false })
   .map('Riak.mapValuesJson')
   .reduce(['Riak.filterNotFound', function(value, count) { return value.slice(0, count - 1) }])
-  .run('airlines')(function(flights) {
+  .run(function(err, flights) {
     sys.puts(flights)
   })</code></pre> 
 
