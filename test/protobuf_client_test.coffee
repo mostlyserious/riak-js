@@ -50,11 +50,13 @@ test (db, end) ->
   db.buckets (err, buckets) ->
     calls += 1
     end()
-    assert.deepEqual [
+    # don't deepEqual until we've got a separate Riak backend for testing
+    # http://github.com/seancribbs/ripple/compare/4737d67...ed9a65e
+    for bucket in [
         'riakjs_airlines'
         'riakjs_airports'
         'riakjs_flights'
-      ], buckets.sort()
+      ] then assert.ok (bucket in buckets)
 
 require('./core_riak_tests') test
 
