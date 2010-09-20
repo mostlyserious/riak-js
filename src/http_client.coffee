@@ -36,11 +36,11 @@ class HttpClient extends Client
       
   getAll: (bucket, options...) ->
     [options, callback] = @ensure options
-    mapfunc = if options.raw then 'Riak.mapValues' else 'Riak.mapValuesJson'
+    mapfunc = if options.noJSON then 'Riak.mapValues' else 'Riak.mapValuesJson'
     limiter = null
     
     if options.withId
-      mapfunc = if options.raw then (v) -> [[v.key, Riak.mapValues(v)[0]]] else (v) -> [[v.key, Riak.mapValuesJson(v)[0]]]
+      mapfunc = if options.noJSON then (v) -> [[v.key, Riak.mapValues(v)[0]]] else (v) -> [[v.key, Riak.mapValuesJson(v)[0]]]
     
     if options.where
       limiter = options.where
