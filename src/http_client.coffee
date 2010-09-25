@@ -139,6 +139,8 @@ class HttpClient extends Client
         @client.removeListener 'close', onClose
           
       @client.on 'close', onClose
+      
+      @client.on 'error', (err) -> onClose true, err
 
       if meta.data
         request.write meta.encode(meta.data), meta.contentEncoding

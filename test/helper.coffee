@@ -43,7 +43,9 @@ db_instance = (api, callbacks...) ->
 popQueue = (queue, db, end) ->
   [bucket, key, value, options] = queue.shift()
 
-  db.save bucket, key, value, options, (data) ->
+  db.save bucket, key, value, options, (err, data) ->
+    console.dir err if err
+  
     if queue.length > 0
       popQueue(queue, db, end)
     else
