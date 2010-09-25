@@ -37,12 +37,9 @@ LOAD test.api, HTTP_TEST_DATA, ->
       assert.ok key.match(/^test/)
       assert.ok name.match(/^Testing/)
 
-  # need a way to do proper cleanup and assert deletions
-   
-  # test (db, end) ->
-  #   db.keys bucket, (err, keys) ->
-  #     for key in keys then db.remove bucket, key, (err, resp, meta) ->
-  #       assert.equal meta.statusCode, 204
+    db.keys bucket, (err, keys) ->
+      for key in keys then db.remove bucket, key, (err, resp, meta) ->
+        assert.equal meta.statusCode, 204
 
 require('./core_riak_tests') test
 

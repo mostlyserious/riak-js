@@ -118,13 +118,15 @@ class HttpClient extends Client
       
       @log "#{verb} #{path}"
      
-      if verb isnt 'GET' then headers.Connection = 'close'
-        
       request = @client.request verb, path, headers
       
-      request.on 'error', (err) ->
-        # do i need to take care of anything else here?
-        callback err
+      # use felixge's approach
+      cbFired = false
+      onClose = (hadError, reason) =>
+        if hadError and not cbFired then callback new Error(reason)
+        @client.removeListener 'close', onClose
+    
+      @client.on 'close', onClose
 
       if meta.data
         request.write meta.encode(meta.data), meta.contentEncoding
@@ -154,6 +156,7 @@ class HttpClient extends Client
               catch e
                 new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
           
+          cbFired = true
           callback buffer, meta
           
       request.end()
