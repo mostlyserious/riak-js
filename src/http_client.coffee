@@ -2,7 +2,7 @@ Client   = require './client'
 CoreMeta     = require './meta'
 Mapper = require './mapper'
 Utils    = require './utils'
-HttpPool = require './http_pool'
+Http = require 'http'
 querystring = require 'querystring'
 
 class HttpClient extends Client
@@ -12,8 +12,9 @@ class HttpClient extends Client
     
     # upon initialization, core meta should merge user-provided defaults for the session
     CoreMeta.defaults = Utils.mixin true, CoreMeta.defaults, options
-
-    @pool or= HttpPool.createPool options?.port or port, options?.host or host
+    
+    @client = Http.createClient options?.port or port, options?.host or host
+    
     
   keys: (bucket, options...) ->
     [options, callback] = @ensure options
@@ -97,7 +98,6 @@ class HttpClient extends Client
       @executeCallback data, meta, callback
   
   end: ->
-    @pool.end()
         
   # private
   
@@ -118,39 +118,45 @@ class HttpClient extends Client
       
       @log "#{verb} #{path}"
      
-      if verb isnt 'GET'
-        headers.Connection = 'close'
+      if verb isnt 'GET' then headers.Connection = 'close'
         
-      @pool.request verb, path, headers, (request) =>
+      request = @client.request verb, path, headers
+      
+      request.on 'error', (err) ->
+        # do i need to take care of anything else here?
+        callback err
 
-        if meta.data
-          request.write meta.encode(meta.data), meta.contentEncoding
-          delete meta.data
-        
-        buffer = ''
+      if meta.data
+        request.write meta.encode(meta.data), meta.contentEncoding
+        delete meta.data
+      
+      buffer = ''
 
-        request.on 'response', (response) ->
+      request.on 'response', (response) ->
+      
+        response.setEncoding meta.usermeta.responseEncoding or 'utf8'
         
-          response.setEncoding meta.usermeta.responseEncoding or 'utf8'
+        response.on 'data', (chunk) -> buffer += chunk
+        response.on 'end', =>
+          meta = meta.loadHeaders response.headers, response.statusCode
+
+          buffer = if 400 <= meta.statusCode < 600
+            err = new Error buffer
+            err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
+            err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
+            err
+          else
+            if meta.usermeta.responseEncoding is 'binary'
+              new Buffer buffer, 'binary'
+            else
+              try
+                if buffer.length > 0 then meta.decode(buffer) else undefined
+              catch e
+                new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
           
-          response.on 'data', (chunk) -> buffer += chunk
-          response.on 'end', =>
-            meta = meta.loadHeaders response.headers, response.statusCode
-            
-            buffer =
-              if meta.usermeta.responseEncoding is 'binary'
-                new Buffer buffer, 'binary'
-              else
-                try
-                  if buffer.length > 0 then meta.decode(buffer) else undefined
-                catch e
-                  new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
-            
-            if meta.statusCode is 404 then buffer = undefined # to be in sync with pbc
-            
-            callback buffer, meta
-            
-        request.end()
+          callback buffer, meta
+          
+      request.end()
 
   # http client utils
 

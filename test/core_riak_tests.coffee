@@ -142,9 +142,9 @@ module.exports = (test) ->
            (value) ->
              this.should.raise.something
          ).
-         run (err, response) ->
+         run (err, response, meta) ->
            end()
-           assert.ok response.message?
+           assert.ok err.message?
            # assert.ok response.errcode? -- ONLY PROTOBUF
            delete calls.mapError
 
