@@ -200,6 +200,7 @@ class Meta extends CoreMeta
     
   toHeaders: () ->
     headers = {}
+      # Accept: "multipart/mixed, application/json;q=0.7, */*;q=0.5" # default accept header
     
     for k,v of @mappings
       if k is 'links'
