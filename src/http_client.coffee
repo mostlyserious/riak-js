@@ -30,6 +30,7 @@ class HttpClient extends Client
       @executeCallback data, meta, callback
     
   get: (bucket, key, options...) ->
+    # console.log "get to get #{options}"
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @execute('GET', meta) (data, meta) =>
@@ -61,7 +62,7 @@ class HttpClient extends Client
     @link(linkPhases).reduce(language: 'erlang', module: 'riak_kv_mapreduce', function: 'reduce_set_union')
       .map('Riak.mapValuesJson')
       .run((if key then [[bucket, key]] else bucket), options, callback)
-      
+   
   save: (bucket, key, data, options...) ->
     [options, callback] = @ensure options
     data or= {}
@@ -69,7 +70,7 @@ class HttpClient extends Client
     meta = new Meta bucket, key, options
     meta.data = data
 
-    verb = if key then 'PUT' else 'POST'
+    verb = options.method or if key then 'PUT' else 'POST'
     @execute(verb, meta) (data, meta) =>
       @executeCallback data, meta, callback
   
@@ -98,6 +99,17 @@ class HttpClient extends Client
       @executeCallback data, meta, callback
   
   end: ->
+    
+  # bucket props
+  
+  getProps: (bucket, options...) ->
+    [options, callback] = @ensure options
+    @get bucket, undefined, options, callback
+  
+  updateProps: (bucket, props, options...) ->
+    [options, callback] = @ensure options
+    options.method = 'PUT'
+    @save bucket, undefined, { props: props }, options, callback
         
   # private
   
@@ -125,7 +137,7 @@ class HttpClient extends Client
       onClose = (hadError, reason) =>
         if hadError and not cbFired then callback new Error(reason)
         @client.removeListener 'close', onClose
-    
+          
       @client.on 'close', onClose
 
       if meta.data

@@ -1,6 +1,7 @@
 test = require('./helper') 'http'
 calls = 0
 bucket = 'riakjs_http'
+assert = require 'assert'
 
 HTTP_TEST_DATA = {}
 HTTP_TEST_DATA[bucket] =
@@ -11,9 +12,15 @@ LOAD test.api, HTTP_TEST_DATA, ->
 
   test (db, end) ->
     calls += 1
+    db.updateProps bucket, n_val: 8, ->
+    db.getProps bucket, (err, resp) ->
+      assert.equal resp.props.n_val, 8
+
+  test (db, end) ->
+    calls += 1
     db.count bucket, (err, elems) ->
       [count] = elems
-      assert.ok count, 2
+      assert.equal count, 2
 
   test (db, end) ->
     calls += 1
@@ -40,5 +47,5 @@ LOAD test.api, HTTP_TEST_DATA, ->
 require('./core_riak_tests') test
 
 process.on 'exit', ->
-  total = 4
+  total = 5
   assert.equal calls, total, "#{calls} out of #{total} http-specific client tests"
