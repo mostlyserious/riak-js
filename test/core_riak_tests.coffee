@@ -180,3 +180,10 @@ module.exports = (test) ->
         assert.equal 8,     keys.length
         assert.equal 'AMS', keys.sort()[0]
         delete calls.keys
+    
+    # cleanup - ONLY HTTP cause protobuf connections are pooled
+    # test (db, end) ->
+    #   for bucket in ['riakjs_airports', 'riakjs_airlines', 'riakjs_flights']
+    #     db.keys bucket, (err, keys) ->
+    #       end()
+    #       for key in keys then db.remove bucket, key
