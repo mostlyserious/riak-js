@@ -175,18 +175,22 @@ class Meta extends CoreMeta
     contentType: 'content-type'
     vclock: 'x-riak-vclock'
     lastMod: 'last-modified'
-    etag: 'etag' # but send ['If-None-Match'] if etag present!
+    etag: 'etag'
     links: 'link'
     host: 'host'
     clientId: 'x-riak-clientid'
 
   loadHeaders: (headers, statusCode) ->
     options = {}
-    for k,v of @mappings when v
+    for k,v of @mappings
       if v is 'link'
         options[k] = @stringToLinks headers[v]
       else
         options[k] = headers[v]
+        
+    for k,v of headers
+      u = k.match /^X-Riak-Meta-(.*)/i
+      @usermeta[u[1]] = v if u
 
     # load destroys usermeta, so pass it in again
     @load Utils.mixin true, @usermeta, options
@@ -196,11 +200,16 @@ class Meta extends CoreMeta
     
   toHeaders: () ->
     headers = {}
+    
     for k,v of @mappings
       if k is 'links'
         headers[v] = @linksToString()
       else
         headers[v] = this[k] if this[k]
+    
+    for k,v of @usermeta then headers["X-Riak-Meta-#{k}"] = v
+
+    headers['If-None-Match'] = @etag if @etag
 
     return headers
     

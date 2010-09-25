@@ -12,26 +12,22 @@ LOAD test.api, HTTP_TEST_DATA, ->
   test (db, end) ->
     calls += 1
     db.count bucket, (err, elems) ->
-      end()
       [count] = elems
       assert.ok count, 2
 
   test (db, end) ->
     calls += 1
     db.head bucket, 'test1', (err, data, meta) ->
-      end()
       assert.equal data, undefined
 
   test (db, end) ->
     calls += 1
     db.keys bucket, (err, keys) ->
-      end()
       assert.deepEqual ['test1', 'test2'], keys.sort()
     
   test (db, end) ->
     calls += 1
     db.getAll bucket, withId: true, (err, elems) ->
-      end()
       assert.equal elems.length, 2
       [[key, { name: name }]] = elems
       assert.ok key.match(/^test/)

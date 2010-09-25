@@ -83,7 +83,7 @@ module.exports = (test) ->
         assert.equal 'riakjs_airlines',            meta.bucket
         assert.equal 'KLM',                        meta.key
         assert.equal 'application/json',           meta.contentType
-        # assert.equal 1,                            meta.usermeta.abc
+        assert.equal 1,                            meta.usermeta.abc
         assert.equal 2,                            meta.links.length
         assert.equal 'riakjs_client_test_flights', meta.links[0].bucket
         assert.equal 'riakjs_client_test_flights', meta.links[1].bucket
@@ -101,8 +101,8 @@ module.exports = (test) ->
          assert.equal 'riakjs_airlines',  meta.bucket
          assert.equal 'IBE',              meta.key
          assert.equal 'application/json', meta.contentType
-         # assert.equal 1,                  meta.usermeta.abc
-         # assert.equal 2,                  meta.usermeta.def
+         assert.equal 1,                  meta.usermeta.abc
+         assert.equal 2,                  meta.usermeta.def
          assert.equal 183,                air.fleet
          assert.ok meta.vclock?
          delete calls.get_usermeta
