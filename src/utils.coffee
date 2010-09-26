@@ -22,7 +22,7 @@ module.exports =
           
         { headers: hs, body: body }
           
-    .filter (e) -> e
+    .filter (e) -> !!e
     
   extractBoundary: (header_string) -> if (c = header_string.match /boundary=([A-Za-z0-9\'()+_,-.\/:=?]+)/) then c[1]
 
