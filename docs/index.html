@@ -16,11 +16,11 @@
         line-height: 1.4;
       }
       
-      h1, h2, h3 { font-family: 'Yanone Kaffeesatz', arial, serif; color: #FFC830; text-shadow: 1px 1px 1px #FA8103; }
-      h1 { text-align: center; font-size: 7em; margin: 0 auto; }
-      h2 { font-size: 2em; }
-      h3 { font-size: 1.7em; }
-      h4 { font-size: 1.3em; }
+      h1, h2 { font-family: 'Yanone Kaffeesatz', arial, serif; color: #FFC830; text-shadow: 1px 1px 1px #FA8103; margin: 5px auto; }
+      h1 { text-align: center; font-size: 7em }
+      h2 { font-size: 2.4em; }
+      h3 { font-size: 1.6em; margin: 5px auto; }
+      h4 { font-size: 1.3em; margin: 5px auto; }
       
       a { color: inherit; }
       
@@ -80,7 +80,7 @@
         <h4><a href="http://nodejs.org">Node.js</a> <a href="http://riak.basho.com">Riak</a> client with support for HTTP and Protocol Buffers.</h4>
         
                 <pre>
-<code>db.save('airlines', 'KLM', {fleet: 111, alliance: 'SkyTeam'}, { links:
+<code>db.save('airlines', 'KLM', {fleet: 111, country: 'NL'}, { links:
   [{ bucket: 'flights', key: 'KLM-8098', tag: 'cargo' },
    { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
 })
@@ -90,7 +90,7 @@ db.getAll('flights', { where: { ready: true }})
 
         <ul> 
           <li>Focused on developer experience – clean API with added sugar</li> 
-          <li>Features all basic commands, plus link walking and map/reduce with chainable phases</li> 
+          <li>Features all basic operations, plus link walking and map/reduce with chainable phases</li> 
           <li>Tested on Riak 0.12+ and node.js 0.2+</li>
         </ul>
         
@@ -99,53 +99,183 @@ db.getAll('flights', { where: { ready: true }})
           <li>License: <a href="http://opensource.org/licenses/mit-license.php">MIT</a></li>
         </ul>
 
-        <h3>Setup</h3>
-
+        <h2>Setup</h2>
+        
         <pre>
-<code>// npm install riak-js  # @latest or @stable -- your pick
+<code>// npm install riak-js@latest
 var db = require('riak-js').getClient()
 
 // git clone git://github.com/frank06/riak-js.git  # or cloning the repo
 var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
-        <h3>Guide by example</h3> 
+        <p>There are two APIs: <code>http</code> and <code>protobuf</code>. Just ask for them: <code>getClient({api: 'protobuf'})</code>.</p>
+        
+        <p>HTTP is the default and what the following API guide is based upon. Expect similar behaviour for the Protocol Buffers interface, but keep in mind there are still some differences. One example is that the HTTP implementation internally queues requests and issues them serially. Reason why there are no race conditions in this guide <strong>only</strong> for HTTP.</p>
+
+        <h2>Guide</h2>
+        
+        <em>Note: This guide is only applicable to riak-js 0.3.0</em>
 
         <pre>
 <code>db.get('flights', 'KLM-5034', function(err, flight, meta) {
+  if (err) throw err
   flight.status = 'delayed'
-  db.save('flights', 'KLM-5034', flight)
-})</code></pre> 
+  meta.links.push({ bucket: 'airlines', key: 'IBE', tag: 'operated_by' })
+  db.save('flights', 'KLM-5034', flight, meta)
+})</code></pre>
 
-        <p>Here we introduce the callback mechanism, and the <code>meta</code> variable, that contains associated information to the retrieved document and the response.</p>
+        <h3>Meta</h3>
+
+        <p>Meta is an important concept in riak-js. It is a <em>implementation-agnostic</em> object that carries all metadata associated to a document, such as the bucket, key, vclock, links, and so on.
+           It is meant to be <em>recycled</em> &mdash; all properties that make sense to be updated for a subsequent store operation can be modified and sent back.
+           Any given properties that aren't used by Riak are assumed to be custom metadata for Riak values.
+           This will become more clear as we go through the guide.
+           </p>
         
-        <p>The <code>meta</code> object could look something like:</p>
+        <p>An example <code>meta</code> object could look like:</p>
         
-<pre><code>// put an example</code></pre>
+<pre>
+<code>{ bucket: 'riakjs_airlines'
+, key: 'CPA'
+, usermeta: { important: false }
+, _type: 'application/json'
+, binary: false
+, links: 
+   [ { tag: 'flight'
+     , key: 'CPA-729'
+     , bucket: 'riakjs_client_test_flights'
+     }
+   ]
+, raw: 'riak'
+, clientId: 'riak-js'
+, host: 'localhost'
+, vclock: 'a85hYGBgymDKBVIsTO+1QzKYEhnzWBm+rRc6xgcRZmtOYvg6tx4q8QMkkQUA'
+, lastMod: 'Sat, 25 Sep 2010 17:40:08 GMT'
+, etag: '8I9CsEwo8kScElgvCOC0k'
+, statusCode: 200
+}</code></pre>
 
-      <p>It also contains handy methods to deal with links, and shortcuts to certain headers.</p>
-
-<pre><code>// put an example</code></pre>
-
-        <h4>Options</h4> 
-
-        <p>riak-js aims to ship sensible defaults, which can of course be overriden. Using <a href="http://api.jquery.com/jQuery.extend/"><code>mixins</code></a> behind the scenes means we only have to supply the properties to override. This can be done during client instantiation, so that it applies to all requests:</p>
-        
-        <pre><code>var db = require('riak-js').getClient({ host: '192.168.1.109', port: 9000, raw: 'other', debug: false })</code></pre> 
-          
-        <p>But also tune them per-request. An example below saving an image:</p>
+      <p>Riak properties such as <code>'contentType', 'vclock', 'clientId', 'links', 'etag', 'r', 'w', 'dw', 'returnBody'</code>
+        can be set on this object. It also contains handy methods to deal with links, and provides <strong>sensible defaults</strong>, which can of course be overriden.
+        Examples are <code>'contentType': 'application/json'</code> and <code>'clientId': 'riak-js'</code>. Note that you cannot change host or port once the client is instantiated.</p>
         
         <pre><code>fs.readFile("drunk-pilot.png", 'binary', function (err, image) {
   if (err) throw err;
-  db.save('evidence', 'pilot-smith-drunk', image, { type: 'jpeg', headers: { 'X-Corporate-Action': 'fire' } })
+  db.save('evidence', 'pilot-smith-drunk', image, { contentType: 'jpeg', immediateAction: 'fire' })
 });</code></pre>
-           
-        <p>And the defaults are:</p> 
-
-        <pre><code>// fill in with new defaults</code></pre>
         
-        <p>Which means that if you don't provide a callback, the result will be logged to stdout. Note that you cannot change host or port once the client is instantiated.</p>
+        <em>Note that <code>'jpeg'</code> is a shortcut and <code>immediateAction</code> is custom metadata</em>
+        
+        <p>Not only these are tunable per-request. If you need certain defaults to apply to the whole session, 
+          provide them at initialization time: <code>getClient({clientId: 'lan-27', raw: 'data', debug: false})</code>.</p>
 
-        <h4>Map/Reduce API</h4> 
+        <h3>Callbacks</h3>
+        
+        <pre><code>db.save('flights', 'KLM-5034', flight)</code></pre>
+        
+        <p>riak-js follows the node.js convention: last argument is the callback, whose first argument is the <code>err</code> variable.
+          If you don't provide a callback the result will be logged through <code>console.log</code>.</p>
+
+        <h3>API</h3>
+        
+        <p><strong>All</strong> commands take <strong>two</strong> optional last arguments: <code>meta</code> (options) and <code>callback</code>,
+          in that order, and so they will not necessarily be shown below.</p>
+        
+        <h4>Get</h4>
+        
+        <pre><code>db.get('airlines', 'KLM')</code></pre>
+        
+        <p>A typical response would be:</p>
+        
+<pre><code>{ name: 'KLM'
+, fleet: 111
+, alliance: 'SkyTeam'
+, european: true
+}</code></pre>
+
+        <p>If, however, there is a <em>sibling conflict</em> (when <code>allow_mult = true</code>) then a typical response would have a <code>meta.statusCode = 300</code> and would look like:</p>
+        
+<pre><code>
+[ { meta: 
+     { bucket: 'airlines'
+     , key: 'KLM'
+     , usermeta: {}
+     , _type: 'application/json'
+     , binary: false
+     , links: []
+     , raw: 'riak'
+     , clientId: 'riak-js'
+     , host: 'localhost'
+     , lastMod: 'Sun, 26 Sep 2010 16:28:17 GMT'
+     , etag: '5QDmB8ezT8hpMNX9Ias8DU'
+     , vclock: 'a85hYGBgymDKBVIsTO+1QzKYEhnzWBkWfhA+xgcRZmtOYlvXp4MskQUA'
+     }
+  , data: { name: 'KLM'
+     , fleet: 111
+     , alliance: 'SkyTeam'
+     , european: true
+     }
+  }
+, { meta: 
+     { bucket: 'airlines'
+     , key: 'KLM'
+     , usermeta: {}
+     , _type: 'application/json'
+     , binary: false
+     , links: []
+     , raw: 'riak'
+     , clientId: 'riak-js'
+     , host: 'localhost'
+     , lastMod: 'Sun, 26 Sep 2010 16:28:17 GMT'
+     , etag: '4wz9tAlKC49RVqQmhcAvHz'
+     , vclock: 'a85hYGBgymDKBVIsTO+1QzKYEhnzWBkWfhA+xgcRZmtOYlvXp4MskQUA'
+     }
+  , data: { name: 'KLM'
+     , fleet: 113
+     , alliance: 'SkyTeam'
+     , european: true
+     }
+  }
+]</code></pre>
+
+        
+        <h4>Head</h4>
+        
+        <p>Head will only get the <code>meta</code> object back &mdash; no data. (It uses the HTTP HEAD verb under the hood.)</p>
+        
+        <pre><code>db.head('airlines', 'KLM')</code></pre>
+                
+        <h4>Get all</h4>
+        
+        <pre><code>db.getAll('airlines')</code></pre>
+
+        <pre><code>db.getAll('airlines', { where: { country: 'NL', fleet: 111 } })</code></pre>
+
+        <pre><code>db.getAll('airlines', { withId: true })</code></pre>
+
+        <h4>Keys</h4>
+        
+        <pre><code>db.keys('airlines')</code></pre>        
+
+        <h4>Count</h4>
+        
+        <pre><code>db.count('airlines')</code></pre>        
+
+        <h4>Link-walking</h4>
+        
+        <pre><code>db.walk('airlines', 'KLM', [["_", "flight"]])</code></pre>        
+        
+        <h4>Save</h4>
+        
+        <pre><code>db.save('airlines', 'ARG', { name: 'Aerolíneas Argentinas', fleet: 40, european: false })</code></pre> 
+        
+        <pre><code>db.save('flights', 'KLM-5034', flight, { returnBody: true, dw: 'quorum', method: 'POST' })</code></pre>
+        
+        <h4>Remove</h4>
+        
+        <pre><code>db.remove('airlines', 'KLM')</code></pre>
+
+        <h4>Map/Reduce</h4>
 
         <pre><code>db.add('albums').map({name: 'Riak.mapValuesJson'}).run()</code></pre> 
 
@@ -158,21 +288,57 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
   .map('Riak.mapValuesJson')
   .reduce(['Riak.filterNotFound', function(value, count) { return value.slice(0, count - 1) }])
   .run(function(err, flights) {
-    sys.puts(flights)
+    console.log(flights)
   })</code></pre> 
 
 
-        <h3>Good to know</h3> 
+        <h4>Ping</h4>
+        
+        <em>Note: this command <strong>only</strong> takes an optional <code>callback</code></em>
+        
+        <pre><code>db.ping()</code></pre>
 
-        <ul> 
-          <li>If no <code>Content-Type</code> header is provided, <code>application/json</code> will be assumed - which in turn will be serialized into JSON</li> 
-          <li>If no <code>language</code> is provided in any map/reduce phase, <code>language: javascript</code> is assumed</li> 
-          <li>Link-walking is done through the map/reduce interface</li> 
-        </ul> 
+        <h4>Stats</h4>
+        
+        <em>Note: this command <strong>only</strong> takes an optional <code>callback</code></em>
 
-        <p>Check out the tests for more examples of API usage.</p>
+        <pre><code>db.stats()</code></pre>
+        
+        <h4>Update bucket properties</h4>        
+        
+        <pre><code>db.updateProps('airlines', { n_val: 8, allow_mult: true })</code></pre>
 
-        <h3>Authors and contributors, in order of appearence</h3> 
+        <h4>Get bucket properties</h4>    
+        
+        <em>Note: this command returns an object with the <code>props</code> property</em>
+        
+        <pre><code>db.getProps('airlines')</code></pre>
+        
+        
+        
+
+        <h2>Development</h2>
+        
+        <h3>Issues</h3>
+        
+        <p>Please report issues <a href="http://github.com/frank06/riak-js/issues">here</a>.</p>
+        
+        <h3>Compilation</h3>
+        
+        <p>Run this in the main directory to compile coffeescript to javascript as you go:</p>
+
+        <pre><code>coffee -wc -o lib --no-wrap src/**/*.coffee</code></pre>
+        
+        <h3>Testing Philosophy</h3> 
+
+        <p>In my mind, there are three main types of tests in riak-js.  The simplest kind is the simple object tests (see <code>test/meta_test.coffee</code>).  These don't hit Riak, and are only sanity checks for various objects.</p> 
+
+        <p>The second type is the high level integration tests for both client libs.  These make sure that common operations between the HTTP and PBC clients behave identically.  I've started on this in <code>test/protobuf_client_test.coffee</code>, but I want to move the common tests to a central spot.</p> 
+
+        <p>The third type is a set of client-specific tests.  There are a few methods on the PBC API that aren't really in the HTTP API.  I still want to support them, even if there isn't any support in the HTTP API.</p> 
+
+
+        <h3>Authors and contributors, in order of appearence</h3>
 
         <ul> 
         <li><a href="http://github.com/frank06">frank06</a></li> 
@@ -184,7 +350,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         
       </div>
       
-      <div class="footer">riak-js is <a href="http://opensource.org/licenses/mit-license.php">MIT-licensed</a> and supported by <a href="http://widescript.com">widescript</a></div>
+      <div class="footer">riak-js is licensed under the <a href="http://opensource.org/licenses/mit-license.php">MIT</a> and supported by <a href="http://widescript.com">widescript</a></div>
       
     </div>
     
