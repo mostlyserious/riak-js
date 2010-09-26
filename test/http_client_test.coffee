@@ -10,29 +10,43 @@ HTTP_TEST_DATA[bucket] =
 
 LOAD test.api, HTTP_TEST_DATA, ->
 
-  test (db, end) ->
+  test (db) ->
     calls += 1
-    db.updateProps bucket, n_val: 8, ->
+    db.updateProps bucket, { n_val: 8, allow_mult: true }, ->
     db.getProps bucket, (err, resp) ->
       assert.equal resp.props.n_val, 8
 
-  test (db, end) ->
+  test (db) ->
     calls += 1
     db.count bucket, (err, elems) ->
       [count] = elems
       assert.equal count, 2
 
-  test (db, end) ->
+  test (db) ->
     calls += 1
     db.head bucket, 'test1', (err, data, meta) ->
       assert.equal data, undefined
 
-  test (db, end) ->
+  test (db) ->
     calls += 1
     db.keys bucket, (err, keys) ->
       assert.deepEqual ['test1', 'test2'], keys.sort()
+      
+  test (db) ->
+    db.save bucket, 'test1', {name: 'Testing conflicting'}
+    db.get bucket, 'test1', (err, data, meta) ->
+      # conflicting versions returned
+      assert.equal data.length, 2
+      # now we pick the one with name 'Testing conflicting'
+      # and save (meta bundles the correct vclock)
+      [resolved] = data.filter (e) -> e.data.name is 'Testing conflicting'
+      db.save bucket, 'test1', resolved.data, resolved.meta
+      db.get bucket, 'test1', (err, data) ->
+        # we now get the object with name 'Testing conflicting'
+        assert.equal !!data.length, false
+        assert.equal data.name, 'Testing conflicting'
     
-  test (db, end) ->
+  test (db) ->
     calls += 1
     db.getAll bucket, withId: true, (err, elems) ->
       assert.equal elems.length, 2
@@ -48,4 +62,6 @@ require('./core_riak_tests') test
 
 process.on 'exit', ->
   total = 5
-  assert.equal calls, total, "#{calls} out of #{total} http-specific client tests"
+  message = "#{calls} out of #{total} http-specific client tests"
+  assert.equal calls, total, message
+  console.log message
