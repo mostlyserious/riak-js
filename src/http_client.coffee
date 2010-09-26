@@ -148,7 +148,7 @@ class HttpClient extends Client
       
       buffer = ''
 
-      request.on 'response', (response) ->
+      request.on 'response', (response) =>
       
         response.setEncoding meta.usermeta.responseEncoding or 'utf8'
         
@@ -161,15 +161,16 @@ class HttpClient extends Client
             err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
             err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
             err
-          else
-            if meta.usermeta.responseEncoding is 'binary'
-              new Buffer buffer, 'binary'
-            else
-              try
-                if buffer.length > 0 then meta.decode(buffer) else undefined
-              catch e
-                new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
-          
+          else @decodeBuffer(buffer, meta)
+            
+          if meta.statusCode is 300 and meta.contentType.match /^multipart\/mixed/ # multiple choices
+            boundary = Utils.extractBoundary meta.contentType
+            buffer = Utils.parseMultipart(buffer, boundary).map (doc) =>
+              _meta = new Meta(meta.bucket, meta.key)
+              _meta.loadHeaders doc.headers
+              _meta.vclock = meta.vclock
+              { meta: _meta, data: @decodeBuffer(doc.body, _meta) }
+            
           cbFired = true
           callback buffer, meta
           
@@ -182,6 +183,14 @@ class HttpClient extends Client
       query[key] = String(value) if typeof value is 'boolean' # stringify booleans
     querystring.stringify(query)
 
+  decodeBuffer: (buffer, meta) ->
+    if meta.usermeta.responseEncoding is 'binary'
+      new Buffer buffer, 'binary'
+    else
+      try
+        if buffer.length > 0 then meta.decode(buffer) else undefined
+      catch e
+        new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
 
 class Meta extends CoreMeta
   

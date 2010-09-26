@@ -2,10 +2,30 @@ module.exports =
   
   isArray: (obj) -> !!(obj and obj.concat and obj.unshift and not obj.callee)
   
-  toJSON: (data) -> JSON.stringify data, (key, val) ->
-    if typeof val is 'function' then val.toString() else val
+  toJSON: (data) -> JSON.stringify data, (key, val) -> if typeof val is 'function' then val.toString() else val
 
+  parseMultipart: (data, boundary) ->
+    
+    escape = (text) -> text.replace /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"
+    
+    data = data.split(new RegExp("\r?\n--#{escape boundary}--\r?\n"))?[0] or ""
+    
+    data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
+
+      if (md = part.split /\r?\n\r?\n/)
+        [headers, body] = md
         
+        hs = {}
+        headers.split(/\r?\n/).forEach (header) ->
+          [k,v] = header.split(': ')
+          hs[k.toLowerCase()] = v
+          
+        { headers: hs, body: body }
+          
+    .filter (e) -> e
+    
+  extractBoundary: (header_string) -> if (c = header_string.match /boundary=([A-Za-z0-9\'()+_,-.\/:=?]+)/) then c[1]
+
   mixin: `function() {
       // copy reference to target object
       var target = arguments[0] || {}, i = 1, length = arguments.length, deep = false, source;
