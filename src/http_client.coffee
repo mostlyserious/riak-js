@@ -16,24 +16,16 @@ class HttpClient extends Client
     @client = Http.createClient options?.port or port, options?.host or host
     
     
-  keys: (bucket, options...) ->
+  get: (bucket, key, options...) ->
     [options, callback] = @ensure options
-    options.keys = true
-    meta = new Meta bucket, '', options
+    meta = new Meta bucket, key, options
     @execute('GET', meta) (data, meta) =>
-      @executeCallback data.keys, meta, callback
-      
+      @executeCallback data, meta, callback
+
   head: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
     @execute('HEAD', meta) (data, meta) =>
-      @executeCallback data, meta, callback
-    
-  get: (bucket, key, options...) ->
-    # console.log "get to get #{options}"
-    [options, callback] = @ensure options
-    meta = new Meta bucket, key, options
-    @execute('GET', meta) (data, meta) =>
       @executeCallback data, meta, callback
       
   getAll: (bucket, options...) ->
@@ -49,6 +41,13 @@ class HttpClient extends Client
       mapfunc = 'Riak.mapByFields'
         
     @add(bucket).map(mapfunc, limiter).run callback
+ 
+  keys: (bucket, options...) ->
+    [options, callback] = @ensure options
+    options.keys = true
+    meta = new Meta bucket, '', options
+    @execute('GET', meta) (data, meta) =>
+      @executeCallback data.keys, meta, callback
   
   count: (bucket, options...) ->
     [options, callback] = @ensure options
@@ -88,16 +87,6 @@ class HttpClient extends Client
     options.raw = 'mapred'
     @save '', '', options.data, options, callback
 
-  ping: (callback) ->
-    meta = new Meta '', '', raw: 'ping'
-    @execute('HEAD', meta) (data, meta) =>
-      @executeCallback true, meta, callback
-      
-  stats: (callback) ->
-    meta = new Meta '', '', raw: 'stats'
-    @execute('GET', meta) (data, meta) =>
-      @executeCallback data, meta, callback
-  
   end: ->
     
   # bucket props
@@ -110,6 +99,18 @@ class HttpClient extends Client
     [options, callback] = @ensure options
     options.method = 'PUT'
     @save bucket, undefined, { props: props }, options, callback
+
+  # node commands
+
+  ping: (callback) ->
+    meta = new Meta '', '', raw: 'ping'
+    @execute('HEAD', meta) (data, meta) =>
+      @executeCallback true, meta, callback
+
+  stats: (callback) ->
+    meta = new Meta '', '', raw: 'stats'
+    @execute('GET', meta) (data, meta) =>
+      @executeCallback data, meta, callback
         
   # private
   
