@@ -1,13 +1,21 @@
-TODO -- temporary, will throw this onto github issues once we merge coffee > master
+TODO
 
- * Resilent to crashes, network errors, etc; auto-reconnect to several hosts; avoid race conditions, queue requests: http://github.com/mranney/node_redis/blob/master/index.js or felix's node-mysql
- * README DRIVEN DEVELOPMENT => website! also documentation (copy from riak.js) and update node wiki
- * Deal with vclocks, exposing and solving conflicts (allow_mult, http://bitbucket.org/basho/wriaki) -- stable and meaningful (bound to env) clientId
- * Support streaming API
+LIB 1: riak-js-client-pool
 
-Testing
- * Test with vows / merge airline tests and introduce fake passengers with faker
- * http://github.com/seancribbs/ripple/compare/4737d67...ed9a65e -- riak_kv_test_backend, awesome
- 
-Other
- * Mapper (separate project) - see visionmedia/rapid, LearnBoost/mongoose, http://seancribbs.com/tech/2010/08/31/ripple-0-8-is-full-of-good-stuff/
+  * riak-js/HTTP no longer features a connection pool; request order is guaranteed, no race conditions
+  * An external library would be handy to provide a client pool:
+    - In case you want to perform multiple requests at once
+    - Should take care of automatically reconnecting to other nodes in the cluster when a node is down
+
+LIB2: riak-js-mapper
+
+  * An ODM or whatever you wanna name it. Just like LearnBoost/mongoose or Ripple
+
+NICE TO HAVES
+
+  * meaningful (bound to env) clientId => need to know how to make a synchronous call to get `hostname`
+  * Bugfix: (Riak?) protobuf stores usermeta in headers without X-Riak-Meta- prefix -- this causes interop problems
+  * Support keep-alive connections
+  * Test with vows / merge airline tests and introduce fake passengers with faker
+  * http://github.com/seancribbs/ripple/compare/4737d67...ed9a65e -- riak_kv_test_backend
+  * Support streaming API / support chunked data from Riak (chunked Map/Reduce and keys streaming, others?)
