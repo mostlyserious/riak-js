@@ -1,48 +1,32 @@
-module.exports = {
-  isArray: function(obj) {
-    return !!(obj && obj.concat && obj.unshift && !obj.callee);
-  },
-  toJSON: function(data) {
-    return JSON.stringify(data, function(key, val) {
-      return typeof val === 'function' ? val.toString() : val;
-    });
-  },
-  parseMultipart: function(data, boundary) {
-    var _a, escape;
-    escape = function(text) {
-      return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-    };
-    data = ((typeof (_a = (data.split(new RegExp("\r?\n--" + (escape(boundary)) + "--\r?\n")))) === "undefined" || _a === null) ? undefined : _a[0]) || "";
-    return data.split(new RegExp("\r?\n--" + (escape(boundary)) + "\r?\n")).filter(function(e) {
-      return !!e;
-    }).map(function(part) {
-      var _b, body, headers, hs, md;
-      if (md = part.split(/\r?\n\r?\n/)) {
-        _b = md;
-        headers = _b[0];
-        body = _b[1];
-        hs = {};
-        headers.split(/\r?\n/).forEach(function(header) {
-          var _c, k, v;
-          _c = header.split(': ');
-          k = _c[0];
-          v = _c[1];
-          return (hs[k.toLowerCase()] = v);
-        });
-        return {
-          headers: hs,
-          body: body
-        };
-      }
-    }).filter(function(e) {
-      return !!e;
-    });
-  },
-  extractBoundary: function(header_string) {
-    var c;
-    return (c = header_string.match(/boundary=([A-Za-z0-9\'()+_,-.\/:=?]+)/)) ? c[1] : null;
-  },
-  mixin: function() {
+module.exports =
+  
+  isArray: (obj) -> !!(obj and obj.concat and obj.unshift and not obj.callee)
+  
+  toJSON: (data) -> JSON.stringify data, (key, val) -> if typeof val is 'function' then val.toString() else val
+
+  parseMultipart: (data, boundary) ->
+    
+    escape = (text) -> text.replace /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"
+    
+    data = data.split(new RegExp("\r?\n--#{escape boundary}--\r?\n"))?[0] or ""
+    
+    data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
+
+      if (md = part.split /\r?\n\r?\n/)
+        [headers, body] = md
+        
+        hs = {}
+        headers.split(/\r?\n/).forEach (header) ->
+          [k,v] = header.split(': ')
+          hs[k.toLowerCase()] = v
+          
+        { headers: hs, body: body }
+          
+    .filter (e) -> !!e
+    
+  extractBoundary: (header_string) -> if (c = header_string.match /boundary=([A-Za-z0-9\'()+_,-.\/:=?]+)/) then c[1]
+
+  mixin: `function() {
       // copy reference to target object
       var target = arguments[0] || {}, i = 1, length = arguments.length, deep = false, source;
 
@@ -90,5 +74,16 @@ module.exports = {
       }
       // Return the modified object
       return target;
-    }
-};
+    }`
+    
+    # mixin: (a, b) ->
+    #   if not b then return a
+    #   target = a
+    # 
+    #   for key, value of b
+    #     if typeof value is 'object'
+    #       target = this.mixin (target[key] or= {}), value
+    #     else
+    #       target[key] = value
+    # 
+    #   return a
