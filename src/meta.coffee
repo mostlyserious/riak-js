@@ -29,6 +29,11 @@ class Meta
   #
   #   meta.encode({a: 1}) # => "{\"a\":1}"
   encode: (value) ->
+    # TODO refactor first bit
+    if value instanceof Buffer
+      @contentEncoding = 'binary'
+      @contentType = @guessType @contentEncoding
+      return value
     if dec = Meta.encoders[@contentType]
       dec value
     else

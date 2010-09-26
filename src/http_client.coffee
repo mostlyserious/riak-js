@@ -127,6 +127,7 @@ class HttpClient extends Client
       
       query = @stringifyQuery queryProps
       path = "#{url}#{if query then '?' + query else ''}"
+      val = meta.encode(meta.data) if meta.data
       headers = meta.toHeaders()
       
       @log "#{verb} #{path}"
@@ -144,13 +145,13 @@ class HttpClient extends Client
       @client.on 'error', (err) -> onClose true, err
 
       if meta.data
-        request.write meta.encode(meta.data), meta.contentEncoding
+        request.write val, meta.contentEncoding
         delete meta.data
       
       buffer = ''
 
       request.on 'response', (response) =>
-      
+
         response.setEncoding meta.usermeta.responseEncoding or 'utf8'
         
         response.on 'data', (chunk) -> buffer += chunk
@@ -185,7 +186,7 @@ class HttpClient extends Client
     querystring.stringify(query)
 
   decodeBuffer: (buffer, meta) ->
-    if meta.usermeta.responseEncoding is 'binary'
+    if meta.contentType is 'application/octet-stream'
       new Buffer buffer, 'binary'
     else
       try
