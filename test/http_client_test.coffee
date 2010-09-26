@@ -54,9 +54,10 @@ LOAD test.api, HTTP_TEST_DATA, ->
       assert.ok key.match(/^test/)
       assert.ok name.match(/^Testing/)
 
-    db.keys bucket, (err, keys) ->
-      for key in keys then db.remove bucket, key, (err, resp, meta) ->
-        assert.equal meta.statusCode, 204
+    for b in [bucket, 'riakjs_airlines', 'riakjs_airports', 'riakjs_flights']
+      db.keys b, (err, keys) ->
+        for key in keys then db.remove b, key, (err, resp, meta) ->
+          assert.equal meta.statusCode, 204
 
 require('./core_riak_tests') test
 
