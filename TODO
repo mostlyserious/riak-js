@@ -1,5 +1,8 @@
 TODO
 
+=> check http://bitbucket.org/basho/wriaki
+=> Much better, exhaustive testing - like Ripple
+
 LIB 1: riak-js-client-pool
 
   * riak-js/HTTP no longer features a connection pool; request order is guaranteed, no race conditions
