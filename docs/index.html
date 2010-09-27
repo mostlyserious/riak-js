@@ -247,11 +247,13 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
                 
         <h4>Get all</h4>
         
+        <p>Just like as with the <em>sibling conflict</em>, <code>getAll</code> will return an <code>Array</code> of <code>Object</code>s
+          with the <code>meta</code> and <code>data</code> properties. <code>withId</code> is no longer necessary:
+           you can grab the key from <code>meta.key</code>.</p>
+        
         <pre><code>db.getAll('airlines')</code></pre>
 
         <pre><code>db.getAll('airlines', { where: { country: 'NL', fleet: 111 } })</code></pre>
-
-        <pre><code>db.getAll('airlines', { withId: true })</code></pre>
 
         <h4>Keys</h4>
         

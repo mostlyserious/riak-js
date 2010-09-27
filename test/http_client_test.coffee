@@ -18,11 +18,8 @@ LOAD test.api, HTTP_TEST_DATA, ->
 
   test (db) ->
     calls += 1
-    db.keys bucket, (err, elems) ->
-      console.dir elems
     db.count bucket, (err, elems) ->
       [count] = elems
-      console.dir count
       assert.equal count, 2
 
   test (db) ->
@@ -51,11 +48,16 @@ LOAD test.api, HTTP_TEST_DATA, ->
     
   test (db) ->
     calls += 1
-    db.getAll bucket, withId: true, (err, elems) ->
+    db.getAll bucket, where: { name: 'Testing 2', other: undefined }, (err, elems) ->
+      assert.equal elems.length, 1
+    
+  test (db) ->
+    calls += 1
+    db.getAll bucket, (err, elems) ->
       assert.equal elems.length, 2
-      [[key, { name: name }]] = elems
-      assert.ok key.match(/^test/)
-      assert.ok name.match(/^Testing/)
+      [{ meta: { key: key }, data: { name: name }}] = elems
+      assert.ok key.match /^test/
+      assert.ok name.match /^Testing/
 
     for b in [bucket, 'riakjs_airlines', 'riakjs_airports', 'riakjs_flights']
       db.keys b, (err, keys) ->
@@ -65,7 +67,7 @@ LOAD test.api, HTTP_TEST_DATA, ->
 require('./core_riak_tests') test
 
 process.on 'exit', ->
-  total = 5
+  total = 6
   message = "#{calls} out of #{total} http-specific client tests"
   assert.equal calls, total, message
   console.log message
