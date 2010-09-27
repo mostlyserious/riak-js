@@ -35,7 +35,7 @@ class HttpClient extends Client
       data = if options.noJSON then Riak.mapValues(v)[0] else Riak.mapValuesJson(v)[0]
       if options.where and not options.noJSON
         keys = []; `for (var i in options.where) keys.push(i)`
-        return [] if keys.some (k) -> options.where[k] isnt data[k]
+        if keys.some((k) -> options.where[k] isnt data[k]) then return []
       delete v.values
       [{ meta: v, data: data }]
         
