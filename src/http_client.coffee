@@ -51,7 +51,7 @@ class HttpClient extends Client
   
   count: (bucket, options...) ->
     [options, callback] = @ensure options
-    @add('users').map((v) -> [1]).reduce(['Riak.filterNotFound', 'Riak.reduceSum']).run callback
+    @add(bucket).map((v) -> [1]).reduce(['Riak.filterNotFound', 'Riak.reduceSum']).run callback
     
   walk: (bucket, key, spec, options...) ->
     [options, callback] = @ensure options

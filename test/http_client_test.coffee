@@ -18,8 +18,11 @@ LOAD test.api, HTTP_TEST_DATA, ->
 
   test (db) ->
     calls += 1
+    db.keys bucket, (err, elems) ->
+      console.dir elems
     db.count bucket, (err, elems) ->
       [count] = elems
+      console.dir count
       assert.equal count, 2
 
   test (db) ->
