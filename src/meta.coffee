@@ -1,4 +1,6 @@
 Utils = require './utils'
+querystring = require 'querystring'
+
 # Stores the meta data for a riak object.
 class Meta
   constructor: (bucket, key, options, data) ->
@@ -45,12 +47,22 @@ class Meta
   load: (options) ->
     @usermeta = Utils.mixin true, @defaults, options
     Meta.riakProperties.forEach (key) =>
-      value = @popKey(key) || Meta.defaults[key]
-      if value
+      value = @popKey(key)
+      value = Meta.defaults[key] if value is undefined
+      if value != undefined
         value = [value] if key is 'links' and not Utils.isArray value
         this[key] = value
       else
         delete this[key]
+    @url = "/#{@raw}/#{@bucket}/#{@key or ''}"
+    @queryProps = {}
+    Meta.queryProperties.forEach (prop) =>
+      @queryProps[prop] = this[prop] unless this[prop] is undefined
+    @queryString = @stringifyQuery @queryProps
+    @path = "#{@url}#{if @queryString then '?' + @queryString else ''}"
+
+  encodeData: () ->
+    @encode(@data)
 
   # Fills in a full content type based on a few defaults
   guessType: (type) ->
@@ -68,12 +80,19 @@ class Meta
     delete  @usermeta[key]
     value
 
+  stringifyQuery: (query) ->
+    for key, value of query
+      query[key] = String(value) if typeof value is 'boolean' # stringify booleans
+    querystring.stringify(query)
+
+Meta.queryProperties = ['r', 'w', 'dw', 'rw', 'keys', 'props',
+  'vtag', 'nocache', 'returnbody', 'chunked']
+
 # Any set properties that aren't in this array are assumed to be custom 
 # headers for a riak value.
 Meta.riakProperties = ['contentType', 'vclock', 'lastMod', 'lastModUsecs',
-  'vtag', 'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
-  'r', 'w', 'dw', 'returnBody', 'rw', 'raw', 'keys', 'nocache', 'clientId',
-  'data', 'host']
+  'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
+  'raw', 'nocache', 'clientId', 'data', 'host'].concat(Meta.queryProperties)
 
 # Defaults for Meta properties.
 Meta.defaults =

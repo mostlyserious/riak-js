@@ -3,7 +3,6 @@ CoreMeta     = require './meta'
 Mapper = require './mapper'
 Utils    = require './utils'
 Http = require 'http'
-querystring = require 'querystring'
 
 class HttpClient extends Client
   constructor: (options) ->
@@ -116,43 +115,30 @@ class HttpClient extends Client
   execute: (verb, meta) ->
     
     (callback) =>
-    
-      url = "/#{meta.raw}/#{meta.bucket}/#{meta.key or ''}"      
       verb = verb.toUpperCase()
-      queryProps = {}
-      
-      ['r', 'w', 'dw', 'keys', 'props', 'vtag', 'nocache', 'returnbody'].forEach (prop) ->
-        queryProps[prop] = meta[prop] unless meta[prop] is undefined
-      
-      query = @stringifyQuery queryProps
-      path = "#{url}#{if query then '?' + query else ''}"
-      val = meta.encode(meta.data) if meta.data
-      headers = meta.toHeaders()
-      
+      path = meta.path
       @log "#{verb} #{path}"
-     
-      request = @client.request verb, path, headers
-      
+
+      request = @client.request verb, path, meta.toHeaders()
+
+      if meta.data
+        request.write meta.encodeData(), meta.contentEncoding
+        delete meta.data
+
       # use felixge's approach
       cbFired = false
       onClose = (hadError, reason) =>
         if hadError and not cbFired then callback new Error(reason)
         @client.removeListener 'close', onClose
-          
-      @client.on 'close', onClose
-      
-      @client.on 'error', (err) -> onClose true, err
 
-      if meta.data
-        request.write val, meta.contentEncoding
-        delete meta.data
+      @client.on 'close', onClose
+      @client.on 'error', (err) -> onClose true, err
       
       buffer = ''
 
       request.on 'response', (response) =>
-
         response.setEncoding meta.usermeta.responseEncoding or 'utf8'
-        
+
         response.on 'data', (chunk) -> buffer += chunk
         response.on 'end', =>
           meta = meta.loadHeaders response.headers, response.statusCode
@@ -178,11 +164,6 @@ class HttpClient extends Client
       request.end()
 
   # http client utils
-
-  stringifyQuery: (query) ->
-    for key, value of query
-      query[key] = String(value) if typeof value is 'boolean' # stringify booleans
-    querystring.stringify(query)
 
   decodeBuffer: (buffer, meta) ->
     if meta.contentType is 'application/octet-stream'
