@@ -8,12 +8,8 @@ class HttpClient extends Client
   constructor: (options) ->
     # client-specific defaults
     [host, port] = ['localhost', 8098]
-    
-    # upon initialization, core meta should merge user-provided defaults for the session
-    CoreMeta.defaults = Utils.mixin true, CoreMeta.defaults, options
-    
+    super options
     @client = Http.createClient options?.port or port, options?.host or host
-    
     
   get: (bucket, key, options...) ->
     [options, callback] = @ensure options

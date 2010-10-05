@@ -1,6 +1,11 @@
 CoreMeta = require './meta'
+Utils    = require './utils'
 
 class Client
+  
+  constructor: (options) ->
+    # upon initialization, core meta should merge user-provided defaults for the session
+    CoreMeta.defaults = Utils.mixin true, CoreMeta.defaults, options
   
   executeCallback: (data, meta, callback) ->
     callback or= (err, data, meta) =>
