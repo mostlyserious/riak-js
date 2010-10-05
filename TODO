@@ -1,5 +1,14 @@
 TODO
 
+=> when i throw the error it must inform a message with status code at least!
+=> fix messy headers / recycle "clean" meta
+=> utilities for managing links! / links should never be undefined (i.e. should be [])
+
+=> it stalls after a connection error, replace client when process.ENOENT or similar? what does node-couchdb do?
+=> err.fatal = true for node errors in process... ECONNRESET, etc
+=> db.on 'error' ...
+
+=> emparejar apis protubuf y http
 => check http://bitbucket.org/basho/wriaki
 => Much better, exhaustive testing - like Ripple
 
