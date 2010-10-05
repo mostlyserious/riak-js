@@ -2,7 +2,6 @@ Client   = require './client'
 Pool     = require './protobuf'
 CoreMeta = require './meta'
 Mapper   = require './mapper'
-utils    = require './utils'
 
 class Meta extends CoreMeta
   # Adds a RpbContent structure, see RpbPutReq for usage.
@@ -22,7 +21,7 @@ class Meta extends CoreMeta
 
   encodeLinks: (links) ->
     parsed = []
-    if links && !utils.isArray(links)
+    if links and not Array.isArray(links)
       links = [links]
     links.forEach (link) ->
       parsed.push link

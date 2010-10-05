@@ -1,7 +1,5 @@
 module.exports =
   
-  isArray: (obj) -> !!(obj and obj.concat and obj.unshift and not obj.callee)
-  
   toJSON: (data) -> JSON.stringify data, (key, val) -> if typeof val is 'function' then val.toString() else val
 
   parseMultipart: (data, boundary) ->

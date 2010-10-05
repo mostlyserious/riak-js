@@ -1,9 +1,4 @@
 #
-# Module dependencies
-#
-utils = require './utils'
-
-#
 # @api private
 #
 class Mapper
@@ -63,7 +58,7 @@ class Mapper
     options
 
   makePhases: (type, phase, args) ->
-    phase = [phase] if not utils.isArray phase
+    phase = [phase] if not Array.isArray phase
     phase.forEach (p) =>
       temp = {}
       if p

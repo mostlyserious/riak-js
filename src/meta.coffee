@@ -50,7 +50,7 @@ class Meta
       value = @popKey(key)
       value = Meta.defaults[key] if value is undefined
       if value != undefined
-        value = [value] if key is 'links' and not Utils.isArray value
+        value = [value] if key is 'links' and not Array.isArray value
         this[key] = value
       else
         delete this[key]
