@@ -1,6 +1,5 @@
 TODO
 
-=> when i throw the error it must inform a message with status code at least!
 => fix messy headers / recycle "clean" meta
 => utilities for managing links! / links should never be undefined (i.e. should be [])
 

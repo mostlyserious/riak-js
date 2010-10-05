@@ -144,7 +144,7 @@ class HttpClient extends Client
           meta = meta.loadHeaders response.headers, response.statusCode
 
           buffer = if 400 <= meta.statusCode < 600
-            err = new Error buffer
+            err = new Error "HTTP error #{meta.statusCode}: #{buffer}"
             err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
             err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
             err
