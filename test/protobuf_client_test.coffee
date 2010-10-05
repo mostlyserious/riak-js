@@ -62,4 +62,6 @@ require('./core_riak_tests') test
 
 process.on 'exit', ->
   total = 6
-  assert.equal calls, total, "#{calls} out of #{total} protobuf-specific client tests"
+  message = "#{calls} out of #{total} protobuf-specific client tests"
+  assert.equal calls, total, message
+  console.log message

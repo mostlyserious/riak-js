@@ -11,28 +11,40 @@ HTTP_TEST_DATA[bucket] =
 LOAD test.api, HTTP_TEST_DATA, ->
 
   test (db) ->
-    calls += 1
-    db.updateProps bucket, { n_val: 8, allow_mult: true }, ->
-    db.getProps bucket, (err, resp) ->
-      assert.equal resp.props.n_val, 8
 
-  test (db) ->
-    calls += 1
+    db.getProps bucket, (err, resp) ->
+      assert.equal resp.props.allow_mult, false
+
     db.count bucket, (err, elems) ->
       [count] = elems
       assert.equal count, 2
 
-  test (db) ->
-    calls += 1
     db.head bucket, 'test1', (err, data, meta) ->
       assert.equal data, undefined
 
-  test (db) ->
-    calls += 1
     db.keys bucket, (err, keys) ->
       assert.deepEqual ['test1', 'test2'], keys.sort()
       
-  test (db) ->
+    # test updates
+    db.save bucket, 'test3', {name: 'Testing 3'}
+    
+    db.get bucket, 'test3', (err, data) ->
+      data.updated = true
+      data.wtf = 'yes'
+      data.wee = 42
+      db.save bucket, 'test3', data
+    
+      db.get bucket, 'test3', (err, data) ->
+        # console.dir data
+        assert.ok data.updated
+        assert.equal data.wtf, 'yes'
+        assert.equal data.wee, 42 
+  
+    db.updateProps bucket, { n_val: 8, allow_mult: true }, ->
+    db.getProps bucket, (err, resp) ->
+      assert.equal resp.props.n_val, 8
+      assert.ok resp.props.allow_mult
+    
     db.save bucket, 'test1', {name: 'Testing conflicting'}
     db.get bucket, 'test1', (err, data, meta) ->
       # conflicting versions returned
@@ -46,18 +58,16 @@ LOAD test.api, HTTP_TEST_DATA, ->
         assert.equal !!data.length, false
         assert.equal data.name, 'Testing conflicting'
     
-  test (db) ->
-    calls += 1
     db.getAll bucket, where: { name: 'Testing 2', other: undefined }, (err, elems) ->
       assert.equal elems.length, 1
     
-  test (db) ->
-    calls += 1
     db.getAll bucket, (err, elems) ->
-      assert.equal elems.length, 2
+      assert.equal elems.length, 3
       [{ meta: { key: key }, data: { name: name }}] = elems
       assert.ok key.match /^test/
       assert.ok name.match /^Testing/
+      
+    db.updateProps bucket, allow_mult: false, ->
 
     for b in [bucket, 'riakjs_airlines', 'riakjs_airports', 'riakjs_flights']
       db.keys b, (err, keys) ->
@@ -67,7 +77,4 @@ LOAD test.api, HTTP_TEST_DATA, ->
 require('./core_riak_tests') test
 
 process.on 'exit', ->
-  total = 6
-  message = "#{calls} out of #{total} http-specific client tests"
-  assert.equal calls, total, message
-  console.log message
+  console.log "Tests completed"
