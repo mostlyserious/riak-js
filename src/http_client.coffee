@@ -1,7 +1,7 @@
-Client   = require './client'
-CoreMeta     = require './meta'
+Client = require './client'
+Meta = require './http_meta'
 Mapper = require './mapper'
-Utils    = require './utils'
+Utils = require './utils'
 Http = require 'http'
 
 class HttpClient extends Client
@@ -137,7 +137,7 @@ class HttpClient extends Client
 
         response.on 'data', (chunk) -> buffer += chunk
         response.on 'end', =>
-          meta = meta.loadHeaders response.headers, response.statusCode
+          meta = meta.loadResponse response
 
           buffer = if 400 <= meta.statusCode < 600
             err = new Error "HTTP error #{meta.statusCode}: #{buffer}"
@@ -150,7 +150,7 @@ class HttpClient extends Client
             boundary = Utils.extractBoundary meta.contentType
             buffer = Utils.parseMultipart(buffer, boundary).map (doc) =>
               _meta = new Meta(meta.bucket, meta.key)
-              _meta.loadHeaders doc.headers
+              _meta.loadResponse { headers: doc.headers, statusCode: meta.statusCode }
               _meta.vclock = meta.vclock
               { meta: _meta, data: @decodeBuffer(doc.body, _meta) }
             
@@ -169,72 +169,5 @@ class HttpClient extends Client
         if buffer.length > 0 then meta.decode(buffer) else undefined
       catch e
         new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
-
-class Meta extends CoreMeta
-  
-  mappings:
-    contentType: 'content-type'
-    vclock: 'x-riak-vclock'
-    lastMod: 'last-modified'
-    etag: 'etag'
-    links: 'link'
-    host: 'host'
-    clientId: 'x-riak-clientid'
-
-  loadHeaders: (headers, statusCode) ->
-    options = {}
-    for k,v of @mappings
-      if v is 'link'
-        options[k] = @stringToLinks headers[v]
-      else
-        options[k] = headers[v]
-        
-    for k,v of headers
-      u = k.match /^X-Riak-Meta-(.*)/i
-      @usermeta[u[1]] = v if u
-
-    # load destroys usermeta, so pass it in again
-    @load Utils.mixin true, @usermeta, options
-    @statusCode = statusCode
-    
-    return this
-    
-  toHeaders: () ->
-    headers =
-      Accept: "multipart/mixed, application/json;q=0.7, */*;q=0.5" # default accept header
-    
-    for k,v of @mappings
-      if k is 'links'
-        headers[v] = @linksToString()
-      else
-        headers[v] = this[k] if this[k]
-    
-    for k,v of @usermeta then headers["X-Riak-Meta-#{k}"] = v
-
-    headers['If-None-Match'] = @etag if @etag
-
-    return headers
-    
-  ##
-    
-  stringToLinks: (links) ->
-    result = []
-    if links
-      links.split(',').forEach (link) ->
-        captures = link.trim().match /^<\/(.*)\/(.*)\/(.*)>;\sriaktag="(.*)"$/
-        if captures
-          for i of captures then captures[i] = decodeURIComponent(captures[i])
-          result.push new Link({bucket: captures[2], key: captures[3], tag: captures[4]})
-    result
-    
-  linksToString: () ->
-    @links.map((link) => "</#{@raw}/#{link.bucket}/#{link.key}>; riaktag=\"#{link.tag || "_"}\"").join ", "
-
-class Link
-  
-  constructor: (options) ->
-    @bucket = options.bucket
-    @key = options.key
-    @tag = options.tag
 
 module.exports = HttpClient

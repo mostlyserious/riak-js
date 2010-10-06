@@ -1,12 +1,16 @@
 Utils = require './utils'
 querystring = require 'querystring'
 
-# Stores the meta data for a riak object.
 class Meta
-  constructor: (bucket, key, options, data) ->
-    @bucket = bucket
-    @key    = key
-    @load     options
+  # options may be a plain object or a Meta
+  # partial is only meant for subclasses to provide a half-filled meta
+  constructor: (options, partial) ->
+    if options instanceof Meta
+      return options
+    else
+      meta = if partial instanceof Meta then partial else this
+      meta.load options
+      return meta
 
   # Parses a Riak value into a Javascript object.  Set custom decoders on 
   # Meta.decoders:
@@ -44,22 +48,17 @@ class Meta
   # Loads the given options into this Meta object.  Any Riak properties are set
   # on the object directly. Anything custom is assumed to be custom Riak 
   # userdata, and will live on meta.usermeta.
-  load: (options) ->
-    @usermeta = Utils.mixin true, @defaults, options
-    Meta.riakProperties.forEach (key) =>
-      value = @popKey(key)
-      value = Meta.defaults[key] if value is undefined
-      if value != undefined
+  load: (options, additionalProperties) ->
+    @usermeta = Utils.mixin true, {}, Meta.defaults, options
+    
+    props = Utils.uniq Meta.riakProperties.concat(additionalProperties)
+    props.forEach (key) =>
+      value = @popKey(key) ? Meta.defaults[key]
+      if value?
         value = [value] if key is 'links' and not Array.isArray value
         this[key] = value
       else
         delete this[key]
-    @url = "/#{@raw}/#{@bucket}/#{@key or ''}"
-    @queryProps = {}
-    Meta.queryProperties.forEach (prop) =>
-      @queryProps[prop] = this[prop] unless this[prop] is undefined
-    @queryString = @stringifyQuery @queryProps
-    @path = "#{@url}#{if @queryString then '?' + @queryString else ''}"
 
   encodeData: () ->
     @encode(@data)
@@ -85,14 +84,28 @@ class Meta
       query[key] = String(value) if typeof value is 'boolean' # stringify booleans
     querystring.stringify(query)
 
-Meta.queryProperties = ['r', 'w', 'dw', 'rw', 'keys', 'props',
-  'vtag', 'nocache', 'returnbody', 'chunked']
-
 # Any set properties that aren't in this array are assumed to be custom 
 # headers for a riak value.
-Meta.riakProperties = ['contentType', 'vclock', 'lastMod', 'lastModUsecs',
-  'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
-  'raw', 'nocache', 'clientId', 'data', 'host'].concat(Meta.queryProperties)
+Meta.riakProperties = [
+  'bucket' # both
+  'key' # both
+  'contentType' # both
+  'vclock' # both
+  'lastMod' # both
+  'lastModUsecs' # both
+  'charset' # ?
+  'contentEncoding' # ?
+  'r' # both
+  'w' # both
+  'dw' # both
+  'rw' # both
+  'links' # both
+  'etag' # http only?
+  'raw' # http only?
+  'clientId' # both
+  'data' # used to attach submission data
+  'returnbody' # both
+]
 
 # Defaults for Meta properties.
 Meta.defaults =
@@ -111,10 +124,9 @@ Meta.encoders =
   "application/json": (data) ->
     JSON.stringify data
 
-Meta.prototype.__defineGetter__ 'contentType', () ->
-  @_type
+Meta::__defineGetter__ 'contentType', -> @_type
 
-Meta.prototype.__defineSetter__ 'contentType', (type) ->
+Meta::__defineSetter__ 'contentType', (type) ->
   @_type = @guessType(type || 'json')
   if @_type.match(/octet/) || @_type.match(/^image/)
     @binary = true
