@@ -1,5 +1,6 @@
 CoreMeta = require './meta'
 Utils    = require './utils'
+Meta = require './http_meta'
 
 class Client
   
@@ -28,5 +29,8 @@ class Client
     options or= {}
     if string and console and (if options.debug isnt undefined then options.debug else CoreMeta.defaults.debug)
       if options.json then console.dir string else console.log string
+
+  # all subclasses must implement metaClass so that clients can call new db.Meta()
+  Meta: -> new @metaClass # FIXME
 
 module.exports = Client

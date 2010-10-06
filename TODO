@@ -3,8 +3,6 @@ TODO
 => fix messy headers / recycle "clean" meta
 => utilities for managing links! / links should never be undefined (i.e. should be [])
 
-=> parse Location header and assign key, close #12
-
 => it stalls after a connection error, replace client when process.ENOENT or similar? what does node-couchdb do?
 => err.fatal = true for node errors in process... ECONNRESET, etc
 => db.on 'error' ...

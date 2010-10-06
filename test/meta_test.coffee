@@ -1,16 +1,20 @@
 assert = require 'assert'
 Meta   = require '../lib/meta'
 
-empty = new Meta { bucket: 'bucket', key: 'empty' }
+# test empty/defaults
+
+empty = new Meta 'bucket', 'empty'
 assert.equal 'bucket',           empty.bucket
 assert.equal 'empty',            empty.key
 assert.equal null,               empty.vclock
 assert.equal 'application/json', empty.contentType
 assert.equal false,              empty.binary
+assert.deepEqual empty.links, Meta.defaults.links
+assert.equal empty.raw, Meta.defaults.raw
+assert.equal empty.clientId, Meta.defaults.clientId
+assert.equal empty.host, Meta.defaults.host
 
-full = new Meta
-  bucket: 'bucket'
-  key: 'full'
+full = new Meta 'bucket', 'full'
   contentType: 'png'
   vclock:      123
   custom:      'abc'
@@ -26,7 +30,7 @@ full.contentType = 'xml'
 assert.equal 'text/xml', full.contentType
 assert.equal false,      full.binary
 
-keyless = new Meta { bucket: 'bucket' }
+keyless = new Meta 'bucket'
 assert.notEqual 'abc', keyless.usermeta.custom
 assert.equal undefined, keyless.key
 

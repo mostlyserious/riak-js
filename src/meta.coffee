@@ -3,14 +3,21 @@ querystring = require 'querystring'
 
 class Meta
   # options may be a plain object or a Meta
-  # partial is only meant for subclasses to provide a half-filled meta
-  constructor: (options, partial) ->
-    if options instanceof Meta
-      return options
+  # partial is only meant for subclasses to provide a half-baked meta
+  constructor: (bucket, key, options) ->
+    if arguments.length is 1 and bucket instanceof Object
+      options = bucket # (in case the first arg is an object)
+      [bucket, key] = [options.bucket, options.key]
+
+    meta = if options instanceof Meta
+      options
     else
-      meta = if partial instanceof Meta then partial else this
-      meta.load options
-      return meta
+      @load options
+      this
+    
+    [meta.bucket, meta.key] = [bucket, key]
+    
+    return meta
 
   # Parses a Riak value into a Javascript object.  Set custom decoders on 
   # Meta.decoders:
@@ -48,17 +55,22 @@ class Meta
   # Loads the given options into this Meta object.  Any Riak properties are set
   # on the object directly. Anything custom is assumed to be custom Riak 
   # userdata, and will live on meta.usermeta.
-  load: (options, additionalProperties) ->
-    @usermeta = Utils.mixin true, {}, Meta.defaults, options
+  load: (options, additionalProperties, additionalDefaults) ->
+    defaults = Utils.mixin true, {}, Meta.defaults, additionalDefaults
+    # FIXME this is a workaround here because the mixin turns the link {} into a [] ... rewrite that stupid motherfucker
+    if options?.links
+      options.links = [options.links] unless Array.isArray(options.links) # DRY!
     
-    props = Utils.uniq Meta.riakProperties.concat(additionalProperties)
+    @usermeta = Utils.mixin true, {}, defaults, this, options
+    
+    props = Utils.uniq Meta.riakProperties
+      .concat(additionalProperties)
+      .concat(Object.keys defaults)
+      
     props.forEach (key) =>
       value = @popKey(key) ? Meta.defaults[key]
-      if value?
-        value = [value] if key is 'links' and not Array.isArray value
-        this[key] = value
-      else
-        delete this[key]
+      if value? then this[key] = value
+      else delete this[key]
 
   encodeData: () ->
     @encode(@data)
@@ -67,8 +79,8 @@ class Meta
   guessType: (type) ->
     switch type
       when 'json'               then 'application/json'
-      when 'xml', 'plain'       then "text/"  + type
-      when 'jpeg', 'gif', 'png' then "image/" + type
+      when 'xml', 'plain'       then "text/#{type}"
+      when 'jpeg', 'gif', 'png' then "image/#{type}"
       when 'binary'             then 'application/octet-stream'
       else                           type
 
@@ -100,11 +112,11 @@ Meta.riakProperties = [
   'dw' # both
   'rw' # both
   'links' # both
-  'etag' # http only?
-  'raw' # http only?
+  'etag' # ?
+  'raw' # ?
   'clientId' # both
-  'data' # used to attach submission data
   'returnbody' # both
+  'vtag' # both
 ]
 
 # Defaults for Meta properties.
@@ -112,9 +124,11 @@ Meta.defaults =
   links:        []
   contentType: 'json'
   raw: 'riak'
-  clientId: 'riak-js'  # fix default clientId
-  debug: true
-  host: 'localhost'
+  clientId: 'riak-js' # fix default clientId
+
+  # reserved by riak-js
+  debug: true # print stuff out
+  data: undefined # attach submission data to meta
 
 Meta.decoders =
   "application/json": (s) ->

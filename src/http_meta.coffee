@@ -2,119 +2,111 @@ CoreMeta = require './meta'
 Utils = require './utils'
 
 class Meta extends CoreMeta
-  
-  # HTTP header mappings
-  
-  requestMappings:
-    accept: 'accept' # mix in default
-    host: 'host' # mix in default
-    clientId: 'x-riak-clientid' # mix in default
-    vclock: 'x-riak-vclock'
-    lastMod: 'If-Modified-Since' # check possible bug with these
-    etag: 'If-None-Match' # check possible bug with these
-    links: 'link'
-    contentType: 'content-type' # only if sending body
-    
-    # other request info
-    # bucket, key, usermeta (X-Riak-Meta-*)
-    
-    # other not sent info: binary, raw, url, path (url and path are the same!!!)
-    # queryProps, queryString -- check out these
-    
+
+  load: (options) ->
+    super options, Meta.riakProperties.concat(Meta.queryProperties), Meta.defaults
+      
+  # HTTP response header mappings
+
   responseMappings:
     'content-type': 'contentType' # binary depends on the contentType
     'x-riak-vclock': 'vclock'
     'last-modified': 'lastMod'
-    'etag': 'etag'
-    'link': 'links'
-    
-    # other response info
-    # statusCode, X-Riak-Meta-* (=> usermeta), Location (=> key)
-    
-    # other ignored info: Vary, Server, Date, Content-Length, Transfer-Encoding
-  
-  load: (options) ->
-    
-    super options, Meta.riakProperties.concat(Meta.queryProperties) # hmmm
-    
-    queryProps = {}
-    Meta.queryProperties.forEach (prop) => queryProps[prop] = this[prop] if this[prop]?
+    etag: 'etag'
 
-    queryString = @stringifyQuery queryProps
+    # other response info:
+    # statusCode, X-Riak-Meta-* (=> usermeta), link (=> links) Location (=> key)
+    # ignored headers: Vary, Server, Date, Content-Length, Transfer-Encoding
 
-    @path = "/#{@raw}/#{@bucket}/#{@key or ''}#{if queryString then '?' + queryString else ''}"
-  
-  
   loadResponse: (response) ->
     headers = response.headers
-    @statusCode = response.statusCode
     
-    for k,v of @mappings
-      if v is 'link'
-        this[k] = @stringToLinks headers[v]
-      else
-        this[k] = headers[v]
-        
+    # one-to-one
+    for v,k of @responseMappings then this[k] = headers[v]
+    
+    # status code
+    @statusCode = response.statusCode
+
+    # usermeta
     for k,v of headers
       u = k.match /^X-Riak-Meta-(.*)/i
       @usermeta[u[1]] = v if u
-
-    # load destroys usermeta, so pass it in again
-    # @load Utils.mixin true, {}, @usermeta, options
+    
+    # links
+    if headers.link then @links = linkUtils.stringToLinks headers.link
+    
+    # location
+    if headers.location
+      [$0, @raw, @bucket, @key] = headers.location.match /\/([^\/]+)\/([^\/]+)\/([^\/]+)/
     
     return this
+
+  # HTTP request header mappings
+
+  requestMappings:
+    accept: 'Accept'
+    host: 'Host'
+    clientId: 'X-Riak-ClientId'
+    vclock: 'X-Riak-Vclock'
+    # lastMod: 'If-Modified-Since' # check possible bug with these
+    # etag: 'If-None-Match' # check possible bug with these
+
+    # other request info:
+    # usermeta (X-Riak-Meta-*), links, contentType
+    # ignored info: binary, raw, url, path
     
   toHeaders: ->
-    headers =
-      Accept: "multipart/mixed, application/json;q=0.7, */*;q=0.5" # default accept header
+    headers = {}
     
-    for k,v of @mappings
-      if k is 'links'
-        headers[v] = @linksToString()
-      else
-        headers[v] = this[k] if this[k]
+    for k,v of @requestMappings then headers[v] = this[k] if this[k]
     
-    for k,v of @usermeta then headers["X-Riak-Meta-#{k}"] = v
-
-    # headers['If-None-Match'] = @etag if @etag # buggy, check
+    # usermeta
+    for k,v of @usermeta then headers["X-Riak-Meta-#{k}"] = String(v)
+    
+    # links
+    headers['Link'] = linkUtils.linksToString(@links, @raw) if @links.length > 0
+    
+    # contentType (only if data is present)
+    headers['Content-Type'] = @contentType if @data?
 
     return headers
-    
-  ## private
-    
+  
+
+Meta::__defineGetter__ 'path', ->
+  queryString = @stringifyQuery @queryProps
+  "/#{@raw}/#{@bucket or ''}/#{@key or ''}#{if queryString then '?' + queryString else ''}"
+
+Meta::__defineGetter__ 'queryProps', ->
+  queryProps = {}
+  Meta.queryProperties.forEach (prop) => queryProps[prop] = this[prop] if this[prop]?
+  queryProps
+  
+Meta.defaults =
+  host: 'localhost'
+  accept: 'multipart/mixed, application/json;q=0.7, */*;q=0.5'
+
+Meta.queryProperties = ['r', 'w', 'dw', 'rw', 'keys', 'props', 'vtag', 'returnbody', 'chunked']
+
+Meta.riakProperties = [
+  'statusCode'
+  'host'
+]
+
+module.exports = Meta
+
+# private
+
+linkUtils =
   stringToLinks: (links) ->
     result = []
     if links
       links.split(',').forEach (link) ->
-        captures = link.trim().match /^<\/(.*)\/(.*)\/(.*)>;\sriaktag="(.*)"$/
+        captures = link.trim().match /^<\/([^\/]+)\/([^\/]+)\/([^\/]+)>;\sriaktag="(.+)"$/
         if captures
           for i of captures then captures[i] = decodeURIComponent(captures[i])
-          result.push new Link({bucket: captures[2], key: captures[3], tag: captures[4]})
+          result.push { bucket: captures[2], key: captures[3], tag: captures[4] }
     result
     
-  linksToString: ->
-    @links.map((link) => "</#{@raw}/#{link.bucket}/#{link.key}>; riaktag=\"#{link.tag || "_"}\"").join ", "
-
-    # typical Riak querystring properties
-    # props=[true|false]
-    # keys=[true|false|stream]
-    # r, w, dw, rw
-    # vtag (the sibling's etag)
-    # returnbody=[true|false]
-    # chunked=[true|false]
-    
-Meta.queryProperties = ['r', 'w', 'dw', 'rw', 'keys', 'props', 'vtag', 'returnbody', 'chunked']
-
-Meta.riakProperties = [
-  'statusCode' # http
-  'host' # http only
-]
-
-class Link
-  
-  constructor: (options) ->
-    @bucket = options.bucket
-    @key = options.key
-    @tag = options.tag
-    
-module.exports = Meta
+  linksToString: (links, raw) ->
+    links = if Array.isArray(links) then links else [links]
+    links.map((link) => "</#{raw}/#{link.bucket}/#{link.key}>; riaktag=\"#{link.tag || "_"}\"").join ", "

@@ -59,7 +59,7 @@ class HttpClient extends Client
   save: (bucket, key, data, options...) ->
     [options, callback] = @ensure options
     data or= {}
-
+    
     meta = new Meta bucket, key, options
     meta.data = data
 
@@ -114,7 +114,7 @@ class HttpClient extends Client
       verb = verb.toUpperCase()
       path = meta.path
       @log "#{verb} #{path}"
-
+      
       request = @client.request verb, path, meta.toHeaders()
 
       if meta.data
@@ -169,5 +169,7 @@ class HttpClient extends Client
         if buffer.length > 0 then meta.decode(buffer) else undefined
       catch e
         new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
+
+  metaClass: Meta
 
 module.exports = HttpClient

@@ -1,6 +1,6 @@
 Client   = require './client'
 Pool     = require './protobuf'
-Meta = require './protobuf_meta'
+Meta     = require './protobuf_meta'
 Mapper   = require './mapper'
 
 class ProtoBufClient extends Client
@@ -105,5 +105,7 @@ class ProtoBufClient extends Client
     delete content.value
     delete content.usermeta
     [content, value]
+
+  metaClass: Meta
 
 module.exports      = ProtoBufClient

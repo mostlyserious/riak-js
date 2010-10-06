@@ -1,6 +1,10 @@
 CoreMeta = require './meta'
 
 class Meta extends CoreMeta
+  
+  load: (options) ->
+    super options #, Meta.riakProperties
+  
   # Adds a RpbContent structure, see RpbPutReq for usage.
   withContent: (body) ->
     @content = 
@@ -10,8 +14,7 @@ class Meta extends CoreMeta
       contentEncoding: @contentEncoding
       links:           @encodeLinks   @links
       usermeta:        @encodeUsermeta @usermeta
-      # links
-      # usermeta
+
     delete @usermeta
     delete @links
     this
