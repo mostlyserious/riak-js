@@ -31,8 +31,12 @@ assert.equal 'text/xml', full.contentType
 assert.equal false,      full.binary
 
 keyless = new Meta 'bucket'
+keyless.addLink { bucket: 'bucket', key: 'test' }
 assert.notEqual 'abc', keyless.usermeta.custom
 assert.equal undefined, keyless.key
+assert.deepEqual keyless.links, [ { bucket: 'bucket', key: 'test' } ]
+keyless.removeLink { bucket: 'bucket', key: 'test' }
+assert.equal keyless.links.length, 0
 
 # test meta is the same
 copy = new Meta full

@@ -95,6 +95,13 @@ class Meta
     for key, value of query
       query[key] = String(value) if typeof value is 'boolean' # stringify booleans
     querystring.stringify(query)
+  
+  # operations on links  
+  
+  addLink: (link) -> @links.push(link)
+  
+  removeLink: (link) -> @links = @links.filter((l) -> l is link)
+  
 
 # Any set properties that aren't in this array are assumed to be custom 
 # headers for a riak value.
