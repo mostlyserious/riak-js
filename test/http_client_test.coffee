@@ -35,7 +35,6 @@ LOAD test.api, HTTP_TEST_DATA, ->
       db.save bucket, 'test3', data
     
       db.get bucket, 'test3', (err, data) ->
-        # console.dir data
         assert.ok data.updated
         assert.equal data.wtf, 'yes'
         assert.equal data.wee, 42 

@@ -79,7 +79,6 @@ module.exports = (test) ->
 
     test (db, end) ->
       db.get 'riakjs_airlines', 'KLM', (err, air, meta) ->
-        # throw new Error
         end()
         assert.equal 'riakjs_airlines',            meta.bucket
         assert.equal 'KLM',                        meta.key

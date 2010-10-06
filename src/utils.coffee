@@ -74,14 +74,28 @@ module.exports =
       return target;
     }`
     
-    # mixin: (a, b) ->
-    #   if not b then return a
-    #   target = a
-    # 
-    #   for key, value of b
-    #     if typeof value is 'object'
-    #       target = this.mixin (target[key] or= {}), value
-    #     else
-    #       target[key] = value
-    # 
-    #   return a
+  uniq: `function(array) {
+        var a = [];
+        var l = array.length;
+        for(var i=0; i<l; i++) {
+          for(var j=i+1; j<l; j++) {
+            // If array[i] is found later in the array
+            if (array[i] === array[j])
+              j = ++i;
+          }
+          a.push(array[i]);
+        }
+        return a;
+      }`
+    
+  # mixin: (a, b) ->
+  #   if not b then return a
+  #   target = a
+  # 
+  #   for key, value of b
+  #     if typeof value is 'object'
+  #       target = this.mixin (target[key] or= {}), value
+  #     else
+  #       target[key] = value
+  # 
+  #   return a

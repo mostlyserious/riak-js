@@ -1,5 +1,7 @@
 assert = require 'assert'
-Meta   = require('../lib/meta')
+Meta   = require '../lib/meta'
+
+# test empty/defaults
 
 empty = new Meta 'bucket', 'empty'
 assert.equal 'bucket',           empty.bucket
@@ -7,8 +9,12 @@ assert.equal 'empty',            empty.key
 assert.equal null,               empty.vclock
 assert.equal 'application/json', empty.contentType
 assert.equal false,              empty.binary
+assert.deepEqual empty.links, Meta.defaults.links
+assert.equal empty.raw, Meta.defaults.raw
+assert.equal empty.clientId, Meta.defaults.clientId
+assert.equal empty.host, Meta.defaults.host
 
-full = new Meta 'bucket', 'full', 
+full = new Meta 'bucket', 'full'
   contentType: 'png'
   vclock:      123
   custom:      'abc'
@@ -25,45 +31,19 @@ assert.equal 'text/xml', full.contentType
 assert.equal false,      full.binary
 
 keyless = new Meta 'bucket'
-assert.equal '/riak/bucket/', keyless.url
+keyless.addLink { bucket: 'bucket', key: 'test' }
+assert.notEqual 'abc', keyless.usermeta.custom
+assert.equal undefined, keyless.key
+assert.deepEqual keyless.links, [ { bucket: 'bucket', key: 'test' } ]
+keyless.removeLink { bucket: 'bucket', key: 'test' }
+assert.equal keyless.links.length, 0
 
-keyed = new Meta 'bucket', 'key'
-assert.equal '/riak/bucket/key', keyed.url
-assert.deepEqual {}, keyed.queryProps
-assert.equal "", keyed.queryString
-assert.equal "/riak/bucket/key", keyed.path
+# test meta is the same
+copy = new Meta full
+assert.equal full, copy
+assert.ok copy instanceof Meta
 
-assert.deepEqual ['r', 'w', 'dw', 'rw', 'keys', 'props',
-'vtag', 'nocache', 'returnbody', 'chunked'], Meta.queryProperties
-
-assert.deepEqual ['contentType', 'vclock', 'lastMod', 'lastModUsecs',
-  'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
-  'raw', 'nocache', 'clientId', 'data', 'host', 'r', 'w',
-  'dw', 'rw', 'keys', 'props', 'vtag', 'nocache', 'returnbody', 'chunked'], Meta.riakProperties
-
-queryProps =
-  r: 1
-  w: 2
-  dw: 2
-  rw: 2
-  keys: true
-  props: false
-  vtag: 'asweetvtag'
-  returnbody: true
-  chunked: true
-
-stringifiedQueryProps =
-  r: '1'
-  w: '2'
-  dw: '2'
-  rw: '2'
-  keys: 'true'
-  props: 'false'
-  vtag: 'asweetvtag'
-  returnbody: 'true'
-  chunked: 'true'
-
-withQueryProps = new Meta 'bucket', 'key', queryProps
-assert.deepEqual stringifiedQueryProps, withQueryProps.queryProps
-assert.equal "r=1&w=2&dw=2&rw=2&keys=true&props=false&vtag=asweetvtag&returnbody=true&chunked=true", withQueryProps.queryString
-assert.equal "/riak/bucket/key?r=1&w=2&dw=2&rw=2&keys=true&props=false&vtag=asweetvtag&returnbody=true&chunked=true", withQueryProps.path
+# assert.deepEqual ['bucket', 'key', 'contentType', 'vclock', 'lastMod', 'lastModUsecs',
+#   'charset', 'contentEncoding', 'statusCode', 'links', 'etag',
+#   'raw', 'clientId', 'data', 'host', 'r', 'w',
+#   'dw', 'rw'], Meta.riakProperties

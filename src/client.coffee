@@ -1,6 +1,12 @@
 CoreMeta = require './meta'
+Utils    = require './utils'
+Meta = require './http_meta'
 
 class Client
+  
+  constructor: (options) ->
+    # upon initialization, core meta should merge user-provided defaults for the session
+    CoreMeta.defaults = Utils.mixin true, {}, CoreMeta.defaults, options
   
   executeCallback: (data, meta, callback) ->
     callback or= (err, data, meta) =>
@@ -23,5 +29,8 @@ class Client
     options or= {}
     if string and console and (if options.debug isnt undefined then options.debug else CoreMeta.defaults.debug)
       if options.json then console.dir string else console.log string
+
+  # all subclasses must implement metaClass so that clients can call new db.Meta()
+  Meta: -> new @metaClass # FIXME
 
 module.exports = Client
