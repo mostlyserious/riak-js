@@ -100,7 +100,7 @@ class Meta
   
   addLink: (link) -> @links.push(link)
   
-  removeLink: (link) -> @links = @links.filter((l) -> l is link)
+  removeLink: (link) -> @links = @links.filter((l) -> l.bucket isnt link.bucket or l.key isnt link.key or l.tag isnt link.tag)
   
 
 # Any set properties that aren't in this array are assumed to be custom 

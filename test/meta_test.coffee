@@ -32,10 +32,13 @@ assert.equal false,      full.binary
 
 keyless = new Meta 'bucket'
 keyless.addLink { bucket: 'bucket', key: 'test' }
+keyless.addLink { bucket: 'bucket', key: 'test', tag: 'tag' }
 assert.notEqual 'abc', keyless.usermeta.custom
 assert.equal undefined, keyless.key
-assert.deepEqual keyless.links, [ { bucket: 'bucket', key: 'test' } ]
+assert.deepEqual keyless.links, [ { bucket: 'bucket', key: 'test' }, { bucket: 'bucket', key: 'test', tag: 'tag' } ]
 keyless.removeLink { bucket: 'bucket', key: 'test' }
+assert.equal keyless.links.length, 1
+keyless.removeLink { bucket: 'bucket', key: 'test', tag: 'tag' }
 assert.equal keyless.links.length, 0
 
 # test meta is the same
