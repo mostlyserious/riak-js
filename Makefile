@@ -16,4 +16,7 @@ publish: generate-js
 	npm publish
 	@remove-js
 
-.PHONY: generate-js remove-js deps test publish
+dev: generate-js
+	@coffee -wc --no-wrap -o lib src/*.coffee
+
+.PHONY: generate-js remove-js deps test publish dev
