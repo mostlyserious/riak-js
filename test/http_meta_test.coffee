@@ -1,5 +1,5 @@
 assert = require 'assert'
-Meta   = require '../lib/http_meta'
+Meta   = require '../src/http_meta'
 
 # test path
 

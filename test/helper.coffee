@@ -1,7 +1,7 @@
 # evil globals for tests only.  beware, kids
 global.sys    ||= require 'sys'
 global.assert ||= require 'assert'
-global.riak   ||= require '../lib/index'
+global.riak   ||= require '../src/index'
 
 # Loads a set of items into Riak, then runs the callback when they're all
 # inserted.
