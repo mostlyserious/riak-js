@@ -1,5 +1,5 @@
 assert = require 'assert'
-Meta   = require '../lib/meta'
+Meta   = require '../src/meta'
 
 # test empty/defaults
 

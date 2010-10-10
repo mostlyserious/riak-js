@@ -1,5 +1,5 @@
 assert = require 'assert'
-Mapper = require('../lib/mapper')
+Mapper = require '../src/mapper'
 
 m = new Mapper 'riak'
 
