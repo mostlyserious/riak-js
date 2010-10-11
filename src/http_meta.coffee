@@ -109,4 +109,4 @@ linkUtils =
     
   linksToString: (links, raw) ->
     links = if Array.isArray(links) then links else [links]
-    links.map((link) => "</#{raw}/#{link.bucket}/#{link.key}>; riaktag=\"#{link.tag || "_"}\"").join ", "
+    links.map((link) => "</#{raw}/#{escape link.bucket}/#{escape link.key}>; riaktag=\"#{link.tag || "_"}\"").join ", "
