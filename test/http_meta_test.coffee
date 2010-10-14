@@ -16,7 +16,7 @@ riakResponse =
     server: 'MochiWeb/1.1 WebMachine/1.7.1 (participate in the frantic)'
     'x-riak-vclock': 'a85hYGBgzGDKBVIsbLvm1WYwJTLmsTLcjeE5ypcFAA=='
     'x-riak-meta-acl': 'users:r,administrators:f'
-    link: '</riak/test>; rel="up", </riak/test/doc2>; riaktag="next"'
+    link: '</riak/test>; rel="up", </riak/test/doc%252%24%40>; riaktag="next"'
     'last-modified': 'Wed, 10 Mar 2010 18:11:41 GMT'
     etag: '6dQBm9oYA1mxRSH0e96l5W'
     date: 'Wed, 10 Mar 2010 18:11:52 GMT'
@@ -31,7 +31,7 @@ assert.deepEqual resp_meta.usermeta, { acl: 'users:r,administrators:f' }
 assert.equal resp_meta.statusCode, 200
 assert.equal resp_meta.date, undefined
 assert.equal new Date(resp_meta.lastMod).getTime(), 1268244701000
-assert.deepEqual resp_meta.links, [{ bucket: 'test', key: 'doc2', tag: 'next' }]
+assert.deepEqual resp_meta.links, [{ bucket: 'test', key: 'doc%2$@', tag: 'next' }]
 assert.equal resp_meta.contentType, 'text/rtf'
 
 resp_meta.usermeta.fire = true
@@ -42,7 +42,7 @@ requestHeaders = resp_meta.toHeaders()
 assert.notEqual requestHeaders.statusCode?
 assert.equal resp_meta.path, '/riak/bucket/key'
 assert.equal requestHeaders['X-Riak-Meta-fire'], 'true'
-assert.equal requestHeaders['Link'], '</riak/test/doc2>; riaktag="next"'
+assert.equal requestHeaders['Link'], '</riak/test/doc%252%24%40>; riaktag="next"'
 
 ##
 
