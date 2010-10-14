@@ -3,6 +3,7 @@ Meta = require './http_meta'
 Mapper = require './mapper'
 Utils = require './utils'
 Http = require 'http'
+fs = require 'fs'
 
 class HttpClient extends Client
   constructor: (options) ->
@@ -95,6 +96,26 @@ class HttpClient extends Client
     [options, callback] = @ensure options
     options.method = 'PUT'
     @save bucket, undefined, { props: props }, options, callback
+    
+  # luwak
+  
+  getFile: (key, options...) ->
+    [options, callback] = @ensure options
+    options.raw or= 'luwak'
+    options.responseEncoding or= 'binary'
+    @get undefined, key, options, callback
+
+  saveFile: (key, file, options...) ->
+    [options, callback] = @ensure options
+    options.raw or= 'luwak'
+    options.contentType or= 'binary'
+    fs.readFile file, (err, data) =>
+      @save undefined, key, data, options, callback
+      
+  removeFile: (key, options...) ->
+    [options, callback] = @ensure options
+    options.raw or= 'luwak'
+    @remove undefined, key, options, callback
 
   # node commands
 
@@ -135,7 +156,7 @@ class HttpClient extends Client
       buffer = ''
 
       request.on 'response', (response) =>
-        response.setEncoding meta.usermeta.responseEncoding or 'utf8'
+        response.setEncoding meta.responseEncoding or 'utf8'
 
         response.on 'data', (chunk) -> buffer += chunk
         response.on 'end', =>

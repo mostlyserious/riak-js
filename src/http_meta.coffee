@@ -90,6 +90,7 @@ Meta.queryProperties = ['r', 'w', 'dw', 'rw', 'keys', 'props', 'vtag', 'returnbo
 Meta.riakProperties = [
   'statusCode'
   'host'
+  'responseEncoding'
 ]
 
 module.exports = Meta
