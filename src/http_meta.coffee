@@ -65,13 +65,19 @@ class Meta extends CoreMeta
     
     # links
     headers['Link'] = linkUtils.linksToString(@links, @raw) if @links.length > 0
-    
-    # contentType (only if data is present)
-    headers['Content-Type'] = @contentType if @data?
-    # don't send chunked data at least until riak #278 gets fixed
-    headers['Content-Length'] = if @data?
-      if @data instanceof Buffer then @data.length
-      else Buffer.byteLength(@data)
+
+    if @data?
+      
+      # now we need to encode the data to calculate its type and length
+      @encodeData()
+      
+      # contentType
+      headers['Content-Type'] = @contentType
+      
+      # don't send chunked data at least until riak #278 gets fixed or we can stream the req body
+      headers['Content-Length'] =
+        if @data instanceof Buffer then @data.length
+        else Buffer.byteLength(@data)
 
     return headers
   

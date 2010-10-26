@@ -68,6 +68,11 @@ LOAD test.api, HTTP_TEST_DATA, ->
       
     db.updateProps bucket, allow_mult: false, ->
 
+    db.save bucket, 'test-buffer', new Buffer('hello')
+    db.get bucket, 'test-buffer', (err, data) ->
+      assert.equal 'hello', data.toString()
+    db.remove bucket, 'test-buffer'
+
     for b in [bucket, 'riakjs_airlines', 'riakjs_airports', 'riakjs_flights']
       db.keys b, (err, keys) ->
         for key in keys then db.remove b, key, (err, resp, meta) ->

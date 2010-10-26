@@ -42,11 +42,7 @@ class Meta
   #
   #   meta.encode({a: 1}) # => "{\"a\":1}"
   encode: (value) ->
-    # TODO refactor first bit
-    if value instanceof Buffer
-      @contentEncoding = 'binary'
-      @contentType = @guessType @contentEncoding
-      return value
+    if value instanceof Buffer then @contentType = @guessType 'binary'
     if dec = Meta.encoders[@contentType]
       dec value
     else
@@ -73,16 +69,16 @@ class Meta
       else delete this[key]
 
   encodeData: () ->
-    @encode(@data)
+    @data = @encode(@data) if @data?
 
   # Fills in a full content type based on a few defaults
   guessType: (type) ->
     switch type
-      when 'json'               then 'application/json'
-      when 'xml', 'plain'       then "text/#{type}"
-      when 'jpeg', 'gif', 'png' then "image/#{type}"
-      when 'binary'             then 'application/octet-stream'
-      else                           type
+      when 'json'                 then 'application/json'
+      when 'xml', 'html', 'plain' then "text/#{type}"
+      when 'jpeg', 'gif', 'png'   then "image/#{type}"
+      when 'binary'               then 'application/octet-stream'
+      else                        type
 
   # Pull the value at the given key from the given object, and then removes
   # it from the object.
@@ -133,6 +129,7 @@ Meta.defaults =
   contentType: 'json'
   raw: 'riak'
   clientId: 'riak-js' # fix default clientId
+  contentEncoding: 'utf8'
 
   # reserved by riak-js
   debug: true # print stuff out
@@ -145,6 +142,9 @@ Meta.decoders =
 Meta.encoders =
   "application/json": (data) ->
     JSON.stringify data
+  "application/octet-stream": (data) ->
+    data = new Buffer(data) unless data instanceof Buffer
+    data
 
 Meta::__defineGetter__ 'contentType', -> @_type
 

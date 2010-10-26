@@ -116,11 +116,11 @@ class HttpClient extends Client
       verb = verb.toUpperCase()
       path = meta.path
       @log "#{verb} #{path}"
-      
-      request = @client.request verb, path, meta.toHeaders()
 
+      request = @client.request verb, path, meta.toHeaders()
+      
       if meta.data
-        request.write meta.encodeData(), meta.contentEncoding
+        request.write meta.data, 'utf8'
         delete meta.data
 
       # use felixge's approach
