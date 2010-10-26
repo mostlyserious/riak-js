@@ -69,7 +69,9 @@ class Meta extends CoreMeta
     # contentType (only if data is present)
     headers['Content-Type'] = @contentType if @data?
     # don't send chunked data at least until riak #278 gets fixed
-    headers['Content-Length'] = @data.length if @data?
+    headers['Content-Length'] = if @data?
+      if @data instanceof Buffer then @data.length
+      else Buffer.byteLength(@data)
 
     return headers
   
