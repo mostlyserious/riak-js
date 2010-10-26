@@ -120,7 +120,7 @@ class HttpClient extends Client
       request = @client.request verb, path, meta.toHeaders()
       
       if meta.data
-        request.write meta.data, 'utf8'
+        request.write meta.data, meta.contentEncoding
         delete meta.data
 
       # use felixge's approach
