@@ -53,9 +53,9 @@ class Meta
   # userdata, and will live on meta.usermeta.
   load: (options, additionalProperties, additionalDefaults) ->
     defaults = Utils.mixin true, {}, Meta.defaults, additionalDefaults
-    # FIXME this is a workaround here because the mixin turns the link {} into a [] ... rewrite that stupid motherfucker
-    if options?.links
-      options.links = [options.links] unless Array.isArray(options.links) # DRY!
+
+    # ensure links is an array
+    options.links = [options.links] if options?.links and not Array.isArray(options.links)
     
     @usermeta = Utils.mixin true, {}, defaults, this, options
     
@@ -94,10 +94,16 @@ class Meta
   
   # operations on links  
   
-  addLink: (link) -> @links.push(link)
-  
-  removeLink: (link) -> @links = @links.filter (l) ->
-    l.bucket isnt link.bucket or l.key isnt link.key or (l.tag isnt link.tag and l.tag isnt '_')
+  addLink: (link) ->
+    if link
+      dupe = @links.some (l) ->
+        l.bucket is link.bucket and l.key is link.key and (l.tag or '_') is (link.tag or '_')
+      @links.push(link) unless dupe
+
+  removeLink: (link) ->
+    if link
+      @links = @links.filter (l) ->
+        l.bucket isnt link.bucket or l.key isnt link.key or (l.tag isnt link.tag and l.tag isnt '_')
   
 
 # Any set properties that aren't in this array are assumed to be custom 

@@ -118,5 +118,4 @@ linkUtils =
     result
     
   linksToString: (links, raw) ->
-    links = if Array.isArray(links) then links else [links]
     links.map((link) => "</#{raw}/#{encodeURIComponent link.bucket}/#{encodeURIComponent link.key}>; riaktag=\"#{encodeURIComponent link.tag || "_"}\"").join ", "

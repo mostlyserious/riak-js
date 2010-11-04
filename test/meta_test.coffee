@@ -31,9 +31,17 @@ assert.equal 'text/xml', full.contentType
 assert.equal false,      full.binary
 
 keyless = new Meta 'bucket'
+
 keyless.addLink { bucket: 'bucket', key: 'test' }
 keyless.addLink { bucket: 'bucket', key: 'test2', tag: '_' }
 keyless.addLink { bucket: 'bucket', key: 'test', tag: 'tag' }
+
+# duplicates should be ignored
+keyless.addLink { bucket: 'bucket', key: 'test' }
+keyless.addLink { bucket: 'bucket', key: 'test', tag: 'tag' }
+keyless.addLink { bucket: 'bucket', key: 'test2', tag: '_' }
+keyless.addLink { bucket: 'bucket', key: 'test2' } # no tag or '_' are equivalent
+
 assert.notEqual 'abc', keyless.usermeta.custom
 assert.equal undefined, keyless.key
 assert.deepEqual keyless.links, [
