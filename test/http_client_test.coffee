@@ -2,6 +2,15 @@ test = require('./helper') 'http'
 calls = 0
 bucket = 'riakjs_http'
 assert = require 'assert'
+# fs = require 'fs'
+# 
+# test (db, end) ->
+#   filename = '/Users/ftreacy/Desktop/progit.png'
+#   file = fs.readFileSync(filename)
+#   db.save 'test', 'file', file, { contentType: 'image/png', clientId: '' } , ->
+#     db.get 'test', 'file', { responseEncoding: 'binary' }, (err, resp, meta) ->
+#       console.log file.length
+#       console.log resp.length
 
 HTTP_TEST_DATA = {}
 HTTP_TEST_DATA[bucket] =
@@ -68,7 +77,7 @@ LOAD test.api, HTTP_TEST_DATA, ->
       
     db.updateProps bucket, allow_mult: false, ->
 
-    db.save bucket, 'test-buffer', new Buffer('hello')
+    db.save bucket, 'test-buffer', new Buffer('hello'), { contentType: 'binary' }
     db.get bucket, 'test-buffer', (err, data) ->
       assert.equal 'hello', data.toString()
     db.remove bucket, 'test-buffer'

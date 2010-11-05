@@ -76,8 +76,9 @@ class Meta extends CoreMeta
       
       # don't send chunked data at least until riak #278 gets fixed or we can stream the req body
       headers['Content-Length'] =
-        if @data instanceof Buffer then @data.length
-        else Buffer.byteLength(@data)
+        if @data instanceof Buffer then @data.length else Buffer.byteLength(@data)
+
+      # console.log "Sending content length: #{headers['Content-Length']} voor #{headers['Content-Type']} (buffer #{@data instanceof Buffer})"
 
     return headers
   

@@ -27,11 +27,12 @@ class Meta
   #     JSON.parse string
   #
   #   meta.decode("{\"a\":1}") # => {a: 1}
-  decode: (value) ->
-    if dec = Meta.decoders[@contentType]
-      dec value
+  decode: (data) ->
+    if Meta.checkBinary(@contentType) then new Buffer(data, 'binary')
     else
-      value
+      switch @contentType
+        when "application/json" then JSON.parse data
+        else data
 
   # Encodes a Javascript object into a Riak value.  Set custom encoders on 
   # Meta.encoders:
@@ -41,12 +42,15 @@ class Meta
   #     JSON.stringify value
   #
   #   meta.encode({a: 1}) # => "{\"a\":1}"
-  encode: (value) ->
-    if value instanceof Buffer then @contentType = @guessType 'binary'
-    if dec = Meta.encoders[@contentType]
-      dec value
-    else
-      value.toString()
+  encode: (data) ->
+    switch @contentType
+      when "application/json" then JSON.stringify data
+      else
+        if data instanceof Buffer
+          @contentType = @guessType 'binary' unless @contentType
+          data
+        else data?.toString() # other or no content-type
+
 
   # Loads the given options into this Meta object.  Any Riak properties are set
   # on the object directly. Anything custom is assumed to be custom Riak 
@@ -62,11 +66,13 @@ class Meta
     props = Utils.uniq Meta.riakProperties
       .concat(additionalProperties)
       .concat(Object.keys defaults)
-      
+    
     props.forEach (key) =>
       value = @popKey(key) ? Meta.defaults[key]
-      if value? then this[key] = value
-      else delete this[key]
+      if value?
+        this[key] = value
+      else
+        delete this[key]
 
   encodeData: () ->
     @data = @encode(@data) if @data?
@@ -104,7 +110,7 @@ class Meta
     if link
       @links = @links.filter (l) ->
         l.bucket isnt link.bucket or l.key isnt link.key or (l.tag isnt link.tag and l.tag isnt '_')
-  
+    
 
 # Any set properties that aren't in this array are assumed to be custom 
 # headers for a riak value.
@@ -141,25 +147,15 @@ Meta.defaults =
   debug: true # print stuff out
   data: undefined # attach submission data to meta
 
-Meta.decoders =
-  "application/json": (s) ->
-    JSON.parse s
-
-Meta.encoders =
-  "application/json": (data) ->
-    JSON.stringify data
-  "application/octet-stream": (data) ->
-    data = new Buffer(data) unless data instanceof Buffer
-    data
 
 Meta::__defineGetter__ 'contentType', -> @_type
 
 Meta::__defineSetter__ 'contentType', (type) ->
-  @_type = @guessType(type || 'json')
-  if @_type.match(/octet/) || @_type.match(/^image/)
-    @binary = true
-  else
-    @binary = false
+  @_type = @guessType(type or 'json')
+  @binary = Meta.checkBinary(@_type)
   @_type
+
+# Checks if the given content type is a binary format
+Meta.checkBinary = (type) -> /octet|^image|^video/.test type
 
 module.exports = Meta

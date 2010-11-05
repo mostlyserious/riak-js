@@ -135,13 +135,14 @@ class HttpClient extends Client
       buffer = ''
 
       request.on 'response', (response) =>
+        # console.log "Responding with encoding #{meta.usermeta.responseEncoding}"
         response.setEncoding meta.usermeta.responseEncoding or 'utf8'
 
         response.on 'data', (chunk) -> buffer += chunk
         response.on 'end', =>
           meta = meta.loadResponse response
 
-          buffer = if 400 <= meta.statusCode < 600
+          buffer = if 400 <= meta.statusCode <= 599
             err = new Error "HTTP error #{meta.statusCode}: #{buffer}"
             err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
             err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
@@ -164,13 +165,10 @@ class HttpClient extends Client
   # http client utils
 
   decodeBuffer: (buffer, meta) ->
-    if meta.contentType is 'application/octet-stream'
-      new Buffer buffer, 'binary'
-    else
-      try
-        if buffer.length > 0 then meta.decode(buffer) else undefined
-      catch e
-        new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
+    try
+      if buffer.length > 0 then meta.decode(buffer) else undefined
+    catch e
+      new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
 
   metaClass: Meta
 
