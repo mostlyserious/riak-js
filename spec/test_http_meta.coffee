@@ -74,13 +74,23 @@ vows.describe('Meta for HTTP').addBatch(
       
   'a meta with JSON data':
     topic: ->
-      meta = new Meta 'bucket', 'aput'
+      meta = new Meta 'bucket', 'json-data'
       meta.data = { test: true }
       meta.toHeaders()
     
     'guesses its content-type': (headers) ->
       assert.equal headers['Content-Type'], 'application/json'
       assert.equal headers['Link'], undefined
+
+  'a meta with responseEncoding=binary':
+    topic: ->
+      new Meta 'bucket', 'binary-data', {
+        data: new Buffer('binary-data')
+        responseEncoding: 'binary'
+      }
+
+    'recognizes it as a first-class property': (meta) ->
+      assert.equal meta.responseEncoding, 'binary'
 
   'a meta with query properties':
     topic: ->

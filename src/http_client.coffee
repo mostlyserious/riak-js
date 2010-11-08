@@ -135,8 +135,7 @@ class HttpClient extends Client
       buffer = ''
 
       request.on 'response', (response) =>
-        # console.log "Responding with encoding #{meta.usermeta.responseEncoding}"
-        response.setEncoding meta.usermeta.responseEncoding or 'utf8'
+        response.setEncoding meta.responseEncoding or 'utf8'
 
         response.on 'data', (chunk) -> buffer += chunk
         response.on 'end', =>
