@@ -169,6 +169,4 @@ class HttpClient extends Client
     catch e
       new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
 
-  metaClass: Meta
-
 module.exports = HttpClient

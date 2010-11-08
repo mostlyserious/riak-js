@@ -9,9 +9,12 @@ class Client
     CoreMeta.defaults = Utils.mixin true, {}, CoreMeta.defaults, options
   
   executeCallback: (data, meta, callback) ->
-    callback or= (err, data, meta) =>
-      @log data, json: @contentType is 'json'
+    def = (err, data, meta) =>
+      @log data, { json: @contentType is 'json' }
+      
+    callback or= def
     err = null
+    
     if data instanceof Error
       err = data
       data = data.message
@@ -29,8 +32,5 @@ class Client
     options or= {}
     if string and console and (if options.debug isnt undefined then options.debug else CoreMeta.defaults.debug)
       if options.json then console.dir string else console.log string
-
-  # all subclasses must implement metaClass so that clients can call new db.Meta()
-  Meta: -> new @metaClass # FIXME
 
 module.exports = Client

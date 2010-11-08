@@ -106,6 +106,4 @@ class ProtoBufClient extends Client
     delete content.usermeta
     [content, value]
 
-  metaClass: Meta
-
-module.exports      = ProtoBufClient
+module.exports = ProtoBufClient

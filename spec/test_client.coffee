@@ -111,7 +111,6 @@ batches = [{
           db.get flights, 'IBE_4418', @callback
           
         'is not present': (err, flight) ->
-          assert.equal undefined, flight
           assert.equal 404, err.statusCode
   
   # walk is ONLY HTTP for now
