@@ -9,14 +9,10 @@ deps:
 	@test `which coffee` || echo 'You need to have CoffeeScript in your PATH.\nPlease install it using `brew install coffee-script` or `npm install coffee-script`.'
 
 test: deps
-	@find test -name '*.coffee' | xargs ls
-
-publish: generate-js
-	@test `which npm` || echo 'You need npm to do npm publish... makes sense?'
-	npm publish
-	@remove-js
+	@test `which vows` || echo 'You need vows to test this library. Install via "npm install vows@0.5.2".'
+	@vows spec/test_* --spec
 
 dev: generate-js
 	@coffee -wc --no-wrap -o lib src/*.coffee
 
-.PHONY: generate-js remove-js deps test publish dev
+.PHONY: generate-js remove-js deps test dev
