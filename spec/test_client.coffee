@@ -179,6 +179,8 @@ teardownBatch =
   'suite teardown':
     topic: ->
       
+      db.updateProps client.bucket, { allow_mult: false } # just in case
+      
       done = @callback
       buckets = Object.keys(data)
       

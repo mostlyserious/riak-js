@@ -3,6 +3,8 @@ bucket = 'riakjs_http'
 
 module.exports =
 
+  bucket: bucket
+
   data:
     riakjs_http:
       'test1': [{name: 'Testing 1'}]
@@ -24,8 +26,7 @@ module.exports =
         topic: ->
           db.count bucket, @callback
       
-        'returns several elements': (elems) ->
-          [count] = elems
+        'returns several elements': (count) ->
           assert.equal count, 3
         
       'head request':
