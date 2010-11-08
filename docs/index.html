@@ -244,6 +244,12 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         <p>Head will only get the <code>meta</code> object back &mdash; no data. (It uses the HTTP HEAD verb under the hood.)</p>
         
         <pre><code>db.head('airlines', 'KLM')</code></pre>
+        
+        <h4>Exists</h4>
+        
+        <p>Exists is a shortcut to tell you if a document exists or not. Internally, it uses <code>head</code> and checks for a <code>404</code>.</p>
+        
+        <pre><code>db.exists('airlines', 'SPIDERMAN')</code></pre>
                 
         <h4>Get all</h4>
         

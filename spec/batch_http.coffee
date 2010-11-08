@@ -3,6 +3,8 @@ bucket = 'riakjs_http'
 
 module.exports =
 
+  bucket: bucket
+
   data:
     riakjs_http:
       'test1': [{name: 'Testing 1'}]
@@ -24,8 +26,7 @@ module.exports =
         topic: ->
           db.count bucket, @callback
       
-        'returns several elements': (elems) ->
-          [count] = elems
+        'returns several elements': (count) ->
           assert.equal count, 3
         
       'head request':
@@ -35,9 +36,23 @@ module.exports =
         'data is undefined': (err, data, meta) ->
           assert.isUndefined data
       
-        'meta exists': (err, data, meta) ->
+        'meta is present': (err, data, meta) ->
           assert.ok meta
-      
+          
+      'exists request (1)':
+        topic: ->
+          db.exists bucket, 'test1', @callback
+        
+        'document exists': (exists) ->
+          assert.isTrue exists
+
+      'exists request (2)':
+        topic: ->
+          db.exists bucket, 'test-3739192843943-b', @callback
+
+        'document does not exist': (exists) ->
+          assert.isFalse exists
+
       'keys request':
         topic: ->
           db.keys bucket, @callback

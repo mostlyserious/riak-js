@@ -23,6 +23,20 @@ class HttpClient extends Client
     @execute('HEAD', meta) (data, meta) =>
       @executeCallback data, meta, callback
       
+  exists: (bucket, key, options...) ->
+    [options, callback] = @ensure options
+    
+    _cb = callback # proxy callback
+    callback = (err, data, meta) ->
+      if meta.statusCode is 404
+        _cb(null, false, meta)
+      else if err
+        _cb(err, data, meta)
+      else
+        _cb(err, true, meta)
+    
+    @head(bucket, key, options, callback)
+
   getAll: (bucket, options...) ->
     [options, callback] = @ensure options
     
@@ -45,6 +59,12 @@ class HttpClient extends Client
   
   count: (bucket, options...) ->
     [options, callback] = @ensure options
+    
+    _cb = callback  # proxy callback
+    callback = (err, data, meta) ->
+      if not err then [data] = data
+      _cb(err, data, meta)
+      
     @add(bucket).map((v) -> [1]).reduce('Riak.reduceSum').run callback
     
   walk: (bucket, key, spec, options...) ->
@@ -135,13 +155,13 @@ class HttpClient extends Client
       buffer = ''
 
       request.on 'response', (response) =>
-        response.setEncoding meta.usermeta.responseEncoding or 'utf8'
+        response.setEncoding meta.responseEncoding or 'utf8'
 
         response.on 'data', (chunk) -> buffer += chunk
         response.on 'end', =>
           meta = meta.loadResponse response
 
-          buffer = if 400 <= meta.statusCode < 600
+          buffer = if 400 <= meta.statusCode <= 599
             err = new Error "HTTP error #{meta.statusCode}: #{buffer}"
             err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
             err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
@@ -164,14 +184,9 @@ class HttpClient extends Client
   # http client utils
 
   decodeBuffer: (buffer, meta) ->
-    if meta.contentType is 'application/octet-stream'
-      new Buffer buffer, 'binary'
-    else
-      try
-        if buffer.length > 0 then meta.decode(buffer) else undefined
-      catch e
-        new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
-
-  metaClass: Meta
+    try
+      if buffer.length > 0 then meta.decode(buffer) else undefined
+    catch e
+      new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
 
 module.exports = HttpClient

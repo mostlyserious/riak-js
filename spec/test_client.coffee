@@ -111,7 +111,6 @@ batches = [{
           db.get flights, 'IBE_4418', @callback
           
         'is not present': (err, flight) ->
-          assert.equal undefined, flight
           assert.equal 404, err.statusCode
   
   # walk is ONLY HTTP for now
@@ -179,6 +178,8 @@ teardownBatch =
 
   'suite teardown':
     topic: ->
+      
+      db.updateProps client.bucket, { allow_mult: false } # just in case
       
       done = @callback
       buckets = Object.keys(data)
