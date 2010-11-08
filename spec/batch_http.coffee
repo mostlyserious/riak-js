@@ -36,9 +36,23 @@ module.exports =
         'data is undefined': (err, data, meta) ->
           assert.isUndefined data
       
-        'meta exists': (err, data, meta) ->
+        'meta is present': (err, data, meta) ->
           assert.ok meta
-      
+          
+      'exists request (1)':
+        topic: ->
+          db.exists bucket, 'test1', @callback
+        
+        'document exists': (exists) ->
+          assert.isTrue exists
+
+      'exists request (2)':
+        topic: ->
+          db.exists bucket, 'test-3739192843943-b', @callback
+
+        'document does not exist': (exists) ->
+          assert.isFalse exists
+
       'keys request':
         topic: ->
           db.keys bucket, @callback
