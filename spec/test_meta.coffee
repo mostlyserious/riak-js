@@ -29,6 +29,7 @@ vows.describe('Meta').addBatch(
         data: 'd32n92390XMIW0'
         vclock:      123
         custom:      'abc'
+      # calling encodeData() resolves to the correct content type and binary state
       full.encodeData()
       full
     
@@ -50,6 +51,7 @@ vows.describe('Meta').addBatch(
   'a keyless meta':
     topic: ->
       keyless = new Meta 'bucket'
+      
       keyless.addLink { bucket: 'bucket', key: 'test' }
       keyless.addLink { bucket: 'bucket', key: 'test2', tag: '_' }
       keyless.addLink { bucket: 'bucket', key: 'test', tag: 'tag' }
@@ -60,6 +62,9 @@ vows.describe('Meta').addBatch(
       keyless.addLink { bucket: 'bucket', key: 'test2', tag: '_' }
       keyless.addLink { bucket: 'bucket', key: 'test2' } # no tag or '_' are equivalent
       
+      keyless.data = 'some text'
+      keyless.encodeData()
+      
       keyless
       
     'hasn\'t got a key': (keyless) ->
@@ -67,6 +72,9 @@ vows.describe('Meta').addBatch(
     
     'usermeta is empty': (keyless) ->
       assert.deepEqual {}, keyless.usermeta
+      
+    'data is plain text': (keyless) ->
+      assert.equal keyless.contentType, 'text/plain'
     
     'duplicate links are ignored': (keyless) ->
       assert.deepEqual keyless.links, [
@@ -83,6 +91,16 @@ vows.describe('Meta').addBatch(
       keyless.removeLink { bucket: 'bucket', key: 'test2' } # should treat tag '_' as non-existent
       assert.equal keyless.links.length, 0
       
+  'a meta provided with a Javascript object as data':
+    topic: ->
+      meta = new Meta 'bucket', 'key', {
+        data: {a: 1, b: 2}
+      }
+      meta.encodeData()
+      meta
+    
+    'has content type json when encoded': (meta) ->
+      assert.equal meta.contentType, "application/json"
 
   'a meta initialized with another meta':
     topic: ->
@@ -90,6 +108,6 @@ vows.describe('Meta').addBatch(
     
     'is an exact copy': (copy) ->
       assert.ok copy instanceof Meta
-      assert.deepEqual full, copy
+      assert.deepEqual full, copy  
 
 ).export module

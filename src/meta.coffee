@@ -19,8 +19,8 @@ class Meta
     
     return meta
 
-  # Parses a Riak value into a Javascript object, by
-  # determining the most suitable decoder.
+  # Parses a Riak value into a Javascript object, and from
+  # available information does its best to determine a suitable encoder.
   #
   #   meta.decode("{\"a\":1}") # => {a: 1}
   decode: (data) ->
@@ -32,8 +32,9 @@ class Meta
         when "application/json" then JSON.parse data
         else data
 
-  # Encodes a Javascript object into a Riak value, and
-  # does its best to determine three properties:
+  # Encodes a Javascript object into a Riak value, and from
+  # available information does its best to determine three properties:
+  #
   #  - content type
   #  - binary (true/false)
   #  - instance type (Buffer/String)
@@ -42,18 +43,19 @@ class Meta
   encode: (data) ->
     
     # content-type: guess if not present
-    if @contentType?
-      @contentType = @resolveType @contentType
-    else
-      # if buffer => octet-stream; else try json; else plain text
-      if data instanceof Buffer
-        @contentType = @resolveType 'binary'
+    @contentType =
+      if @contentType?
+        # expand if it's in short from, 'html' => 'text/html'
+        @resolveType @contentType
       else
-        try
-          parsedJson = JSON.stringify data
-          @contentType = @resolveType 'json'
-        catch e
-          @contentType = @resolveType 'plain'
+        # if buffer => octet-stream; else try json; else plain text
+        if data instanceof Buffer
+          @resolveType 'binary'
+        else if typeof data is 'object'
+          json = JSON.stringify data
+          @resolveType 'json'
+        else
+          @resolveType 'plain'
     
     # binary
     @binary = @checkBinary @contentType
@@ -66,8 +68,7 @@ class Meta
       when @binary?
         data
       when "application/json"
-        parsedJson or= JSON.stringify data  # in case it was already done
-        parsedJson
+        json or JSON.stringify data  # in case it was already done
       else
         data.toString()
 
@@ -138,7 +139,7 @@ class Meta
     
 
 # Any set properties that aren't in this array are assumed to be custom 
-# headers for a riak value.
+# headers for a Riak value.
 Meta.riakProperties = [
   'bucket' # both
   'key' # both
@@ -170,7 +171,7 @@ Meta.defaults =
 
   # reserved by riak-js
   debug: true # print stuff out
-  data: undefined # attach submission data to meta
+  data: undefined # attach request body data to meta
   
   # content-type
   # see @encode -- too complex to have just one simple default
