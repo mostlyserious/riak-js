@@ -159,21 +159,39 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         can be set on this object. It also contains handy methods to deal with links, and provides <strong>sensible defaults</strong>, which can of course be overriden.
         Examples are <code>'contentType': 'application/json'</code> and <code>'clientId': 'riak-js'</code>. Note that you cannot change host or port once the client is instantiated.</p>
         
+       <p>Not only these are tunable per-request. If you need certain defaults to apply to the whole session, 
+          provide them at initialization time: <code>getClient({clientId: 'lan-27', raw: 'data', debug: false})</code>.</p>
+        
         <pre><code>fs.readFile("drunk-pilot.png", 'binary', function (err, image) {
   if (err) throw err;
   db.save('evidence', 'pilot-smith-drunk', image, { contentType: 'jpeg', immediateAction: 'fire' })
 });</code></pre>
         
-        <em>Note that <code>'jpeg'</code> is a shortcut and <code>immediateAction</code> is custom metadata</em>
+        <em>Note that <code>'jpeg'</code> is a shortcut and <code>immediateAction</code> is custom metadata.</em>
         
-        <p>Not only these are tunable per-request. If you need certain defaults to apply to the whole session, 
-          provide them at initialization time: <code>getClient({clientId: 'lan-27', raw: 'data', debug: false})</code>.</p>
+        <p>
+          <code>Buffer</code>s are only returned when the <code>responseEncoding</code> property is set to <code>binary</code>.
+          This happens automatically for known binary types, such as <code>image/*</code>, <code>video/*</code> or
+          <code>application/octet-stream</code>, otherwise you have to provide yourself through <code>Meta</code>.
+        </p>
+        
+        <h4>Content detection</h4>
+        
+        <p>
+          If you don't provide a content type, riak-js will do its best to guess one:
+          <ul>
+            <li>If your data is a <code>Buffer</code> it will assume <code>application/octet-stream</code></li>
+            <li>If your data is a Javascript object whose <code>typeof</code> yields <code>object</code>, it will assume <code>application/json</code></li>
+            <li>Otherwise, <code>text/plain</code></li>
+          </ul>
+          
+        </p>
 
         <h3>Callbacks</h3>
         
         <pre><code>db.save('flights', 'KLM-5034', flight)</code></pre>
         
-        <p>riak-js follows the node.js convention: last argument is the callback, whose first argument is the <code>err</code> variable.
+        <p>riak-js follows the Node convention: last argument is the callback, whose first argument is the <code>err</code> variable.
           If you don't provide a callback the result will be logged through <code>console.log</code>.</p>
 
         <h3>API</h3>
@@ -299,6 +317,16 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
     console.log(flights)
   })</code></pre> 
 
+        <h4>Luwak</h4>
+        
+        <p>These commands (<code>getFile</code>, <code>saveFile</code>, <code>removeFile</code>) behave much like
+           their counterparts <code>get</code>, <code>save</code>, <code>remove</code>.
+          They don't take a <code>bucket</code> argument, internally reference the <code>luwak</code>
+           raw resource, and always use <code>responseEncoding = 'binary'</code> therefore returning <code>Buffer</code>s.</p>
+          
+        <pre><code>db.getFile('lowcost-pilot')</code></pre>
+        <pre><code>db.saveFile('lowcost-pilot', "/tmp/lp.jpg")</code></pre>
+        <pre><code>db.removeFile('lowcost-pilot')</code></pre>
 
         <h4>Ping</h4>
         
