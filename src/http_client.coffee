@@ -122,7 +122,7 @@ class HttpClient extends Client
   getFile: (key, options...) ->
     [options, callback] = @ensure options
     options.raw or= 'luwak'
-    options.responseEncoding or= 'binary'
+    options.responseEncoding = 'binary'
     @get undefined, key, options, callback
 
   saveFile: (key, file, options...) ->
