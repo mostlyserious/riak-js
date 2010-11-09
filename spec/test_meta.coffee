@@ -14,8 +14,7 @@ vows.describe('Meta').addBatch(
       assert.equal 'bucket',           empty.bucket
       assert.equal 'empty',            empty.key
       assert.equal null,               empty.vclock
-      assert.equal 'application/json', empty.contentType
-      assert.equal false,              empty.binary      
+      assert.equal false,              empty.binary
     
     'falls back to defaults from non-set properties': (empty) ->
       assert.deepEqual empty.links, Meta.defaults.links
@@ -27,8 +26,11 @@ vows.describe('Meta').addBatch(
     topic: ->
       full = new Meta 'bucket', 'full'
         contentType: 'png'
+        data: 'd32n92390XMIW0'
         vclock:      123
         custom:      'abc'
+      full.encodeData()
+      full
     
     'has its basic properties set': (full) ->
       assert.equal 'bucket',    full.bucket
@@ -40,6 +42,8 @@ vows.describe('Meta').addBatch(
       
     'can be updated': (full) ->
       full.contentType = 'xml'
+      full.data = "<a>test</a>"
+      full.encodeData()
       assert.equal 'text/xml', full.contentType
       assert.equal false,      full.binary
       

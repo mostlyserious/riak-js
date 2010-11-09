@@ -155,7 +155,7 @@ class HttpClient extends Client
       buffer = ''
 
       request.on 'response', (response) =>
-        response.setEncoding meta.responseEncoding or 'utf8'
+        response.setEncoding meta.responseEncoding
 
         response.on 'data', (chunk) -> buffer += chunk
         response.on 'end', =>

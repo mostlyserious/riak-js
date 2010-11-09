@@ -19,38 +19,73 @@ class Meta
     
     return meta
 
-  # Parses a Riak value into a Javascript object.  Set custom decoders on 
-  # Meta.decoders:
-  #
-  #   # parse all JSON data
-  #   Meta.decoders['application/json'] = (string) ->
-  #     JSON.parse string
+  # Parses a Riak value into a Javascript object, by
+  # determining the most suitable decoder.
   #
   #   meta.decode("{\"a\":1}") # => {a: 1}
   decode: (data) ->
-    if Meta.checkBinary(@contentType) then new Buffer(data, 'binary')
+    if @responseEncoding is 'binary' or @checkBinary(@contentType)
+      # not completely sure @responseEncoding is http only -- otherwise move down to http_meta
+      new Buffer(data, 'binary')
     else
       switch @contentType
         when "application/json" then JSON.parse data
         else data
 
-  # Encodes a Javascript object into a Riak value.  Set custom encoders on 
-  # Meta.encoders:
-  #
-  #   # Convert JSON data
-  #   Meta.encoders['application/json'] = (value) ->
-  #     JSON.stringify value
-  #
+  # Encodes a Javascript object into a Riak value, and
+  # does its best to determine three properties:
+  #  - content type
+  #  - binary (true/false)
+  #  - instance type (Buffer/String)
+  # 
   #   meta.encode({a: 1}) # => "{\"a\":1}"
   encode: (data) ->
-    switch @contentType
-      when "application/json" then JSON.stringify data
+    
+    # content-type: guess if not present
+    if @contentType?
+      @contentType = @resolveType @contentType
+    else
+      # if buffer => octet-stream; else try json; else plain text
+      if data instanceof Buffer
+        @contentType = @resolveType 'binary'
       else
-        if data instanceof Buffer
-          @contentType = @guessType 'binary' unless @contentType
-          data
-        else data?.toString() # other or no content-type
+        try
+          parsedJson = JSON.stringify data
+          @contentType = @resolveType 'json'
+        catch e
+          @contentType = @resolveType 'plain'
+    
+    # binary
+    @binary = @checkBinary @contentType
+    
+    # instance
+    if @binary and not data instanceof Buffer
+      data = new Buffer(data, 'binary')
+    
+    switch @contentType
+      when @binary?
+        data
+      when "application/json"
+        parsedJson or= JSON.stringify data  # in case it was already done
+        parsedJson
+      else
+        data.toString()
 
+  # calls encode on data
+  encodeData: () ->
+    @data = @encode(@data) if @data?
+
+  # Fills in a full content type based on a few defaults
+  resolveType: (type) ->
+    switch type
+      when 'json'                 then 'application/json'
+      when 'xml', 'html', 'plain' then "text/#{type}"
+      when 'jpeg', 'gif', 'png'   then "image/#{type}"
+      when 'binary'               then 'application/octet-stream'
+      else                        type
+      
+  # Checks if the given content type is a binary format
+  checkBinary: (type) -> /octet|^image|^video/.test type
 
   # Loads the given options into this Meta object.  Any Riak properties are set
   # on the object directly. Anything custom is assumed to be custom Riak 
@@ -74,24 +109,14 @@ class Meta
       else
         delete this[key]
 
-  encodeData: () ->
-    @data = @encode(@data) if @data?
-
-  # Fills in a full content type based on a few defaults
-  guessType: (type) ->
-    switch type
-      when 'json'                 then 'application/json'
-      when 'xml', 'html', 'plain' then "text/#{type}"
-      when 'jpeg', 'gif', 'png'   then "image/#{type}"
-      when 'binary'               then 'application/octet-stream'
-      else                        type
-
   # Pull the value at the given key from the given object, and then removes
   # it from the object.
   popKey: (key) ->
     value = @usermeta[key]
     delete  @usermeta[key]
     value
+    
+  # query properties to string
 
   stringifyQuery: (query) ->
     for key, value of query
@@ -135,10 +160,10 @@ Meta.riakProperties = [
   'vtag' # both
 ]
 
-# Defaults for Meta properties.
+# Defaults for Meta properties
 Meta.defaults =
-  links:        []
-  contentType: 'json'
+  links: []
+  binary: false
   raw: 'riak'
   clientId: 'riak-js' # fix default clientId
   contentEncoding: 'utf8'
@@ -146,16 +171,8 @@ Meta.defaults =
   # reserved by riak-js
   debug: true # print stuff out
   data: undefined # attach submission data to meta
-
-
-Meta::__defineGetter__ 'contentType', -> @_type
-
-Meta::__defineSetter__ 'contentType', (type) ->
-  @_type = @guessType(type or 'json')
-  @binary = Meta.checkBinary(@_type)
-  @_type
-
-# Checks if the given content type is a binary format
-Meta.checkBinary = (type) -> /octet|^image|^video/.test type
+  
+  # content-type
+  # see @encode -- too complex to have just one simple default
 
 module.exports = Meta

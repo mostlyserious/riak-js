@@ -91,9 +91,9 @@ module.exports =
           
       'a Buffer':
         topic: ->
-          db.save bucket, 'test-buffer', new Buffer('hello'), { contentType: 'binary', returnbody: true }, @callback
+          db.save bucket, 'test-buffer', new Buffer('hello'), { contentType: 'application/x-play', responseEncoding: 'binary', returnbody: true }, @callback
         
-        'remains a Buffer when retrieved': (data) ->
+        'remains a Buffer when requested with responseEncoding=binary': (data) ->
           assert.ok data instanceof Buffer
           assert.equal 'hello', data.toString()
         
@@ -102,6 +102,21 @@ module.exports =
             db.remove bucket, 'test-buffer', @callback
             
           'succeeds': ->
+          
+      'another Buffer':
+        topic: ->
+          image = new Buffer('&StttÂ ïÁÕõßæøq„Fï*UÓ‹Ωk¥Ÿåf≥…bypÛfÙΩ{F/¸ò6≠9', 'binary')
+          db.save bucket, 'test-another-buffer', image, { contentType: 'image/png', returnbody: true }, @callback
+
+        'remains a Buffer if content-type is image (responseEncoding is automatic with known content types)': (data) ->
+          assert.ok data instanceof Buffer
+
+        'when removed':
+          topic: ->
+            db.remove bucket, 'test-another-buffer', @callback
+
+          'succeeds': ->
+
     
     }
     
@@ -129,7 +144,7 @@ module.exports =
       
         'when allow_mult=true, returns conflicting versions': (err, data, meta) ->
           assert.equal data.length, 2
-
+    
         'when solving the conflict':
           # we now select the document with name 'Testing conflicting'
           # and save (meta passes the correct vclock along)
@@ -166,7 +181,3 @@ module.exports =
     }
 
 ]
-        
-        
-
-

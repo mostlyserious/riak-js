@@ -81,7 +81,7 @@ class Meta extends CoreMeta
       # console.log "Sending content length: #{headers['Content-Length']} voor #{headers['Content-Type']} (buffer #{@data instanceof Buffer})"
 
     return headers
-  
+    
 
 Meta::__defineGetter__ 'path', ->
   queryString = @stringifyQuery @queryProps
@@ -95,6 +95,7 @@ Meta::__defineGetter__ 'queryProps', ->
 Meta.defaults =
   host: 'localhost'
   accept: 'multipart/mixed, application/json;q=0.7, */*;q=0.5'
+  responseEncoding: 'utf8'
 
 Meta.queryProperties = ['r', 'w', 'dw', 'rw', 'keys', 'props', 'vtag', 'returnbody', 'chunked']
 
