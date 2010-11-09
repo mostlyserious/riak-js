@@ -25,11 +25,13 @@ setupBatch =
         [bucket, key, value, meta] = entry
         
         db.save bucket, key, value, meta, (err) ->
-          done() if index is queue.length-1
+          if index is queue.length-1
+            # make sure allow_mult is set to false
+            db.updateProps client.bucket, { allow_mult: false }, done()
     
     'when get keys':
       topic: ->
-        db.keys 'riakjs_airports', @callback
+        db.keys airports, @callback
       
       'data is present': (keys) ->
         assert.length keys, 8
@@ -57,8 +59,8 @@ batches = [{
       
     'returns its links': (err, air, meta) ->
       assert.equal 2,                            meta.links.length
-      assert.equal 'riakjs_client_test_flights', meta.links[0].bucket
-      assert.equal 'riakjs_client_test_flights', meta.links[1].bucket
+      assert.equal 'riakjs_flights',             meta.links[0].bucket
+      assert.equal 'riakjs_flights',             meta.links[1].bucket
       assert.equal 'KLM-8098',                   meta.links[0].key
       assert.equal 'KLM-1196',                   meta.links[1].key
       assert.equal 'flight',                     meta.links[0].tag
@@ -91,7 +93,7 @@ batches = [{
 
     'returns its links': (err, air, meta) ->
       assert.equal 1,                            meta.links.length
-      assert.equal 'riakjs_client_test_flights', meta.links[0].bucket
+      assert.equal 'riakjs_flights',             meta.links[0].bucket
       assert.equal 'CPA-729',                    meta.links[0].key
       assert.equal 'flight',                     meta.links[0].tag
       
@@ -179,8 +181,6 @@ teardownBatch =
   'suite teardown':
     topic: ->
       
-      db.updateProps client.bucket, { allow_mult: false } # just in case
-      
       done = @callback
       buckets = Object.keys(data)
       
@@ -237,7 +237,7 @@ data =
       [
         {name: 'Cathay Pacific', fleet: 127, alliance: 'One World', european: false}
         {
-          links: {bucket: "riakjs_client_test_flights", key: "CPA-729", tag: "flight"}
+          links: {bucket: "riakjs_flights", key: "CPA-729", tag: "flight"}
         }
       ]
     KLM:
@@ -246,8 +246,8 @@ data =
         {
           links:
             [
-              {bucket: "riakjs_client_test_flights", key: 'KLM-8098', tag: 'flight'}
-              {bucket: "riakjs_client_test_flights", key: 'KLM-1196', tag: 'flight'}
+              {bucket: "riakjs_flights", key: 'KLM-8098', tag: 'flight'}
+              {bucket: "riakjs_flights", key: 'KLM-1196', tag: 'flight'}
             ]
           abc: 1
         }
