@@ -1,6 +1,6 @@
 CoreMeta = require './meta'
 Utils    = require './utils'
-Meta = require './http_meta'
+Meta = require './meta'
 
 class Client
   
