@@ -78,8 +78,6 @@ class Meta extends CoreMeta
       headers['Content-Length'] =
         if @data instanceof Buffer then @data.length else Buffer.byteLength(@data)
 
-      # console.log "Sending content length: #{headers['Content-Length']} voor #{headers['Content-Type']} (buffer #{@data instanceof Buffer})"
-
     return headers
     
 

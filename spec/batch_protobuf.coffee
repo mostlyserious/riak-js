@@ -76,7 +76,6 @@ module.exports =
         db.buckets @callback
       
       'returns buckets': (buckets) ->
-        console.dir buckets
         # DRY!
         for bucket in [
             'riakjs_airlines'
