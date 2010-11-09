@@ -172,6 +172,13 @@ module.exports =
     
     {
       
+      'getting a non-existent file':
+        topic: ->
+          db.getFile '90230230230dff3j0f3', @callback
+        
+        'gives back a 404': (err, data) ->
+          assert.equal err?.statusCode, 404
+      
       'saving a file to luwak':
         topic: ->
           filename = "#{__dirname}/fixtures/lowcost-pilot.jpg"
