@@ -365,14 +365,12 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
         <pre><code>coffee -wc -o lib --no-wrap src/**/*.coffee</code></pre>
         
-        <h3>Testing Philosophy</h3> 
+        <h3>Testing</h3> 
 
-        <p>In my mind, there are three main types of tests in riak-js.  The simplest kind is the simple object tests (see <code>test/meta_test.coffee</code>).  These don't hit Riak, and are only sanity checks for various objects.</p> 
-
-        <p>The second type is the high level integration tests for both client libs.  These make sure that common operations between the HTTP and PBC clients behave identically.  I've started on this in <code>test/protobuf_client_test.coffee</code>, but I want to move the common tests to a central spot.</p> 
-
-        <p>The third type is a set of client-specific tests.  There are a few methods on the PBC API that aren't really in the HTTP API.  I still want to support them, even if there isn't any support in the HTTP API.</p> 
-
+        <p>
+          Checkout the <code>spec</code> folder.
+          Test with <code>make test</code>. Requires <a href="http://vowsjs.org">Vows</a> 0.5.2.
+        </p>
 
         <h3>Authors and contributors, in order of appearence</h3>
 
