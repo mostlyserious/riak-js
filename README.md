@@ -14,7 +14,7 @@ It can be installed via `brew install coffee-script` or `npm install coffee-scri
 
 Simply execute `make dev` to start continuous compilation.
 
-Testing with [http://vowsjs.org](Vows) 0.5.2.
+Test with `make test`. Requires [Vows](http://vowsjs.org) 0.5.2.
 
 ### Features and documentation
 
