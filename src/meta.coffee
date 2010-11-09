@@ -65,12 +65,13 @@ class Meta
       data = new Buffer(data, 'binary')
     
     switch @contentType
-      when @binary?
-        data
       when "application/json"
         json or JSON.stringify data  # in case it was already done
       else
-        data.toString()
+        if @binary?
+          data
+        else
+          data.toString()
 
   # calls encode on data
   encodeData: () ->

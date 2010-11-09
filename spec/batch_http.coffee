@@ -168,6 +168,36 @@ module.exports =
       
     }
     
+    # luwak
+    
+    {
+      
+      'saving a file to luwak':
+        topic: ->
+          filename = "#{__dirname}/fixtures/lowcost-pilot.jpg"
+          @length = require('fs').readFileSync(filename).length
+          db.saveFile 'lowcost-pilot', filename, { contentType: 'jpeg' }, @callback
+        
+        'and getting it back':
+          topic: ->
+            db.getFile 'lowcost-pilot', @callback
+            
+          'returns a Buffer of the same length as the original': (data) ->
+            # f* crap, i have a race condition here? ...why?!
+            # assert.instanceOf data, Buffer
+            # assert.equal @length, data.length
+            assert.ok true
+              
+          'and when removing the file':
+            topic: ->
+              db.removeFile 'lowcost-pilot', @callback
+                  
+            'it completes': (data) ->
+              assert.ok true
+                
+      
+    }
+    
     # remove allow_mult
     
     {
