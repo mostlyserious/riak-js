@@ -1,5 +1,6 @@
 assert = require 'assert'
 bucket = 'riakjs_http'
+fs = require 'fs'
 
 module.exports =
 
@@ -172,36 +173,41 @@ module.exports =
     
     {
       
+      'trying to save a non-buffer':
+        topic: ->
+          db.saveLarge 'lowcost-pilot', "String data, no Buffer", @callback
+        
+        'gives back an error': (err, data) ->
+          assert.instanceOf err, Error
+      
       'getting a non-existent file':
         topic: ->
-          db.getFile '90230230230dff3j0f3', @callback
+          db.getLarge '90230230230dff3j0f3', @callback
         
         'gives back a 404': (err, data) ->
           assert.equal err?.statusCode, 404
       
-      'saving a file to luwak':
+      'getting a file stored in luwak':
         topic: ->
-          filename = "#{__dirname}/fixtures/lowcost-pilot.jpg"
-          @length = require('fs').readFileSync(filename).length
-          db.saveFile 'lowcost-pilot', filename, { contentType: 'jpeg' }, @callback
-        
-        'and getting it back':
-          topic: ->
-            db.getFile 'lowcost-pilot', @callback
+          done = @callback
+          
+          fs.readFile "#{__dirname}/fixtures/lowcost-pilot.jpg", (err, data) =>
+            @length = data.length
+            db.saveLarge 'lowcost-pilot', data, { contentType: 'jpeg' }, (err) ->
+              setTimeout -> # let's wait for Riak for 50ms
+                db.getLarge 'lowcost-pilot', done
+              , 50
+          
+        'returns a Buffer of the same length as the original': (data) ->
+          assert.instanceOf data, Buffer
+          assert.equal @length, data.length
             
-          'returns a Buffer of the same length as the original': (data) ->
-            # f* crap, i have a race condition here? ...why?!
-            # assert.instanceOf data, Buffer
-            # assert.equal @length, data.length
-            assert.ok true
-              
-          'and when removing the file':
-            topic: ->
-              db.removeFile 'lowcost-pilot', @callback
-                  
-            'it completes': (data) ->
-              assert.ok true
+        'and when removing the file':
+          topic: ->
+            db.removeLarge 'lowcost-pilot', @callback
                 
+          'is complete': (err, data) ->
+            assert.ok not err
       
     }
     

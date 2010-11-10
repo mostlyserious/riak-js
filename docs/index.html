@@ -319,14 +319,14 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
         <h4>Luwak</h4>
         
-        <p>These commands (<code>getFile</code>, <code>saveFile</code>, <code>removeFile</code>) behave much like
+        <p>These commands (<code>getLarge</code>, <code>saveLarge</code>, <code>removeLarge</code>) behave much like
            their counterparts <code>get</code>, <code>save</code>, <code>remove</code>.
-          They don't take a <code>bucket</code> argument, internally reference the <code>luwak</code>
+          Except they don't take a <code>bucket</code> argument, internally reference the <code>luwak</code>
            raw resource, and always use <code>responseEncoding = 'binary'</code> therefore returning <code>Buffer</code>s.</p>
           
-        <pre><code>db.getFile('lowcost-pilot')</code></pre>
-        <pre><code>db.saveFile('lowcost-pilot', "/tmp/lp.jpg")</code></pre>
-        <pre><code>db.removeFile('lowcost-pilot')</code></pre>
+        <pre><code>db.getLarge('lowcost-pilot')</code></pre>
+        <pre><code>db.saveLarge('lowcost-pilot', buffer)</code></pre>
+        <pre><code>db.removeLarge('lowcost-pilot')</code></pre>
 
         <h4>Ping</h4>
         

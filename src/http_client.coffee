@@ -3,7 +3,6 @@ Meta = require './http_meta'
 Mapper = require './mapper'
 Utils = require './utils'
 Http = require 'http'
-fs = require 'fs'
 
 class HttpClient extends Client
   constructor: (options) ->
@@ -119,19 +118,22 @@ class HttpClient extends Client
     
   # luwak
 
-  getFile: (key, options...) ->
+  getLarge: (key, options...) ->
     [options, callback] = @ensure options
     options.raw or= 'luwak'
     options.responseEncoding = 'binary'
     @get undefined, key, options, callback
 
-  saveFile: (key, file, options...) ->
+  saveLarge: (key, data, options...) ->
     [options, callback] = @ensure options
     options.raw or= 'luwak'
-    fs.readFile file, (err, data) =>
+    
+    if data instanceof Buffer
       @save undefined, key, data, options, callback
+    else
+      callback(new Error('Data has to be a Buffer'))
 
-  removeFile: (key, options...) ->
+  removeLarge: (key, options...) ->
     [options, callback] = @ensure options
     options.raw or= 'luwak'
     @remove undefined, key, options, callback  
