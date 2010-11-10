@@ -110,7 +110,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
         <p>There are two APIs: <code>http</code> and <code>protobuf</code>. Just ask for them: <code>getClient({api: 'protobuf'})</code>.</p>
         
-        <p>HTTP is the default and what the following API guide is based upon. Expect similar behaviour for the Protocol Buffers interface, but keep in mind there are still some differences. One example is that the HTTP implementation internally queues requests and issues them serially. Reason why there are no race conditions in this guide <strong>only</strong> for HTTP.</p>
+        <p>HTTP is the default and what the following API guide is based upon. Expect similar behaviour for the Protocol Buffers interface, but keep in mind it is lagging a bit behind. One example is that the HTTP implementation internally queues requests and issues them serially. Reason why there are no race conditions in this guide <strong>only</strong> for HTTP.</p>
 
         <h2>Guide</h2>
         
@@ -157,7 +157,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
       <p>Riak properties such as <code>'contentType', 'vclock', 'clientId', 'links', 'etag', 'r', 'w', 'dw', 'returnBody'</code>
         can be set on this object. It also contains handy methods to deal with links, and provides <strong>sensible defaults</strong>, which can of course be overriden.
-        Examples are <code>'contentType': 'application/json'</code> and <code>'clientId': 'riak-js'</code>. Note that you cannot change host or port once the client is instantiated.</p>
+        Examples are <code>contentType: 'application/json'</code> and <code>clientId: 'riak-js'</code>. Note that you cannot change host or port once the client is instantiated.</p>
         
        <p>Not only these are tunable per-request. If you need certain defaults to apply to the whole session, 
           provide them at initialization time: <code>getClient({clientId: 'lan-27', raw: 'data', debug: false})</code>.</p>
@@ -178,7 +178,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         <h4>Content detection</h4>
         
         <p>
-          If you don't provide a content type, riak-js will do its best to guess one:
+          If you don't provide a content type while sending a request body, riak-js will do its best to guess one:
           <ul>
             <li>If your data is a <code>Buffer</code> it will assume <code>application/octet-stream</code></li>
             <li>If your data is a Javascript object whose <code>typeof</code> yields <code>object</code>, it will assume <code>application/json</code></li>
@@ -267,7 +267,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         
         <p>Exists is a shortcut to tell you if a document exists or not. Internally, it uses <code>head</code> and checks for a <code>404</code>.</p>
         
-        <pre><code>db.exists('airlines', 'SPIDERMAN')</code></pre>
+        <pre><code>db.exists('airlines', 'AIR_FRIGGIN_MADRID')</code></pre>
                 
         <h4>Get all</h4>
         
@@ -363,7 +363,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         
         <p>Run this in the main directory to compile coffeescript to javascript as you go:</p>
 
-        <pre><code>coffee -wc -o lib --no-wrap src/**/*.coffee</code></pre>
+        <pre><code>make dev</code></pre>
         
         <h3>Testing</h3> 
 
@@ -372,7 +372,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
           Test with <code>make test</code>. Requires <a href="http://vowsjs.org">Vows</a> 0.5.2.
         </p>
 
-        <h3>Authors and contributors, in order of appearence</h3>
+        <h3>Authors and contributors, in order of appearance</h3>
 
         <ul> 
         <li><a href="http://github.com/frank06">frank06</a></li> 
