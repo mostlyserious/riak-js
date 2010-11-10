@@ -18,7 +18,7 @@ module.exports =
   getClient: (options) ->
     options or= {}
     options.api or= module.exports.defaults.api
-    @[options.api] options
+    module.exports[options.api] options
 
 module.exports.__defineGetter__ 'ProtoBufClient', ->
   @_pbcClient ||= require './protobuf_client'
