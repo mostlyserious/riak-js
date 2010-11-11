@@ -18,6 +18,7 @@ class Client
     if data instanceof Error
       err = data
       data = data.message
+      err.notFound = meta.statusCode is 404
     
     callback err, data, meta
     

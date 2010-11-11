@@ -112,9 +112,8 @@ batches = [{
         topic: ->
           db.get flights, 'IBE_4418', @callback
           
-        'is not present': (err, flight, meta) ->
-          # assert.ok meta.notFound
-          # FIXME can't test notFound until vows, in the case of an error, gives me my meta back
+        'is not present': (err, flight) ->
+          assert.ok err.notFound
           assert.equal 404, err.statusCode
   
   # walk is ONLY HTTP for now

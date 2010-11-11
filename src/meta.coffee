@@ -177,6 +177,4 @@ Meta.defaults =
   # content-type
   # see @encode -- too complex to have just one simple default
 
-Meta::__defineGetter__ 'notFound', -> @statusCode is 404
-
 module.exports = Meta
