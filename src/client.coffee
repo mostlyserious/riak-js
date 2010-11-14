@@ -1,8 +1,9 @@
 CoreMeta = require './meta'
 Utils    = require './utils'
 Meta = require './meta'
+EventEmitter = require('events').EventEmitter
 
-class Client
+class Client extends EventEmitter
   
   constructor: (options) ->
     # upon initialization, core meta should merge user-provided defaults for the session

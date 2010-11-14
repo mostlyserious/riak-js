@@ -174,6 +174,7 @@ class HttpClient extends Client
       @client.on 'close', onClose
       @client.on 'error', (err) =>
         onClose true, err
+        @emit 'clientError', err
         if err.errno is process.ECONNREFUSED
           # if connection is refused (node down) leave a client ready for when it's up again
           @client = Http.createClient(@client.port, @client.host)
