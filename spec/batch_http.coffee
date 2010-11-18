@@ -74,7 +74,7 @@ module.exports =
       
       'document update request':
         topic: ->
-        
+          
           callback = @callback
         
           db.get bucket, 'test3', (err, data) ->
@@ -82,10 +82,9 @@ module.exports =
             data.wtf = 'yes'
             data.wee = 42
           
-            db.save bucket, 'test3', data, ->
-              db.get bucket, 'test3', callback
+            db.save bucket, 'test3', data, { returnbody: true }, callback
       
-        'gets updated data': (data) ->
+        'gets updated data': (err, data, meta) ->
           assert.ok data.updated
           assert.equal data.wtf, 'yes'
           assert.equal data.wee, 42
@@ -138,7 +137,11 @@ module.exports =
         
           'allow_mult is updated': (response) ->
             assert.ok response.props.allow_mult
-          
+      
+    }
+    
+    {
+      
       'a document':
         topic: ->
           db.save bucket, 'test1', { name: 'Testing conflicting' }, { returnbody: true }, @callback
@@ -150,6 +153,7 @@ module.exports =
           # we now select the document with name 'Testing conflicting'
           # and save (meta passes the correct vclock along)
           topic: (data) ->
+            assert.instanceOf data, Array
             [resolved] = data.filter (e) -> e.data.name is 'Testing conflicting'
             resolved.meta.returnbody = true
             db.save bucket, 'test1', resolved.data, resolved.meta, @callback
@@ -194,9 +198,9 @@ module.exports =
           fs.readFile "#{__dirname}/fixtures/lowcost-pilot.jpg", (err, data) =>
             @length = data.length
             db.saveLarge 'lowcost-pilot', data, { contentType: 'jpeg' }, (err) ->
-              setTimeout -> # let's wait for Riak for 50ms
+              setTimeout -> # let's wait for Riak for 80ms
                 db.getLarge 'lowcost-pilot', done
-              , 50
+              , 80
           
         'returns a Buffer of the same length as the original': (data) ->
           assert.instanceOf data, Buffer
