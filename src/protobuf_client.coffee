@@ -105,5 +105,9 @@ class ProtoBufClient extends Client
     delete content.value
     delete content.usermeta
     [content, value]
+    
+  # provide particular Meta impl to clients
+
+  Meta: Meta
 
 module.exports = ProtoBufClient

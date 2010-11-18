@@ -38,6 +38,15 @@ setupBatch =
 
 batches = [{
   
+  'a particular meta implementation':
+    topic: -> new db.Meta()
+    
+    'has no links': (meta) ->
+      assert.equal meta.links.length, 0
+    
+    'is of the correct API': (meta) ->
+      assert.equal meta.api, api  # api defined above
+  
   'ping request':
     topic: ->
       db.ping @callback

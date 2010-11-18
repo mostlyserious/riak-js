@@ -149,6 +149,10 @@ class HttpClient extends Client
     meta = new Meta '', '', raw: 'stats'
     @execute('GET', meta) (data, meta) =>
       @executeCallback data, meta, callback
+      
+  # provide particular Meta impl to clients
+  
+  Meta: Meta
         
   # private
   

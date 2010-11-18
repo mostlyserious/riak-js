@@ -35,4 +35,6 @@ class Client extends EventEmitter
     if string and console and (if options.debug isnt undefined then options.debug else CoreMeta.defaults.debug)
       if options.json then console.dir string else console.log string
 
+  Meta: -> throw new Error('APIs should override this function with their particular Meta implementation.')
+
 module.exports = Client
