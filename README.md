@@ -12,9 +12,9 @@ If you clone the repository or download a tarball from github you will need Coff
 
 It can be installed via `brew install coffee-script` or `npm install coffee-script`.
 
-Simply execute `make dev` to start continuous compilation.
+Simply execute `cake dev` to start continuous compilation.
 
-Test with `make test`. Requires [Vows](http://vowsjs.org) 0.5.2.
+Test with `cake test`. Requires [Vows](http://vowsjs.org) 0.5.2.
 
 ### Features and documentation
 
