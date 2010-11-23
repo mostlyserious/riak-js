@@ -160,6 +160,9 @@ Meta.riakProperties = [
   'clientId' # both
   'returnbody' # both
   'vtag' # both
+  'range'
+  'contentRange'
+  'acceptRanges'
 ]
 
 # Defaults for Meta properties

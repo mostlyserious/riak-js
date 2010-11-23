@@ -12,7 +12,9 @@ class Meta extends CoreMeta
     'content-type': 'contentType' # binary depends on the contentType
     'x-riak-vclock': 'vclock'
     'last-modified': 'lastMod'
-    etag: 'etag'
+    'etag': 'etag'
+    'content-range': 'contentRange'
+    'accept-ranges': 'acceptRanges'
 
     # other response info:
     # statusCode, X-Riak-Meta-* (=> usermeta), link (=> links) Location (=> key)
@@ -48,6 +50,7 @@ class Meta extends CoreMeta
     host: 'Host'
     clientId: 'X-Riak-ClientId'
     vclock: 'X-Riak-Vclock'
+    range: 'Range'
     # lastMod: 'If-Modified-Since' # check possible bug with these
     # etag: 'If-None-Match' # check possible bug with these
 

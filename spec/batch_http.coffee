@@ -191,6 +191,8 @@ module.exports =
         'gives back a 404': (err, data) ->
           assert.equal err?.statusCode, 404
       
+      # TODO test range get - once we can list keys in luwak, to be able to remove the test doc later
+      
       'getting a file stored in luwak':
         topic: ->
           done = @callback
