@@ -106,6 +106,8 @@ module.exports = Meta
 
 # private
 
+decode = (s) -> decodeURIComponent s.replace(/\+/g, ' ')
+
 linkUtils =
   stringToLinks: (links) ->
     result = []
@@ -113,8 +115,7 @@ linkUtils =
       links.split(',').forEach (link) ->
         captures = link.trim().match /^<\/([^\/]+)\/([^\/]+)\/([^\/]+)>;\sriaktag="(.+)"$/
         if captures
-          for i of captures then captures[i] = decodeURIComponent(captures[i])
-          result.push { bucket: captures[2], key: captures[3], tag: captures[4] }
+          result.push { bucket: decode(captures[2]), key: decode(captures[3]), tag: decode(captures[4]) }
     result
     
   linksToString: (links, raw) ->
