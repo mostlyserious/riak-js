@@ -83,8 +83,8 @@ class Meta extends CoreMeta
 
 Meta::__defineGetter__ 'path', ->
   queryString = @stringifyQuery @queryProps
-  bq = if @bucket then "/#{@bucket}" else ''
-  kq = if @key then "/#{@key}" else ''
+  bq = if @bucket then "/#{encodeURIComponent(@bucket)}" else ''
+  kq = if @key then "/#{encodeURIComponent(@key)}" else ''
   qs = if queryString then "?#{queryString}" else ''
   "/" + @raw + bq + kq + qs
 
