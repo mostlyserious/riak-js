@@ -140,38 +140,38 @@ module.exports =
       
     }
     
-    {
-      
-      'a document':
-        topic: ->
-          db.save bucket, 'test1', { name: 'Testing conflicting' }, { returnbody: true }, @callback
-      
-        'when allow_mult=true, returns conflicting versions': (err, data, meta) ->
-          assert.equal data.length, 2
-    
-        'when solving the conflict':
-          # we now select the document with name 'Testing conflicting'
-          # and save (meta passes the correct vclock along)
-          topic: (data) ->
-            assert.instanceOf data, Array
-            [resolved] = data.filter (e) -> e.data.name is 'Testing conflicting'
-            resolved.meta.returnbody = true
-            db.save bucket, 'test1', resolved.data, resolved.meta, @callback
-            
-          'gives back one document again': (data) ->
-            # we now get the object with name 'Testing conflicting'
-            assert.equal !!data.length, false
-            assert.equal data.name, 'Testing conflicting'
-            
-        'when requesting a different document':
-          topic: ->
-            db.getAll bucket, { where: { name: 'Testing 2', other: undefined } }, @callback
-            
-          'does not give a conflict': (err, elems, meta) ->
-            assert.equal elems.length, 1
-            assert.notEqual 300, meta.statusCode
-      
-    }
+    # {
+    #   
+    #   'a document':
+    #     topic: ->
+    #       db.save bucket, 'test1', { name: 'Testing conflicting' }, { returnbody: true }, @callback
+    #   
+    #     'when allow_mult=true, returns conflicting versions': (err, data, meta) ->
+    #       assert.equal data.length, 2
+    # 
+    #     'when solving the conflict':
+    #       # we now select the document with name 'Testing conflicting'
+    #       # and save (meta passes the correct vclock along)
+    #       topic: (data) ->
+    #         assert.instanceOf data, Array
+    #         [resolved] = data.filter (e) -> e.data.name is 'Testing conflicting'
+    #         resolved.meta.returnbody = true
+    #         db.save bucket, 'test1', resolved.data, resolved.meta, @callback
+    #         
+    #       'gives back one document again': (data) ->
+    #         # we now get the object with name 'Testing conflicting'
+    #         assert.equal !!data.length, false
+    #         assert.equal data.name, 'Testing conflicting'
+    #         
+    #     'when requesting a different document':
+    #       topic: ->
+    #         db.getAll bucket, { where: { name: 'Testing 2', other: undefined } }, @callback
+    #         
+    #       'does not give a conflict': (err, elems, meta) ->
+    #         assert.equal elems.length, 1
+    #         assert.notEqual 300, meta.statusCode
+    #   
+    # }
     
     # luwak
     
