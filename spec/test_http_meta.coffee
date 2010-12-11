@@ -81,6 +81,14 @@ vows.describe('Meta for HTTP').addBatch(
     'guesses its content-type': (headers) ->
       assert.equal headers['Content-Type'], 'application/json'
       assert.equal headers['Link'], undefined
+      
+  'a meta without a vclock':
+    topic: ->
+      meta = new Meta 'bucket', 'test'
+      meta.toHeaders()
+      
+    'does not send a clientId header': (headers) ->
+      assert.isUndefined headers['X-Riak-ClientId']      
 
   'a meta with responseEncoding=binary':
     topic: ->

@@ -61,8 +61,11 @@ class Meta extends CoreMeta
   toHeaders: ->
     headers = {}
     
-    for k,v of @requestMappings then headers[v] = this[k] if this[k]
+    # remove client id if there's no vclock
+    delete @requestMappings.clientId unless this.vclock?
     
+    for k,v of @requestMappings then headers[v] = this[k] if this[k]
+        
     # usermeta
     for k,v of @usermeta then headers["X-Riak-Meta-#{k}"] = String(v)
     
