@@ -29,7 +29,7 @@ class Meta extends CoreMeta
 
   encodeUsermeta: (data) ->
     parsed = []
-    for all key, value of data
+    for key, value of data
       parsed.push key: key, value: value
     parsed
     

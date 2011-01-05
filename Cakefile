@@ -33,7 +33,7 @@ task 'test', 'Test the app', (options) ->
   vows.stderr.on 'data', print
 
 task 'dev', 'Continuous compilation', ->
-  coffee = spawn 'coffee', '-wc --no-wrap -o lib src'.split(' ')
+  coffee = spawn 'coffee', '-wc --bare -o lib src'.split(' ')
   
   coffee.stdout.on 'data', print
   coffee.stderr.on 'data', print
