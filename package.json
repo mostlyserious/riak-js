@@ -1,7 +1,7 @@
 {
    "name": "riak-js",
-   "version": "0.3.0beta4",
-   "description": "Riak client for node (HTTP + protobufs)",
+   "version": "0.3.0beta5",
+   "description": "Riak client for node (HTTP + Protobuf)",
    "keywords": [
        "riak",
        "node",
