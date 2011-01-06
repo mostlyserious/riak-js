@@ -24,4 +24,7 @@ Test with `cake test`. Requires [Vows](http://vowsjs.org) 0.5.2.
 
 #### 0.3.0beta5
 
- - 
+ - Add support for bucket listing in HTTP (new Riak 0.14 feature)
+ - Updated to CoffeeScript 1.0.0
+ - Fixed a memory leak caused by adding too many Event Listeners
+ - If there's no `vclock` present in a Meta, do not send any `clientId`
