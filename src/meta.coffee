@@ -9,15 +9,9 @@ class Meta
       options = bucket # (in case the first arg is an object)
       [bucket, key] = [options.bucket, options.key]
 
-    meta = if options instanceof Meta
-      options
-    else
-      @load options
-      this
-    
-    [meta.bucket, meta.key] = [bucket, key]
-    
-    return meta
+    @load options      
+    @bucket = bucket
+    @key = key    
 
   # Parses a Riak value into a Javascript object, and from
   # available information does its best to determine a suitable encoder.

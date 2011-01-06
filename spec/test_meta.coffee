@@ -102,12 +102,4 @@ vows.describe('Meta').addBatch(
     'has content type json when encoded': (meta) ->
       assert.equal meta.contentType, "application/json"
 
-  'a meta initialized with another meta':
-    topic: ->
-      new Meta(full)
-    
-    'is an exact copy': (copy) ->
-      assert.ok copy instanceof Meta
-      assert.deepEqual full, copy  
-
 ).export module
