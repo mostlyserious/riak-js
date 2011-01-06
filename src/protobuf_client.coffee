@@ -35,11 +35,11 @@ class ProtoBufClient extends Client
   end: ->
     @connection.end() if @connection
 
-  ## PBC Specific Riak-JS methods.
-
   buckets: (callback) ->
     @send('ListBucketsReq') (data, meta) =>
       @executeCallback data.buckets, meta, callback
+
+  ## PBC Specific Riak-JS methods.
 
   keys: (bucket, callback) ->
     keys = []

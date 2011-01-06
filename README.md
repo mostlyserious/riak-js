@@ -19,3 +19,9 @@ Test with `cake test`. Requires [Vows](http://vowsjs.org) 0.5.2.
 ### Features and documentation
 
 [http://riakjs.org](http://riakjs.org)
+
+### Changelog
+
+#### 0.3.0beta5
+
+ - 

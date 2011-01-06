@@ -114,6 +114,13 @@ class HttpClient extends Client
     
   # bucket props
   
+  # new in 0.14 -- won't rely on this feature for tests until later
+  buckets: (callback) ->
+    meta = new Meta
+    meta.buckets = true
+    @execute('GET', meta) (data, meta) =>
+      @executeCallback data, meta, callback      
+  
   getProps: (bucket, options...) ->
     [options, callback] = @ensure options
     @get bucket, undefined, options, callback
