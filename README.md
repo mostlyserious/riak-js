@@ -12,9 +12,9 @@ If you clone the repository or download a tarball from github you will need Coff
 
 It can be installed via `brew install coffee-script` or `npm install coffee-script`.
 
-Simply execute `cake dev` to start continuous compilation.
+Simply execute `cake dev` to start continuous compilation. You may also want to run `npm link` so that whenever you call `require('riak-js')` it will always point to the current dev version.
 
-Test with `cake test`. Requires [Vows](http://vowsjs.org) 0.5.2.
+Test with `cake test` or `cake -s test`. Requires [Vows](http://vowsjs.org) 0.5.2.
 
 ### Features and documentation
 
