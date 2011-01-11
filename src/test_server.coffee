@@ -48,7 +48,9 @@ class TestServer extends EventEmitter
     @erlangPrompt = new RegExp("^.#{@options.vmArgs['-name']}.\\d+>", "m")
 
   prepare: (callback) ->
-    unless @prepared?
+    if @prepared
+      callback() if callback
+    else
       @createTempDirectories =>
         @riakScript = "#{@temp_bin}/riak"
         @writeRiakScript  =>
@@ -58,14 +60,15 @@ class TestServer extends EventEmitter
               callback() if callback
 
   start: (callback) ->
-    if @prepared and not @started and @listeners('erlangPrompt').length is 0
+    if @started
+      callback() if callback
+    else if @prepared and @listeners('erlangPrompt').length is 0
       setStarted = =>
         @started = true
         callback() if callback
 
       @once 'erlangPrompt', setStarted
       @console = spawn(@riakScript, ["console"])
-      @console.on 'exit', @registerStop
 
       @console.stdout.setEncoding("ascii")
       @console.stderr.setEncoding("ascii")
@@ -80,12 +83,16 @@ class TestServer extends EventEmitter
         @console.stdout.on 'data', sys.debug
 
       process.on 'exit', =>
-        @console.kill('SIGKILL')
+        @console.kill('SIGKILL') if @console
         @registerStop()
 
-  stop: ->
+  stop: (callback) ->
+    if not @started and callback
+      callback()
     if @started and @listeners('erlangPrompt').length is 0
-      @console.stdin.write("init:stop().\n", "ascii")
+      @console.on 'exit', callback if callback
+      @console.kill('SIGHUP')
+      @registerStop()
 
   clear: (callback) ->
     if @started and @listeners('erlangPrompt').length is 0

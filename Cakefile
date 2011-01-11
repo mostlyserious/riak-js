@@ -16,15 +16,16 @@ task 'build', 'Compile riak-js Coffeescript source to Javascript', ->
 
 task 'clean', 'Remove generated Javascripts', ->
   exec 'rm -fr lib', handleError
-  
+
 task 'test', 'Test the app', (options) ->
   # invoke 'build'
-  
+
   args = [
     'spec/test_client.coffee'
     'spec/test_http_meta.coffee'
     'spec/test_mapper.coffee'
     'spec/test_meta.coffee'
+    'spec/test_test_server.coffee'
   ]
   args.unshift '--spec' if options.spec
 
@@ -34,6 +35,6 @@ task 'test', 'Test the app', (options) ->
 
 task 'dev', 'Continuous compilation', ->
   coffee = spawn 'coffee', '-wc --bare -o lib src'.split(' ')
-  
+
   coffee.stdout.on 'data', print
   coffee.stderr.on 'data', print
