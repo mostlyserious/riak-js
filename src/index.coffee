@@ -1,4 +1,4 @@
-module.exports = 
+module.exports =
 
   # Gets a new client instance using the HTTP REST api.
   http: (options) -> new @HttpClient options
@@ -12,9 +12,9 @@ module.exports =
     cli      = new @ProtoBufClient options
     cli.pool = pool
     cli
-    
+
   defaults: { api: 'http' }
-  
+
   getClient: (options) ->
     options or= {}
     options.api or= module.exports.defaults.api
@@ -28,3 +28,6 @@ module.exports.__defineGetter__ 'ProtoBufPool', ->
 
 module.exports.__defineGetter__ 'HttpClient', ->
   @_httpClient ||= require './http_client'
+
+module.exports.__defineGetter__ 'TestServer', ->
+  @_testServer ||= require './test_server'
