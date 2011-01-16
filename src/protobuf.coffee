@@ -107,6 +107,8 @@ class Pool
 
 # A single Riak socket connection.
 class Connection
+  PB_HEADER_LENGTH = 5
+  
   constructor: (pool) ->
     @conn = net.createConnection pool.options.port, pool.options.host
     @pool = pool
@@ -172,13 +174,21 @@ class Connection
       buf.copy msg, 5, 0
     msg
 
+  chunk_append: (buf) ->
+    @new_buf = new Buffer(@chunk.length + buf.length) 
+    @chunk.copy(@new_buf, 0, 0)
+    buf.copy(@new_buf, @chunk.length, 0)
+    @chunk = @new_buf
+
   # Parses the received chunk for one or more messages.  If there is no data
   # from a Riak response left to read from the chunk, release this connection
   # to the pool.
   #
   # Returns nothing.
   receive: (chunk) ->
-    @chunk = chunk
+    # Append the chunk to the current buffer
+    @chunk_append(chunk)
+
     if @attempt_parse()
       if @pool.running? then @reset() else @end()
 
@@ -218,8 +228,23 @@ class Connection
       @chunk_pos += bytes_read
 
       # are we there yet?
-      @type.parse @resp if @resp_pos == @resp_len
+      if @resp_pos >= @resp_len
+        resp = @type.parse @resp 
+        
+        # slice the chunk to leave any remaining bytes
+        remaining = @chunk.slice(@resp_len + PB_HEADER_LENGTH, @chunk.length)
+        
+        # reset because a full response has been read
+        @reset()
+  
+        # set the current chunk to the remaining part
+        @chunk = remaining
+        
+        resp
     else
+      if @chunk.length < PB_HEADER_LENGTH
+        return
+    
       @resp_len = (@chunk[@chunk_pos + 0] << 24) + 
                   (@chunk[@chunk_pos + 1] << 16) +
                   (@chunk[@chunk_pos + 2] <<  8) +
@@ -236,7 +261,7 @@ class Connection
   reset: ->
     @type      = null
     @resp      = null
-    @chunk     = null
+    @chunk     = new Buffer(0)
     @chunk_pos = 0 # byte position of the chunk buffer
     @resp_pos  = 0 # byte position of the response buffer
     @resp_len  = 0 # expected response length
