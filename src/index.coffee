@@ -20,6 +20,9 @@ module.exports =
     options.api or= module.exports.defaults.api
     module.exports[options.api] options
 
+  getSessionStore: (options) ->
+    new @SessionStore options
+
 module.exports.__defineGetter__ 'ProtoBufClient', ->
   @_pbcClient ||= require './protobuf_client'
 
@@ -31,3 +34,6 @@ module.exports.__defineGetter__ 'HttpClient', ->
 
 module.exports.__defineGetter__ 'TestServer', ->
   @_testServer ||= require './test_server'
+
+module.exports.__defineGetter__ 'SessionStore', ->
+  @_sessionStore ||= require './session_store'
