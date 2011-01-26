@@ -1,4 +1,4 @@
-Store = require('connect/middleware/session/store')
+{Store} = require('connect/middleware/session')
 
 class SessionStore extends Store
   constructor: (options) ->
@@ -18,5 +18,26 @@ class SessionStore extends Store
 
   destroy: (sid, cb) ->
     @client.remove @bucket, sid, cb
+
+  all: (cb) ->
+    @client.getAll @bucket, (err, sessions) ->
+      if err
+        cb(err, null) if cb
+      else
+        cb(null, sessions.map((i) -> i.data)) if cb
+
+  clear: (cb) ->
+    @client.keys @bucket, (err, meta, keys) ->
+      deleteNextKey = (err, meta) =>
+        if keys.length > 0
+          @client.remove @bucket, keys.shift, deleteNextKey
+        else
+          cb() if cb
+
+      @client.remove @bucket, keys.shift, deleteNextKey
+
+  length: (cb) ->
+    @client.count @bucket, cb
+
 
 exports = SessionStore
