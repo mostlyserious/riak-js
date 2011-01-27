@@ -7,7 +7,7 @@ fs = require 'fs'
 
 if binDir
   db = require('../src/index').getClient({port: 9000, debug: false})
-  TestServer = require('../lib/test_server')
+  TestServer = require('../src/test_server')
   ts = new TestServer({binDir: binDir, tempDir: path.normalize("#{process.cwd()}/.testing")})
 
   suite = vows.describe "Riak Test Server"
