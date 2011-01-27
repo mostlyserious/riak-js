@@ -26,6 +26,7 @@ task 'test', 'Test the app', (options) ->
     'spec/test_mapper.coffee'
     'spec/test_meta.coffee'
     'spec/test_test_server.coffee'
+    'spec/test_session_store.coffee'
   ]
   args.unshift '--spec' if options.spec
 
