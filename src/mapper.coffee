@@ -50,9 +50,8 @@ class Mapper
   # @api private
   #
 
-  job: (inputs, options) ->
-    options           ||= {}
-    options.data        = 
+  job: (inputs, options = {}) ->
+    options.data =
       inputs: inputs
       query:  @phases
     options
