@@ -1,5 +1,7 @@
 {Store} = require('connect/middleware/session')
 
+Store.prototype.constructor = Store
+
 class SessionStore extends Store
   constructor: (options) ->
     super options
@@ -26,18 +28,8 @@ class SessionStore extends Store
       else
         cb(null, sessions.map((i) -> i.data)) if cb
 
-  clear: (cb) ->
-    @client.keys @bucket, (err, meta, keys) ->
-      deleteNextKey = (err, meta) =>
-        if keys.length > 0
-          @client.remove @bucket, keys.shift, deleteNextKey
-        else
-          cb() if cb
-
-      @client.remove @bucket, keys.shift, deleteNextKey
-
   length: (cb) ->
     @client.count @bucket, cb
 
 
-exports = SessionStore
+module.exports = SessionStore
