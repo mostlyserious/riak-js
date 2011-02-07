@@ -9,13 +9,16 @@ class HttpClient extends Client
     # client-specific defaults
     [host, port] = ['localhost', 8098]
     super options
-    @client = Http.createClient options?.port or port, options?.host or host
+    
+    init = =>
+      @client = Http.createClient options?.port or port, options?.host or host
 
-    @client.on 'error', (err) =>
-      @emit 'clientError', err
-      if err.errno is process.ECONNREFUSED
+      @client.on 'error', (err) =>
+        @emit 'clientError', err
         # if connection is refused (node down) leave a client ready for when it's up again
-        @client = Http.createClient(@client.port, @client.host)
+        if err.errno is process.ECONNREFUSED then init()
+    
+    init()
 
 
   get: (bucket, key, options...) ->
