@@ -157,7 +157,7 @@ class HttpClient extends Client
   ping: () ->
     [options, callback] = @ensure arguments
     meta = new Meta '', '', raw: 'ping'
-    @execute 'HEAD', meta, callback
+    @execute 'HEAD', meta, (err) -> callback(null, !err?)
 
   stats: () ->
     [options, callback] = @ensure arguments
