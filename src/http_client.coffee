@@ -56,7 +56,7 @@ class HttpClient extends Client
       delete v.values
       [{ meta: v, data: data }]
 
-    @add(bucket).map(mapfunc, options).run callback
+    @add(bucket).map(mapfunc).run(options, callback)
 
   keys: (bucket, options...) ->
     [options, callback] = @ensure options
@@ -73,7 +73,7 @@ class HttpClient extends Client
       if not err then [data] = data
       _cb(err, data, meta)
 
-    @add(bucket).map((v) -> [1]).reduce('Riak.reduceSum').run callback
+    @add(bucket).map((v) -> [1]).reduce('Riak.reduceSum').run(options, callback)
 
   walk: (bucket, key, spec, options...) ->
     [options, callback] = @ensure options
@@ -146,10 +146,9 @@ class HttpClient extends Client
       
   search: (query, options...) ->
     [options, callback] = @ensure options
-    options = { raw: 'solr', wt: 'json', start: 0, r: 2, rows: 10000, q: query }
+    options = { raw: 'solr', wt: 'json', start: 0, rows: 10000, q: query, debug: false }
     index = options.index or ''
     meta = new Meta index, 'select', options
-    console.dir meta
     @execute 'GET', meta, callback
 
   # luwak
@@ -196,7 +195,7 @@ class HttpClient extends Client
 
     verb = verb.toUpperCase()
     path = meta.path
-    Client.log "#{verb} #{path}"
+    Client.log "#{verb} #{path}", meta
 
     request = @client.request verb, path, meta.toHeaders()
 
