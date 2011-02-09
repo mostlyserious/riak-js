@@ -4,7 +4,10 @@ Meta     = require './protobuf_meta'
 Mapper   = require './mapper'
 
 class ProtoBufClient extends Client
-  ## CORE Riak-JS methods
+
+  ## **** IMPORTANT ****
+  
+  # Client and HttpClient have evolved - this API is old and needs updating
 
   get: (bucket, key, options...) ->
     [options, callback] = @ensure options

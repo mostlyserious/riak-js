@@ -24,14 +24,12 @@ class HttpClient extends Client
   get: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
-    @execute('GET', meta) (data, meta) =>
-      @executeCallback data, meta, callback
+    @execute 'GET', meta, callback
 
   head: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
-    @execute('HEAD', meta) (data, meta) =>
-      @executeCallback data, meta, callback
+    @execute 'HEAD', meta, callback
 
   exists: (bucket, key, options...) ->
     [options, callback] = @ensure options
@@ -63,9 +61,9 @@ class HttpClient extends Client
   keys: (bucket, options...) ->
     [options, callback] = @ensure options
     options.keys = true
-    meta = new Meta bucket, '', options
-    @execute('GET', meta) (data, meta) =>
-      @executeCallback data.keys, meta, callback
+    
+    @get bucket, undefined, options, (err, obj) ->
+      callback(err, obj.keys)    
 
   count: (bucket, options...) ->
     [options, callback] = @ensure options
@@ -96,20 +94,19 @@ class HttpClient extends Client
     meta.data = data
 
     verb = options.method or if key then 'PUT' else 'POST'
-    @execute(verb, meta) (data, meta) =>
-      @executeCallback data, meta, callback
+    @execute verb, meta, callback
 
   remove: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
-    @execute('DELETE', meta) (data, meta) =>
-      @executeCallback data, meta, callback
+    @execute 'DELETE', meta, callback
 
   # map/reduce
 
   add: (inputs) -> new Mapper this, inputs
 
-  runJob: (options, callback) ->
+  runJob: () ->
+    [options, callback] = @ensure arguments
     options.raw = 'mapred'
     @save '', '', options.data, options, callback
 
@@ -117,22 +114,22 @@ class HttpClient extends Client
 
   # bucket props
 
-  # new in 0.14 -- won't rely on this feature for tests until later
-  buckets: (callback) ->
-    meta = new Meta
+  buckets: () ->
+    [options, callback] = @ensure arguments
+    meta = new Meta '', '', options
     meta.buckets = true
-    @execute('GET', meta) (data, meta) =>
-      @executeCallback data, meta, callback
+    @execute 'GET', meta, callback
 
   getProps: (bucket, options...) ->
     [options, callback] = @ensure options
-    @get bucket, undefined, options, callback
+    @get bucket, undefined, options, (err, obj) ->
+      callback(err, obj.props)
 
   updateProps: (bucket, props, options...) ->
     [options, callback] = @ensure options
     options.method = 'PUT'
     @save bucket, undefined, { props: props }, options, callback
-
+    
   # luwak
 
   getLarge: (key, options...) ->
@@ -154,18 +151,18 @@ class HttpClient extends Client
     [options, callback] = @ensure options
     options.raw or= 'luwak'
     @remove undefined, key, options, callback
-
+    
   # node commands
 
-  ping: (callback) ->
+  ping: () ->
+    [options, callback] = @ensure arguments
     meta = new Meta '', '', raw: 'ping'
-    @execute('HEAD', meta) (data, meta) =>
-      @executeCallback true, meta, callback
+    @execute 'HEAD', meta, callback
 
-  stats: (callback) ->
+  stats: () ->
+    [options, callback] = @ensure arguments
     meta = new Meta '', '', raw: 'stats'
-    @execute('GET', meta) (data, meta) =>
-      @executeCallback data, meta, callback
+    @execute 'GET', meta, callback
 
   # provide particular Meta impl to clients
 
@@ -173,54 +170,59 @@ class HttpClient extends Client
 
   # private
 
-  execute: (verb, meta) ->
+  execute: (verb, meta, callback) ->
 
-    (callback) =>
-      verb = verb.toUpperCase()
-      path = meta.path
-      @log "#{verb} #{path}"
+    verb = verb.toUpperCase()
+    path = meta.path
+    Client.log "#{verb} #{path}"
 
-      request = @client.request verb, path, meta.toHeaders()
+    request = @client.request verb, path, meta.toHeaders()
 
-      if meta.data
-        request.write meta.data, meta.contentEncoding
-        delete meta.data
+    if meta.data
+      request.write meta.data, meta.contentEncoding
+      delete meta.data
 
-      # use felixge's approach
-      cbFired = false
-      onClose = (hadError, reason) =>
-        if hadError and not cbFired then callback new Error(reason)
-        @client.removeListener 'close', onClose
+    # use felixge's approach
+    cbFired = false
+    onClose = (hadError, reason) =>
+      if hadError and not cbFired then callback new Error(reason)
+      @client.removeListener 'close', onClose
 
-      @client.on 'close', onClose
+    @client.on 'close', onClose
 
-      request.on 'response', (response) =>
-        response.setEncoding meta.responseEncoding
-        buffer = ''
+    request.on 'response', (response) =>
+      response.setEncoding meta.responseEncoding
+      buffer = ''
 
-        response.on 'data', (chunk) -> buffer += chunk
-        response.on 'end', =>
-          meta = meta.loadResponse response
+      response.on 'data', (chunk) -> buffer += chunk
+      response.on 'end', =>
+        meta = meta.loadResponse response
 
-          buffer = if 400 <= meta.statusCode <= 599
-            err = new Error "HTTP error #{meta.statusCode}: #{buffer}"
-            err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
-            err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
-            err
-          else @decodeBuffer(buffer, meta)
+        buffer = if 400 <= meta.statusCode <= 599
+          err = new Error "HTTP error #{meta.statusCode}: #{buffer}"
+          err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
+          err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
+          err
+        else @decodeBuffer(buffer, meta)
 
-          if meta.statusCode is 300 and meta.contentType.match /^multipart\/mixed/ # multiple choices
-            boundary = Utils.extractBoundary meta.contentType
-            buffer = Utils.parseMultipart(buffer, boundary).map (doc) =>
-              _meta = new Meta(meta.bucket, meta.key)
-              _meta.loadResponse { headers: doc.headers, statusCode: meta.statusCode }
-              _meta.vclock = meta.vclock
-              { meta: _meta, data: @decodeBuffer(doc.body, _meta) }
+        if meta.statusCode is 300 and meta.contentType.match /^multipart\/mixed/ # multiple choices
+          boundary = Utils.extractBoundary meta.contentType
+          buffer = Utils.parseMultipart(buffer, boundary).map (doc) =>
+            _meta = new Meta(meta.bucket, meta.key)
+            _meta.loadResponse { headers: doc.headers, statusCode: meta.statusCode }
+            _meta.vclock = meta.vclock
+            { meta: _meta, data: @decodeBuffer(doc.body, _meta) }
 
-          cbFired = true
-          callback buffer, meta
+        cbFired = true
+        
+        if buffer instanceof Error
+          err = buffer
+          data = buffer.message
+          err.notFound = meta?.statusCode is 404
+        
+        callback err, buffer, meta
 
-      request.end()
+    request.end()
 
   # http client utils
 

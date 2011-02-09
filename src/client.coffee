@@ -9,31 +9,20 @@ class Client extends EventEmitter
     # upon initialization, core meta should merge user-provided defaults for the session
     CoreMeta.defaults = Utils.mixin true, {}, CoreMeta.defaults, options
   
-  executeCallback: (data, meta, callback) ->
-    def = (err, data, meta) =>
-      @log data, { json: @contentType is 'json' }
-      
-    callback or= def
-    err = null
-    
-    if data instanceof Error
-      err = data
-      data = data.message
-      err.notFound = meta?.statusCode is 404
-    
-    callback err, data, meta
-    
   ensure: (options) ->
+    unless Array.isArray options
+      options = Array::slice.call(options)
     [options, callback] = options
     if typeof options == 'function'
       callback = options
       options = undefined
+
+    callback or= (err, data, meta) -> Client.log data
     return [options or {}, callback]
     
-  log: (string, options) ->
-    options or= {}
-    if string and console and (if options.debug isnt undefined then options.debug else CoreMeta.defaults.debug)
-      if options.json then console.dir string else console.log string
+  @log: (string, options = {}) ->
+    if string? and console and (if options.debug? then options.debug else CoreMeta.defaults.debug)
+      console.log string
 
   Meta: -> throw new Error('APIs should override this function with their particular Meta implementation.')
 
