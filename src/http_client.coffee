@@ -130,6 +130,28 @@ class HttpClient extends Client
     options.method = 'PUT'
     @save bucket, undefined, { props: props }, options, callback
     
+  # search
+
+  enableIndex: (bucket, options...) ->
+    [options, callback] = @ensure options
+    @getProps bucket, options, (err, props) =>
+      props.precommit.push { mod: 'riak_search_kv_hook', fun: 'precommit' }
+      @updateProps bucket, props, options
+
+  disableIndex: (bucket, options...) ->
+    [options, callback] = @ensure options
+    @getProps bucket, options, (err, props) =>
+      props.precommit = for p in props.precommit when p.mod isnt 'riak_search_kv_hook' then p
+      @updateProps bucket, props, options
+      
+  search: (query, options...) ->
+    [options, callback] = @ensure options
+    options = { raw: 'solr', wt: 'json', start: 0, r: 2, rows: 10000, q: query }
+    index = options.index or ''
+    meta = new Meta index, 'select', options
+    console.dir meta
+    @execute 'GET', meta, callback
+
   # luwak
 
   getLarge: (key, options...) ->
