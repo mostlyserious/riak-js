@@ -107,7 +107,7 @@ class HttpClient extends Client
 
   runJob: () ->
     [options, callback] = @ensure arguments
-    options.raw = 'mapred'
+    options.raw or= 'mapred'
     @save '', '', options.data, options, callback
 
   end: ->
@@ -144,12 +144,17 @@ class HttpClient extends Client
       props.precommit = for p in props.precommit when p.mod isnt 'riak_search_kv_hook' then p
       @updateProps bucket, props, options
       
-  search: (query, options...) ->
+  search: (index, query, options...) ->
     [options, callback] = @ensure options
-    options = { raw: 'solr', wt: 'json', start: 0, rows: 10000, q: query, debug: false }
-    index = options.index or ''
+    options.raw or= 'solr'
+    options.wt = 'json'
+    options.q = query
     meta = new Meta index, 'select', options
-    @execute 'GET', meta, callback
+    @execute 'GET', meta, (err, data, meta) ->
+      callback(err, data?.response, meta)
+
+  addSearch: (index, query) ->
+    @add({ module: 'riak_search', function: 'mapred_search', arg: [index, query] })
 
   # luwak
 
