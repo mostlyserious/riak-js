@@ -21,7 +21,7 @@ module.exports =
           db.getProps bucket, @callback
       
         'have allow_mult disabled': (response) ->
-          assert.equal response.props.allow_mult, false
+          assert.equal response.allow_mult, false
         
       'bucket count request':
         topic: ->
@@ -133,10 +133,10 @@ module.exports =
             db.getProps bucket, @callback
         
           'n_val is updated': (response) ->
-            assert.equal response.props.n_val, 8
+            assert.equal response.n_val, 8
         
           'allow_mult is updated': (response) ->
-            assert.ok response.props.allow_mult
+            assert.ok response.allow_mult
       
     }
     

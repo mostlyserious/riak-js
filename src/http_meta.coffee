@@ -104,7 +104,23 @@ Meta.defaults =
   accept: 'multipart/mixed, application/json;q=0.7, */*;q=0.5'
   responseEncoding: 'utf8'
 
-Meta.queryProperties = ['r', 'w', 'dw', 'rw', 'keys', 'props', 'vtag', 'returnbody', 'chunked', 'buckets']
+Meta.queryProperties = [
+  'r'
+  'w'
+  'dw'
+  'rw'
+  'keys'
+  'props'
+  'vtag'
+  'returnbody'
+  'chunked'
+  'buckets'
+  'q' # search
+  'start' # search
+  'rows' # search
+  'wt' # search
+  'sort' # search
+]
 
 Meta.riakProperties = ['statusCode', 'host', 'responseEncoding']
 

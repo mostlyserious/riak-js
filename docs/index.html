@@ -101,6 +101,8 @@ db.getAll('flights', { where: { ready: true }})
 
         <h2>Setup</h2>
         
+        <p><strong>Important note:</strong>The protobuf interface is <strong>not yet</strong> on par with HTTP, on which this API guide is based. That is the reason why we are still in beta. Fork or get in contact if you want to contribute protobuf code.</p>
+        
         <pre>
 <code>// npm install riak-js@latest
 var db = require('riak-js').getClient()
@@ -110,8 +112,6 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
         <p>There are two APIs: <code>http</code> and <code>protobuf</code>. Just ask for them: <code>getClient({api: 'protobuf'})</code>.</p>
         
-        <p>HTTP is the default and what the following API guide is based upon. Expect similar behaviour for the Protocol Buffers interface, but keep in mind it is lagging a bit behind. One example is that the HTTP implementation internally queues requests and issues them serially. Reason why there are no race conditions in this guide <strong>only</strong> for HTTP.</p>
-
         <h2>Guide</h2>
         
         <em>Note: This guide is only applicable to riak-js 0.3.0</em>
@@ -279,6 +279,10 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
         <pre><code>db.getAll('airlines', { where: { country: 'NL', fleet: 111 } })</code></pre>
 
+        <h4>Buckets</h4>
+        
+        <pre><code>db.buckets()</code></pre>        
+
         <h4>Keys</h4>
         
         <pre><code>db.keys('airlines')</code></pre>        
@@ -316,6 +320,12 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
   .run(function(err, flights) {
     console.log(flights)
   })</code></pre> 
+        
+        <p>You can also use key filters:</p>
+        
+        <pre><code>db.add({ bucket: 'flights', key_filters: [["matches", "KLM"]] }).map('Riak.mapValuesJson').run()</code></pre>
+        
+        <p>For input syntax <a href="http://wiki.basho.com/Key-Filters.html#Example-query-solutions">follow the API</a>. <code>add</code> simply takes the value of the <code>inputs</code> property.</p>
 
         <h4>Luwak</h4>
         
@@ -346,14 +356,25 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 
         <h4>Get bucket properties</h4>    
         
-        <em>Note: this command returns an object with the <code>props</code> property</em>
-        
         <pre><code>db.getProps('airlines')</code></pre>
         
         
+        <h4>Search</h4>
+        
+        <em>Note: experimental, in <code>search</code> branch. Sample use:</em>
+        
+        <pre><code>db.enableIndex('airlines')
+db.save('airlines', 'FYI-8098', 'this is a plain text flight')
+db.search('airlines', 'text')</code></pre>
+        
+        <p>or in a Map/Reduce scenario:</p>
+        
+        <pre><code>db.addSearch('airlines', 'text').map('Riak.mapValues').run()</code></pre>
         
 
         <h2>Development</h2>
+        
+        <h3>Follow riak-js on Twitter: <a href="http://twitter.com/riakjs">@riakjs</a></h3>
         
         <h3>Issues</h3>
         
