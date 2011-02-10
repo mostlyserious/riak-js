@@ -1,6 +1,6 @@
 {
    "name": "riak-js",
-   "version": "0.3.0beta5",
+   "version": "0.3.0beta6",
    "description": "Riak client for node (HTTP + Protobuf)",
    "keywords": [
        "riak",
@@ -18,7 +18,7 @@
        {
            "name": "rick (technoweenie)",
            "web": "http://techno-weenie.net" 
-       }       
+       }   
    ],
    "bugs": {
        "web": "http://github.com/frank06/riak-js/issues" 
