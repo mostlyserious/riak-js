@@ -116,9 +116,10 @@ Meta.queryProperties = [
   'chunked'
   'buckets'
   'q' # search
-  'start'
-  'rows'
-  'wt'
+  'start' # search
+  'rows' # search
+  'wt' # search
+  'sort' # search
 ]
 
 Meta.riakProperties = ['statusCode', 'host', 'responseEncoding']
