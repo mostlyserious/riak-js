@@ -1,6 +1,6 @@
 # riak-js
 
-[Riak](http://riak.basho.com) Javascript library for [node.js](http://nodejs.org/).
+[Node.js](http://nodejs.org/) client for [Riak](http://riak.basho.com) with support for HTTP and Protocol Buffers.
 
 ### Installation
 
@@ -20,7 +20,18 @@ Test with `cake test` or `cake -s test`. Requires [Vows](http://vowsjs.org) 0.5.
 
 [http://riakjs.org](http://riakjs.org)
 
+Twitter: [@riakjs](http://twitter.com/riakjs)
+
 ### Changelog
+
+#### 0.3.0beta6
+
+ - Test backend implementation
+ - Connect session store
+ - Protobuf parsing is now more robust
+ - Replace client every time ECONNREFUSED occurs
+ - Initial Riak Search support
+ - Minor bugfixing and internals refactoring
 
 #### 0.3.0beta5
 
