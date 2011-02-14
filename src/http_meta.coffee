@@ -12,7 +12,6 @@ class Meta extends CoreMeta
     'content-type': 'contentType' # binary depends on the contentType
     'x-riak-vclock': 'vclock'
     'last-modified': 'lastMod'
-    'etag': 'etag'
     'content-range': 'contentRange'
     'accept-ranges': 'acceptRanges'
 
@@ -36,6 +35,9 @@ class Meta extends CoreMeta
     
     # links
     if headers.link then @links = linkUtils.stringToLinks headers.link
+    
+    # etag -- replace any quotes in the string
+    if headers.etag then @etag = headers.etag.replace /"/g, ''
     
     # location
     if headers.location
