@@ -92,7 +92,9 @@ class Meta
     # ensure links is an array
     options.links = [options.links] if options?.links and not Array.isArray(options.links)
     
-    @usermeta = Utils.mixin true, {}, defaults, this, options
+    @usermeta = options?.usermeta or {} # get previous usermeta
+    @usermeta = Utils.mixin true, @usermeta, defaults, this, options
+    delete @usermeta.usermeta # remove old, mixed-in usermeta
     
     props = Utils.uniq Meta.riakProperties
       .concat(additionalProperties)
