@@ -2,24 +2,11 @@ Client = require './client'
 Meta = require './http_meta'
 Mapper = require './mapper'
 Utils = require './utils'
-Http = require 'http'
+http = require 'http'
 
 class HttpClient extends Client
   constructor: (options) ->
-    # client-specific defaults
-    [host, port] = ['localhost', 8098]
     super options
-    
-    init = =>
-      @client = Http.createClient options?.port or port, options?.host or host
-
-      @client.on 'error', (err) =>
-        @emit 'clientError', err
-        # if connection is refused (node down) leave a client ready for when it's up again
-        if err.errno is process.ECONNREFUSED then init()
-    
-    init()
-
 
   get: (bucket, key, options...) ->
     [options, callback] = @ensure options
@@ -198,25 +185,11 @@ class HttpClient extends Client
 
   execute: (verb, meta, callback) ->
 
-    verb = verb.toUpperCase()
-    path = meta.path
-    Client.log "#{verb} #{path}", meta
+    meta.method = verb.toUpperCase()
+    meta.headers = meta.toHeaders()
+    Client.log "#{meta.method} #{meta.path}", meta
 
-    request = @client.request verb, path, meta.toHeaders()
-
-    if meta.data
-      request.write meta.data, meta.contentEncoding
-      delete meta.data
-
-    # use felixge's approach
-    cbFired = false
-    onClose = (hadError, reason) =>
-      if hadError and not cbFired then callback new Error(reason)
-      @client.removeListener 'close', onClose
-
-    @client.on 'close', onClose
-
-    request.on 'response', (response) =>
+    request = http.request meta, (response) =>
       response.setEncoding meta.responseEncoding
       buffer = ''
 
@@ -239,8 +212,6 @@ class HttpClient extends Client
             _meta.vclock = meta.vclock
             { meta: _meta, data: @decodeBuffer(doc.body, _meta) }
 
-        cbFired = true
-        
         if buffer instanceof Error
           err = buffer
           data = buffer.message
@@ -248,8 +219,17 @@ class HttpClient extends Client
         
         callback err, buffer, meta
 
+    if meta.data
+      request.write meta.data, meta.contentEncoding
+      delete meta.data
+    
+    request.on 'error', (err) =>
+      @emit 'clientError', err
+      callback err
+    
     request.end()
-
+    return undefined # otherwise the repl prints out the returned value by request.end()
+    
   # http client utils
 
   decodeBuffer: (buffer, meta) ->

@@ -166,7 +166,7 @@ Meta.defaults =
   links: []
   binary: false
   raw: 'riak'
-  clientId: 'riak-js' # fix default clientId
+  clientId: 'riak-js'
   contentEncoding: 'utf8'
 
   # reserved by riak-js

@@ -62,32 +62,31 @@ class Meta extends CoreMeta
     
   toHeaders: ->
     headers = {}
-    
+  
     # remove client id if there's no vclock
     delete @requestMappings.clientId unless this.vclock?
-    
+  
     for k,v of @requestMappings then headers[v] = this[k] if this[k]
-        
+      
     # usermeta
     for k,v of @usermeta then headers["X-Riak-Meta-#{k}"] = String(v)
-    
+  
     # links
     headers['Link'] = linkUtils.linksToString(@links, @raw) if @links.length > 0
 
     if @data?
-      
+    
       # now we need to encode the data to calculate its type and length
       @encodeData()
-      
+    
       # contentType
       headers['Content-Type'] = @contentType
-      
+    
       # don't send chunked data at least until riak #278 gets fixed or we can stream the req body
       headers['Content-Length'] =
         if @data instanceof Buffer then @data.length else Buffer.byteLength(@data)
 
     return headers
-    
 
 Meta::__defineGetter__ 'path', ->
   queryString = @stringifyQuery @queryProps
@@ -103,6 +102,7 @@ Meta::__defineGetter__ 'queryProps', ->
   
 Meta.defaults =
   host: 'localhost'
+  port: 8098
   accept: 'multipart/mixed, application/json;q=0.7, */*;q=0.5'
   responseEncoding: 'utf8'
 
