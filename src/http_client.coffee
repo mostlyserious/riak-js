@@ -21,16 +21,13 @@ class HttpClient extends Client
   exists: (bucket, key, options...) ->
     [options, callback] = @ensure options
 
-    _cb = callback # proxy callback
-    callback = (err, data, meta) ->
+    @head bucket, key, options, (err, data, meta) ->
       if meta?.statusCode is 404
-        _cb(null, false, meta)
+        callback(null, false, meta)
       else if err
-        _cb(err, data, meta)
+        callback(err, data, meta)
       else
-        _cb(err, true, meta)
-
-    @head(bucket, key, options, callback)
+        callback(err, true, meta)
 
   getAll: (bucket, options...) ->
     [options, callback] = @ensure options
@@ -55,12 +52,9 @@ class HttpClient extends Client
   count: (bucket, options...) ->
     [options, callback] = @ensure options
 
-    _cb = callback  # proxy callback
-    callback = (err, data, meta) ->
+    @add(bucket).map((v) -> [1]).reduce('Riak.reduceSum').run options, (err, data, meta) ->
       if not err then [data] = data
-      _cb(err, data, meta)
-
-    @add(bucket).map((v) -> [1]).reduce('Riak.reduceSum').run(options, callback)
+      callback(err, data, meta)
 
   walk: (bucket, key, spec, options...) ->
     [options, callback] = @ensure options
