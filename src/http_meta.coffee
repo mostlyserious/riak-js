@@ -41,7 +41,7 @@ class Meta extends CoreMeta
     
     # location
     if headers.location
-      [$0, @raw, @bucket, @key] = headers.location.match /\/([^\/]+)\/([^\/]+)\/([^\/]+)/
+      [$0, @raw, @bucket, @key] = headers.location.match /^\/([^\/]+)(?:\/([^\/]+))?\/([^\/]+)$/
     
     return this
 
