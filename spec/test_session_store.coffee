@@ -44,6 +44,7 @@ suite.addBatch
           undefined
         'successfully': (err, data) ->
           assert.isNotNull err
+          assert.equal err.errno, process.ENOENT
           assert.isUndefined data
 
 suite.addBatch

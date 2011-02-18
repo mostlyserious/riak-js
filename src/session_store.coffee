@@ -14,6 +14,10 @@ class SessionStore extends Store
   get: (sid, cb) ->
     @client.get @bucket, sid, (err, data, meta) ->
       if err?
+        
+        if meta.statusCode >= 400 && meta.statusCode < 500
+          err.errno = process.ENOENT
+        
         cb(err, null) if cb
       else
         cb(null, data) if cb
