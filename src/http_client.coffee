@@ -116,14 +116,15 @@ class HttpClient extends Client
   enableIndex: (bucket, options...) ->
     [options, callback] = @ensure options
     @getProps bucket, options, (err, props) =>
-      props.precommit.push { mod: 'riak_search_kv_hook', fun: 'precommit' }
-      @updateProps bucket, props, options
+      hook = { mod: 'riak_search_kv_hook', fun: 'precommit' }
+      props.precommit.push hook unless (props.precommit.some (p) -> p.mod is hook.mod)
+      @updateProps bucket, props, options, callback
 
   disableIndex: (bucket, options...) ->
     [options, callback] = @ensure options
     @getProps bucket, options, (err, props) =>
       props.precommit = for p in props.precommit when p.mod isnt 'riak_search_kv_hook' then p
-      @updateProps bucket, props, options
+      @updateProps bucket, props, options, callback
       
   search: (index, query, options...) ->
     [options, callback] = @ensure options
