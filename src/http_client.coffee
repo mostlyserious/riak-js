@@ -129,6 +129,7 @@ class HttpClient extends Client
   search: (index, query, options...) ->
     [options, callback] = @ensure options
     options.raw or= 'solr'
+    options.rows or= 10000
     options.wt = 'json'
     options.q = query
     meta = new Meta index, 'select', options
