@@ -24,6 +24,13 @@ Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.3.6
+
+ - Fix index.js and package.json for npm compat
+ - Fix recursing usermeta
+ - Fix for luwak location parsing
+ - Updates related to Riak Search operations
+
 #### 0.3.0beta6
 
  - Test backend implementation
