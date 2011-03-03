@@ -231,7 +231,7 @@ class HttpClient extends Client
           err.message = undefined if meta.statusCode is 404 # message == undefined to be in sync with pbc
           err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
           err
-        else @decodeBuffer(buffer, meta)
+        else @decodeBuffer(buffer, meta, verb)
 
         if meta.statusCode is 300 and meta.contentType.match /^multipart\/mixed/ # multiple choices
           boundary = Utils.extractBoundary meta.contentType
@@ -239,7 +239,7 @@ class HttpClient extends Client
             _meta = new Meta(meta.bucket, meta.key)
             _meta.loadResponse { headers: doc.headers, statusCode: meta.statusCode }
             _meta.vclock = meta.vclock
-            { meta: _meta, data: @decodeBuffer(doc.body, _meta) }
+            { meta: _meta, data: @decodeBuffer(doc.body, _meta, verb) }
 
         cbFired = true
         
@@ -254,9 +254,11 @@ class HttpClient extends Client
 
   # http client utils
 
-  decodeBuffer: (buffer, meta) ->
+  decodeBuffer: (buffer, meta, verb) ->
     try
-      if buffer.length > 0 then meta.decode(buffer) else undefined
+      if meta.statusCode is 204 or verb is 'HEAD' then undefined
+      else if buffer == "" then buffer
+      else meta.decode(buffer)
     catch e
       new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
 
