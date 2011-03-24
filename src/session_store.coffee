@@ -1,4 +1,4 @@
-{Store} = require('connect/middleware/session')
+{Store} = require('connect').session
 
 Store.prototype.constructor = Store
 
