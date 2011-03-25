@@ -106,6 +106,10 @@ class Meta
         this[key] = value
       else
         delete this[key]
+    
+    # remove useless props that are not popped out and remain in usermeta
+    delete @usermeta.headers
+    delete @usermeta.agent
 
   # Pull the value at the given key from the given object, and then removes
   # it from the object.
