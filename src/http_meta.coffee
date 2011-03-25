@@ -43,6 +43,9 @@ class Meta extends CoreMeta
     if headers.location
       [$0, @raw, @bucket, @key] = headers.location.match /^\/([^\/]+)(?:\/([^\/]+))?\/([^\/]+)$/
     
+    # delete method used in previous request
+    delete @method
+    
     return this
 
   # HTTP request header mappings
