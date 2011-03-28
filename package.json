@@ -41,5 +41,9 @@
    },
    "os": [ "linux", "darwin" ],
    "dependencies": {},
-   "engines": { "node": ">=0.1.97" }
+   "devDependencies": {
+     "vows": "*",
+     "coffee-script": "*"
+   },
+   "engines": { "node": ">=0.4.0" }
 }
