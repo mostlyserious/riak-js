@@ -86,8 +86,8 @@ class Meta
   # Loads the given options into this Meta object.  Any Riak properties are set
   # on the object directly. Anything custom is assumed to be custom Riak 
   # userdata, and will live on meta.usermeta.
-  load: (options, additionalProperties, additionalDefaults) ->
-    defaults = Utils.mixin true, {}, Meta.defaults, additionalDefaults
+  load: (options, additionalProperties, additionalDefaults, coreDefaults) ->
+    defaults = Utils.mixin true, {}, Meta.defaults, additionalDefaults, coreDefaults
 
     # ensure links is an array
     options.links = [options.links] if options?.links and not Array.isArray(options.links)
