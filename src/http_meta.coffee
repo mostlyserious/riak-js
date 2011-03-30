@@ -4,7 +4,7 @@ Utils = require './utils'
 class Meta extends CoreMeta
 
   load: (options) ->
-    super options, Meta.riakProperties.concat(Meta.queryProperties), Meta.defaults
+    super options, Meta.riakProperties.concat(Meta.queryProperties), Meta.defaults, CoreMeta.defaults
       
   # HTTP response header mappings
 
