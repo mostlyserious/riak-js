@@ -40,6 +40,7 @@
        "lib": "./lib"
    },
    "os": [ "linux", "darwin" ],
-   "dependencies": {},
+   "dependencies": {"coffee-script": ">=1.0.1"},
+   "scripts": {"install": "./node_modules/coffee-script/bin/cake build"},
    "engines": { "node": ">=0.1.97" }
 }
