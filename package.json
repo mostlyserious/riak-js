@@ -41,6 +41,6 @@
    },
    "os": [ "linux", "darwin" ],
    "dependencies": {"coffee-script": ">=1.0.1"},
-   "scripts": {"install": "./node_modules/coffee-script/bin/cake build"},
+   "scripts": {"install": "./build.sh"},
    "engines": { "node": ">=0.1.97" }
 }
