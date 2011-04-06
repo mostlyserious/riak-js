@@ -6,6 +6,7 @@ http = require 'http'
 
 class HttpClient extends Client
   constructor: (options) ->
+    options = Utils.mixin true, {}, Meta.defaults, options
     super options
 
   get: (bucket, key, options...) ->
