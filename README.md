@@ -24,6 +24,12 @@ Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.4.0rc1
+
+ - node 0.4.x compatibility
+ - npm 1.0 compatibility
+ - Minor bug fixes
+
 #### 0.3.6
 
  - Fix index.js and package.json for npm compat
