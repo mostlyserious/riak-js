@@ -1,13 +1,13 @@
 {
    "name": "riak-js",
-   "version": "0.3.6",
-   "description": "Riak client for node (HTTP + Protobuf)",
+   "version": "0.4.0beta",
+   "description": "Riak client with support for HTTP and Protocol Buffers",
    "keywords": [
        "riak",
-       "node",
-       "async",
        "nosql",
-       "database" 
+       "database",
+       "http",
+       "protobuf"
    ],
    "maintainers": [
        {
@@ -41,5 +41,9 @@
    },
    "os": [ "linux", "darwin" ],
    "dependencies": {},
-   "engines": { "node": ">=0.1.97" }
+   "devDependencies": {
+     "vows": "*",
+     "coffee-script": "*"
+   },
+   "engines": { "node": ">=0.4.0" }
 }

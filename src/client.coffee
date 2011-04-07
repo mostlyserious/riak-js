@@ -23,6 +23,8 @@ class Client extends EventEmitter
   @log: (string, options = {}) ->
     if string? and console and (if options.debug? then options.debug else CoreMeta.defaults.debug)
       console.log string
+      
+  version: '0.4'
 
   Meta: -> throw new Error('APIs should override this function with their particular Meta implementation.')
 

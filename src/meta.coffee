@@ -86,8 +86,8 @@ class Meta
   # Loads the given options into this Meta object.  Any Riak properties are set
   # on the object directly. Anything custom is assumed to be custom Riak 
   # userdata, and will live on meta.usermeta.
-  load: (options, additionalProperties, additionalDefaults) ->
-    defaults = Utils.mixin true, {}, Meta.defaults, additionalDefaults
+  load: (options, additionalProperties, additionalDefaults, coreDefaults) ->
+    defaults = Utils.mixin true, {}, Meta.defaults, additionalDefaults, coreDefaults
 
     # ensure links is an array
     options.links = [options.links] if options?.links and not Array.isArray(options.links)
@@ -106,6 +106,10 @@ class Meta
         this[key] = value
       else
         delete this[key]
+    
+    # remove useless props that are not popped out and remain in usermeta
+    delete @usermeta.headers
+    delete @usermeta.agent
 
   # Pull the value at the given key from the given object, and then removes
   # it from the object.
@@ -166,7 +170,7 @@ Meta.defaults =
   links: []
   binary: false
   raw: 'riak'
-  clientId: 'riak-js' # fix default clientId
+  clientId: 'riak-js'
   contentEncoding: 'utf8'
 
   # reserved by riak-js
