@@ -2,6 +2,10 @@
 
 Store.prototype.constructor = Store
 
+uriSafe = (key="") ->
+  encodeURIComponent(key.replace(/\+/g, "%20"));
+  
+
 class SessionStore extends Store
   constructor: (options) ->
     super options
@@ -9,10 +13,10 @@ class SessionStore extends Store
     @bucket = options.bucket || '_sessions'
 
   set: (sid, sess, cb) ->
-    @client.save @bucket, sid, sess, cb
+    @client.save @bucket, uriSafe(sid), sess, cb
 
   get: (sid, cb) ->
-    @client.get @bucket, sid, (err, data, meta) ->
+    @client.get @bucket, uriSafe(sid), (err, data, meta) ->
       if err?
         
         if meta.statusCode >= 400 && meta.statusCode < 500
@@ -23,7 +27,7 @@ class SessionStore extends Store
         cb(null, data) if cb
 
   destroy: (sid, cb) ->
-    @client.remove @bucket, sid, cb
+    @client.remove @bucket, uriSafe(sid), cb
 
   all: (cb) ->
     @client.getAll @bucket, (err, sessions) ->
