@@ -4,7 +4,7 @@
 class Mapper
   constructor: (@riak, @inputs) ->
     @phases = []
-    
+
   #
   # Add one or more *map* phases to the Map/Reduce job
   #
@@ -34,7 +34,7 @@ class Mapper
   #
   link: (phase) ->
     @makePhases "link", phase
-  
+
   #
   # Run the Map/Reduce job
   #
@@ -54,6 +54,7 @@ class Mapper
     options.data =
       inputs: inputs
       query:  @phases
+    options.data.timeout = options.timeout if options.timeout?
     options
 
   makePhases: (type, phase, args) ->
