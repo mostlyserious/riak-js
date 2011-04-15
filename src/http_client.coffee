@@ -53,9 +53,15 @@ class HttpClient extends Client
   count: (bucket, options...) ->
     [options, callback] = @ensure options
 
-    @add(bucket).map((v) -> [1]).reduce('Riak.reduceSum').run options, (err, data, meta) ->
-      if not err then [data] = data
-      callback(err, data, meta)
+    count = 0
+    @on 'keys', (_bucket, keys) ->
+      console.log "bucket: #{_bucket}"
+      count += keys.length if bucket is _bucket
+    options.keys = 'stream'
+    options.props = false
+    
+    @get bucket, '', options, (err, data, meta) =>
+      callback(err, count, meta)
 
   walk: (bucket, key, spec, options...) ->
     [options, callback] = @ensure options
@@ -189,8 +195,32 @@ class HttpClient extends Client
     request = http.request meta, (response) =>
       response.setEncoding meta.responseEncoding
       buffer = ''
+      firstChunk = false
+      buffer2 = ''
 
-      response.on 'data', (chunk) -> buffer += chunk
+      response.on 'data', (chunk) =>
+        if meta.keys == 'stream'
+          unless firstChunk # only buffer the first chunk, the rest will be emitted
+            buffer += chunk
+            firstChunk = true
+          else
+          
+            buffer2 += chunk
+            
+            m = buffer2.match /\}\{?/
+            if m?.index  # contiguous chunks
+              head = buffer2.substr(0, m.index+1)
+              tail = buffer2.substr(m.index+1)
+              buffer2 = tail
+              
+              try
+                @emit 'keys', meta.bucket, JSON.parse(head).keys
+              catch err
+                @emit 'clientError', err
+
+        else
+          buffer += chunk
+        
       response.on 'end', =>
         meta = meta.loadResponse response
 
