@@ -55,7 +55,6 @@ class HttpClient extends Client
 
     count = 0
     @on 'keys', (_bucket, keys) ->
-      console.log "bucket: #{_bucket}"
       count += keys.length if bucket is _bucket
     options.keys = 'stream'
     options.props = false
