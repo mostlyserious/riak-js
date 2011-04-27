@@ -1,6 +1,9 @@
 CoreMeta = require './meta'
 Utils = require './utils'
 
+uriSafe = (key="") ->
+  encodeURIComponent key.replace /\+/g, "%20"
+
 class Meta extends CoreMeta
 
   load: (options) ->
@@ -94,8 +97,8 @@ class Meta extends CoreMeta
 
 Meta::__defineGetter__ 'path', ->
   queryString = @stringifyQuery @queryProps
-  bq = if @bucket then "/#{@bucket}" else ''
-  kq = if @key then "/#{@key}" else ''
+  bq = if @bucket then "/#{uriSafe @bucket}" else ''
+  kq = if @key then "/#{uriSafe @key}" else ''
   qs = if queryString then "?#{queryString}" else ''
   "/" + @raw + bq + kq + qs
 
