@@ -48,7 +48,7 @@ class HttpClient extends Client
     options.keys = true
     
     @get bucket, undefined, options, (err, obj) ->
-      callback(err, obj.keys)    
+      callback(err, obj?.keys)
 
   count: (bucket, options...) ->
     [options, callback] = @ensure options
