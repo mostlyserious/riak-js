@@ -61,11 +61,12 @@ class HttpClient extends Client
     [options, callback] = @ensure options
     linkPhases = spec.map (unit) ->
       bucket: unit[0] or '_', tag: unit[1] or '_', keep: unit[2]?
+    map = if options.noJSON then 'Riak.mapValues' else 'Riak.mapValuesJson'
 
     @add(if key then [[bucket, key]] else bucket)
       .link(linkPhases)
       .reduce(language: 'erlang', module: 'riak_kv_mapreduce', function: 'reduce_set_union')
-      .map('Riak.mapValuesJson')
+      .map(map)
       .run(options, callback)
 
   save: (bucket, key, data, options...) ->
