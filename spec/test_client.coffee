@@ -75,6 +75,15 @@ batches = [{
       assert.equal 'flight',                     meta.links[0].tag
       assert.equal 'flight',                     meta.links[1].tag
 
+  # walk is ONLY HTTP for now
+  'walk request':
+    topic: ->
+      db.walk airlines, 'KLM', [["_", "flight"]], @callback
+
+    'returns several flights': (flights) ->
+      assert.equal 2, flights.length
+      assert.ok flights[0].to in ['JFK', 'AMS']
+      assert.ok flights[1].code in ['KLM-8098', 'KLM-1196']      
   
   'document 2':
     topic: ->
@@ -106,34 +115,25 @@ batches = [{
       assert.equal 'CPA-729',                    meta.links[0].key
       assert.equal 'flight',                     meta.links[0].tag
       
-  'flight IBE_4418':
+  'flight IBE-4418':
     topic: ->
-      db.get flights, 'IBE_4418', @callback
+      db.get flights, 'IBE-4418', @callback
       
     'is present': (flight) ->
       assert.equal 'JFK', flight.from
       
     'when removed':
       topic: ->
-        db.remove flights, 'IBE_4418', @callback
+        db.remove flights, 'IBE-4418', @callback
         
       'and requested again':
         topic: ->
-          db.get flights, 'IBE_4418', @callback
+          db.get flights, 'IBE-4418', @callback
           
         'is not present': (err, flight) ->
           assert.ok err.notFound
           assert.equal 404, err.statusCode
-  
-  # walk is ONLY HTTP for now
-  'walk request':
-    topic: ->
-      db.walk airlines, 'KLM', [["_", "flight"]], @callback
-      
-    'returns several flights': (flights) ->
-      assert.equal flights.length, 2
-      
-  
+    
   'an invalid map/reduce request':
     topic: ->
       db
@@ -264,18 +264,18 @@ data =
       ]
 
   riakjs_flights:
-    KLM_8098: [{code: 'KLM-8098', to: 'JFK', from: 'AMS', departure: 'Mon, 05 Jul 2010 17:05:00 GMT'}]
-    AFR_394:  [{code: 'AFR-394',  to: 'CDG', from: 'EZE', departure: 'Mon, 12 Jul 2010 05:35:00 GMT'}]
-    CPA_112:  [{code: 'CPA-112',  to: 'HKK', from: 'AMS', departure: 'Wed, 11 Aug 2010 01:20:00 GMT'}]
-    IBE_5624: [{code: 'IBE-5624', to: 'MUC', from: 'BCN', departure: 'Mon, 15 Mar 2010 22:10:00 GMT'}]
-    ARG_714:  [{code: 'ARG-714',  to: 'EZE', from: 'BCN', departure: 'Mon, 08 Mar 2010 20:50:00 GMT'}]
-    DLH_4001: [{code: 'DLH-4001', to: 'JFK', from: 'MUC', departure: 'Tue, 23 Aug 2010 13:30:00 GMT'}]
-    AMX_1344: [{code: 'AMX-1344', to: 'EZE', from: 'MEX', departure: 'Wed, 21 Jul 2010 08:45:00 GMT'}]
-    AMX_1346: [{code: 'AMX-1346', to: 'MEX', from: 'EZE', departure: 'Mon, 08 Mar 2010 19:40:00 GMT'}]
-    KLM_1196: [{code: 'KLM-1196', to: 'AMS', from: 'CDG', departure: 'Fri, 20 Aug 2010 14:59:00 GMT'}]
-    CPA_729:  [{code: 'CPA-729',  to: 'CDG', from: 'HKK', departure: 'Thu, 19 Aug 2010 07:30:00 GMT'}]
-    ARG_909:  [{code: 'ARG-909',  to: 'AMS', from: 'EZE', departure: 'Tue, 24 Aug 2010 15:25:00 GMT'}]
+    'KLM-8098': [{code: 'KLM-8098', to: 'JFK', from: 'AMS', departure: 'Mon, 05 Jul 2010 17:05:00 GMT'}]
+    'AFR-394':  [{code: 'AFR-394',  to: 'CDG', from: 'EZE', departure: 'Mon, 12 Jul 2010 05:35:00 GMT'}]
+    'CPA-112':  [{code: 'CPA-112',  to: 'HKK', from: 'AMS', departure: 'Wed, 11 Aug 2010 01:20:00 GMT'}]
+    'IBE-5624': [{code: 'IBE-5624', to: 'MUC', from: 'BCN', departure: 'Mon, 15 Mar 2010 22:10:00 GMT'}]
+    'ARG-714':  [{code: 'ARG-714',  to: 'EZE', from: 'BCN', departure: 'Mon, 08 Mar 2010 20:50:00 GMT'}]
+    'DLH-4001': [{code: 'DLH-4001', to: 'JFK', from: 'MUC', departure: 'Tue, 23 Aug 2010 13:30:00 GMT'}]
+    'AMX-1344': [{code: 'AMX-1344', to: 'EZE', from: 'MEX', departure: 'Wed, 21 Jul 2010 08:45:00 GMT'}]
+    'AMX-1346': [{code: 'AMX-1346', to: 'MEX', from: 'EZE', departure: 'Mon, 08 Mar 2010 19:40:00 GMT'}]
+    'KLM-1196': [{code: 'KLM-1196', to: 'AMS', from: 'CDG', departure: 'Fri, 20 Aug 2010 14:59:00 GMT'}]
+    'CPA-729':  [{code: 'CPA-729',  to: 'CDG', from: 'HKK', departure: 'Thu, 19 Aug 2010 07:30:00 GMT'}]
+    'ARG-909':  [{code: 'ARG-909',  to: 'AMS', from: 'EZE', departure: 'Tue, 24 Aug 2010 15:25:00 GMT'}]
     # EXPENDABLE
-    IBE_4418: [{code: 'IBE-4418', to: 'BCN', from: 'JFK', departure: 'Sat, 24 Jul 2010 12:00:00 GMT'}]
+    'IBE-4418': [{code: 'IBE-4418', to: 'BCN', from: 'JFK', departure: 'Sat, 24 Jul 2010 12:00:00 GMT'}]
     
 [airports, airlines, flights] = Object.keys(data)
