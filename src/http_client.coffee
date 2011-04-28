@@ -40,8 +40,8 @@ class HttpClient extends Client
         if keys.some((k) -> options.where[k] isnt data[k]) then return []
       delete v.values
       [{ meta: v, data: data }]
-
-    @add(bucket).map(mapfunc).run(options, callback)
+      
+    @add(bucket).map(mapfunc, options).run(callback)
 
   keys: (bucket, options...) ->
     [options, callback] = @ensure options
