@@ -3,6 +3,7 @@ Meta = require './http_meta'
 Mapper = require './mapper'
 Utils = require './utils'
 http = require 'http'
+{ EventEmitter } = require 'events'
 
 class HttpClient extends Client
   constructor: (options) ->
@@ -45,17 +46,33 @@ class HttpClient extends Client
 
   keys: (bucket, options...) ->
     [options, callback] = @ensure options
-    options.keys = true
+    meta = new Meta bucket, undefined, options
+    meta.keys or= true
     
-    @get bucket, undefined, options, (err, obj) ->
-      callback(err, obj?.keys)
+    if meta.keys == 'stream'
+      meta._emitter = new EventEmitter()
+    
+      meta._emitter.start = =>
+        @execute 'GET', meta, (err, data, meta) ->
+          delete meta._emitter if meta
+          callback(err, data, meta)
+
+      return meta._emitter
+
+    else
+      @get bucket, undefined, meta, (err, obj) ->
+        callback(err, obj?.keys)
 
   count: (bucket, options...) ->
     [options, callback] = @ensure options
-
-    @add(bucket).map((v) -> [1]).reduce('Riak.reduceSum').run options, (err, data, meta) ->
-      if not err then [data] = data
-      callback(err, data, meta)
+    options.keys = 'stream'
+    buffer = []
+    
+    stream = @keys bucket, options, (err, data, meta) ->
+      callback(err, buffer.length, meta)
+    
+    stream.on 'keys', (keys) -> for k in keys then buffer.push(k)
+    stream.start()
 
   walk: (bucket, key, spec, options...) ->
     [options, callback] = @ensure options
@@ -188,11 +205,44 @@ class HttpClient extends Client
     Client.log "#{meta.method} #{meta.path}", meta
 
     request = http.request meta, (response) =>
+    
       response.setEncoding meta.responseEncoding
+      
       buffer = ''
+      firstChunk = false
+      tempBuffer = ''
 
-      response.on 'data', (chunk) -> buffer += chunk
+      response.on 'data', (chunk) ->
+      
+        if meta._emitter
+
+          unless firstChunk # only buffer the first chunk, the rest will be emitted
+            buffer += chunk
+            firstChunk = true
+
+          else
+          
+            tempBuffer += chunk
+          
+            m = tempBuffer.match /\}\{?/
+            if m?.index  # contiguous chunks
+              head = tempBuffer.substr(0, m.index+1)
+              tail = tempBuffer.substr(m.index+1)
+              tempBuffer = tail
+            
+              try
+                meta._emitter.emit 'keys', JSON.parse(head).keys
+              catch err
+                @emit 'clientError', err
+
+        else
+          buffer += chunk
+      
       response.on 'end', =>
+      
+        if meta._emitter
+          meta._emitter.emit 'end'
+
         meta = meta.loadResponse response
 
         buffer = if 400 <= meta.statusCode <= 599
