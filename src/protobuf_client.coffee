@@ -1,116 +1,166 @@
-Client   = require './client'
-Pool     = require './protobuf'
-Meta     = require './protobuf_meta'
-Mapper   = require './mapper'
+Client = require './client'
+Pool = require './protobuf'
+Meta = require './protobuf_meta'
+Mapper = require './mapper'
+Utils = require './utils'
 
-class ProtoBufClient extends Client
-
-  ## **** IMPORTANT ****
+class ProtobufClient extends Client
   
-  # Client and HttpClient have evolved - this API is old and needs updating
+  constructor: (options) ->
+    options = Utils.mixin true, {}, Meta.defaults, options
+    super options
 
   get: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
-    @send("GetReq", meta) (data) =>
-      @executeCallback @processValueResponse(meta, data), meta, callback
-
-  save: (bucket, key, body, options...) ->
+    meta.serializable = true
+    @execute 'GetReq', meta, callback
+    
+  save: (bucket, key, data, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
-    @send("PutReq", meta.withContent(body)) (data) =>
-      @executeCallback @processValueResponse(meta, data), meta, callback
-
+    meta.serializable = true
+    meta.data = data or {}
+    @execute 'PutReq', meta, callback
+    
   remove: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
-    @send("DelReq", meta) (data, meta) =>
-      @executeCallback data, meta, callback
-      
+    meta.serializable = true
+    @execute 'DelReq', meta, callback
+
+  keys: (bucket, options...) ->
+    [options, callback] = @ensure options
+    # TODO should be real Meta
+    # meta = new Meta(options)
+    meta = options
+    # TODO validate bucket exists
+    meta.bucket = bucket
+    meta.serializable = true
+
+    processChunk = (data) -> data.keys
+
+    cb = (err, data) ->
+      result = []
+      for chunk in data
+        for key in chunk
+          result.push key.toString()
+
+      callback(null, result, meta)
+
+    @execute 'ListKeysReq', meta, cb, processChunk
+
   # map/reduce
 
   add: (inputs) -> new Mapper this, inputs
 
-  ping: (callback) ->
-    @send('PingReq') (data, meta) =>
-      @executeCallback data, meta, callback
+  runJob: () ->
+    [meta, callback] = @ensure arguments
+    # TODO should be real Meta
+    # meta = new Meta '', '', meta
+    
+    meta.request = JSON.stringify(meta.data)
+    meta.contentType = 'application/json'
+    meta.serializable = true
+
+    processChunk = (data) ->
+      if data.phase?
+        result = try
+          JSON.parse(data.response)
+        catch err
+          err
+
+        [data.phase, result]
+
+    cb = (err, data) ->
+      result = []
+      for [phase, elem] in data
+        result[phase] = [] unless result[phase]
+        result[phase] = result[phase].concat elem
+
+      callback(err, result, meta)
+
+    @execute 'MapRedReq', meta, cb, processChunk
+
+  # not working
+  
+  # updateProps: (bucket, props, options...) ->
+  #   [options, callback] = @ensure options
+  #   meta = new Meta bucket, '', options
+  #   meta.serializable = true
+  #   meta.data = props
+  #   @execute 'SetBucketReq', meta, callback
+  
+  ping: () ->
+    [options, callback] = @ensure arguments
+    meta = new Meta(options)
+    meta.serializable = false
+    @execute 'PingReq', meta, callback
+
+  buckets: () ->
+    [options, callback] = @ensure arguments
+    meta = new Meta(options)
+    meta.serializable = false
+    @execute 'ListBucketsReq', meta, (err, data, meta) ->
+      if not err
+        data = for p in data.buckets then p.toString()
+      callback(err, data, meta)
+
+  # private
+  
+  actuallySend: (name, data, cb) ->
+    serializable = data.serializable
+    delete data.serializable # we don't need it anymore    
+    if not serializable then data = undefined
+    @connection.send(name, data, cb)
+
+  send: (verb, data, cb) ->
+    if @connection? and @connection.writable
+      @actuallySend(verb, data, cb)
+    else
+      @pool.start (@connection) =>
+        @actuallySend(verb, data, cb)
+
+  execute: (verb, meta, callback, processChunk) ->
+    
+    cb = (response) ->
+    
+      if (verb == 'GetReq') or (verb == 'PutReq' and meta.returnBody)
+        meta = meta.loadResponse response
+        response = meta.response
+        delete meta.response
+      
+      # TODO check for RpbErrorResp
+      err = null
+      
+      callback(err, response, meta)
+    
+    ##
+        
+    if processChunk?
+      
+      buffer = []
+      
+      @send verb, meta, (data) ->
+      
+        if data.errcode then cb(data)
+        
+        result = processChunk(data)
+        buffer.push(result) if result
+        
+        if data.done then cb(buffer)
+      
+    else
+      @send(verb, meta, cb)
+    
+    return undefined # for the repl not to print out the return value of this function
+
 
   end: ->
     @connection.end() if @connection
 
-  buckets: (callback) ->
-    @send('ListBucketsReq') (data, meta) =>
-      @executeCallback data.buckets, meta, callback
-
-  ## PBC Specific Riak-JS methods.
-
-  keys: (bucket, callback) ->
-    keys = []
-    @send('ListKeysReq', bucket: bucket) (data, meta) =>
-      @processKeysResponse data, keys, meta, callback
-
-  serverInfo: (callback) ->
-    @send('GetServerInfoReq') (data, meta) =>
-      @executeCallback data, meta, callback
-
-  ## PRIVATE
-
-  runJob: (job, callback) ->
-    body = request: JSON.stringify(job.data), contentType: 'application/json'
-    resp = phases: []
-    @send("MapRedReq", body) (data, meta) =>
-      @processMapReduceResponse data, resp, meta, callback
-
-  send: (name, data) ->
-    if @connection? && @connection.writable
-      @connection.send(name, data)
-    else
-      (callback) =>
-        @pool.start (conn) =>
-          @connection = conn
-          @connection.send(name, data)(callback)
-
-  processKeysResponse: (data, keys, meta, callback) ->
-    if data.errcode
-      @executeCallback data, meta, callback
-    if data.keys
-      data.keys.forEach (key) -> keys.push(key)
-    if data.done
-      @executeCallback keys, meta, callback
-
-  processMapReduceResponse: (data, resp, meta, callback) ->
-    if data.errcode
-      @executeCallback data, meta, callback
-    if data.phase?
-      resp.phases.push data.phase if resp.phases.indexOf(data.phase) == -1
-      parsed = JSON.parse data.response
-      if resp[data.phase]? # if it exists, assume it's an array and APPEND
-        parsed.forEach (item) ->
-          resp[data.phase].push item
-      else
-        resp[data.phase] = parsed
-    if data.done
-      @executeCallback resp, meta, callback
-
-  processValueResponse: (meta, data) ->
-    delete meta.content
-    if data.content? and data.content[0]? and data.vclock?
-      [content, value] = @processValue data.content[0]
-      meta.load     content
-      meta.vclock = data.vclock
-      meta.decode   value
-
-  processValue: (content) ->
-    value = content.value
-    if content.usermeta?.forEach?
-      content.usermeta.forEach (pair) ->
-        content[pair.key] = pair.value
-    delete content.value
-    delete content.usermeta
-    [content, value]
-    
   # provide particular Meta impl to clients
 
   Meta: Meta
 
-module.exports = ProtoBufClient
+module.exports = ProtobufClient

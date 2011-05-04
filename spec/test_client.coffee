@@ -27,7 +27,7 @@ setupBatch =
         db.save bucket, key, value, meta, (err) ->
           if index is queue.length-1
             # make sure allow_mult is set to false
-            db.updateProps client.bucket, { allow_mult: false }, done()
+            db.updateProps client.bucket, { allow_mult: false }, done
     
     'when get keys':
       topic: ->

@@ -71,10 +71,9 @@ class HttpClient extends Client
 
   save: (bucket, key, data, options...) ->
     [options, callback] = @ensure options
-    data or= {}
 
     meta = new Meta bucket, key, options
-    meta.data = data
+    meta.data = data or {}
 
     verb = options.method or if key then 'PUT' else 'POST'
     @execute verb, meta, callback
