@@ -1,6 +1,6 @@
 seq = require 'seq'
 assert = require 'assert'
-db = require('../src/index').getClient({ api: 'protobuf', debug: false })
+db = require('../../src/index').getClient({ api: 'protobuf', debug: false })
 
 bucket = 'riakjs_protobuf'
 print = (message) -> console.log "=> " + message
