@@ -89,19 +89,14 @@ db.getAll('flights', { where: { ready: true }})
 </code></pre>
 
         <ul> 
-          <li>Focused on developer experience – clean API with added sugar</li> 
-          <li>Features all basic operations, plus link walking and map/reduce with chainable phases</li> 
           <li>For Riak 0.12+ and node.js 0.4.x</li>
-        </ul>
-        
-        <ul> 
           <li>Code: <a href="http://github.com/frank06/riak-js">frank06/riak-js</a></li>
           <li>License: <a href="http://opensource.org/licenses/mit-license.php">MIT</a></li>
         </ul>
 
         <h2>Setup</h2>
         
-        <p><strong>Please note:</strong>Protobuf support is still experimental.</p>
+        <p><strong>Please note:</strong> Protobuf support is still experimental.</p>
         
         <pre>
 <code>// npm install riak-js@latest
@@ -154,7 +149,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
 }</code></pre>
 
       <p>Riak properties such as <code>'contentType', 'vclock', 'clientId', 'links', 'etag', 'r', 'w', 'dw', 'returnbody'</code>
-        can be set on this object. It also contains handy methods to deal with links, and provides <strong>sensible defaults</strong>, which can of course be overriden.
+        can all be set on this object. It also contains handy methods to deal with links, and provides <strong>sensible defaults</strong>, which can of course be overriden.
         Examples are <code>contentType: 'application/json'</code> and <code>clientId: 'riak-js'</code>.</p>
         
        <p>Not only these are tunable per-request. If you need certain defaults to apply to the whole session, 
@@ -287,6 +282,8 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         <h5>Streaming keys</h5>
         
         <pre><code>db.keys('airlines', { keys: 'stream' }).on('keys', console.dir).start()</code></pre>
+        
+        <p>Yes, in this case <code>db.keys</code> will return an <code>EventEmitter</code>. It will emit both the <code>keys</code> and <code>end</code> events.</p>
 
         <h4>Count</h4>
         
@@ -316,7 +313,7 @@ var db = require('/path/to/riak-js/lib').getClient()</code></pre>
         
         <pre><code>db.add('albums').map({name: 'Riak.mapValuesJson', keep: true }).run()</code></pre>
 
-        <pre><code>db.add('albums').map(function(v) { return [Riak.mapValuesJson[0]] }).run()</code></pre>
+        <pre><code>db.add('albums').map(function(v) { return [Riak.mapValuesJson(v)[0]] }).run()</code></pre>
 
         <p>You can chain any number of phases or pass arrays, too:</p> 
 
