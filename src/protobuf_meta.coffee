@@ -32,6 +32,19 @@ class Meta extends CoreMeta
 
     return this
 
+  # Adds a RpbContent structure, see RpbPutReq for usage.
+  loadData: ->
+    if @data
+      @content =
+        value: @encode(@data)
+        contentType: @contentType
+        charset: @charset
+        contentEncoding: @contentEncoding
+        links: @encodeLinks(@links)
+
+      delete @usermeta
+      delete @links
+
   encodeLinks: (links) ->
     if links
       if not Array.isArray(links) then links = [links]
@@ -39,18 +52,5 @@ class Meta extends CoreMeta
 
   encodeUsermeta: (data) ->
     for key, value of data then { key: key, value: value }
-
-# Adds a RpbContent structure, see RpbPutReq for usage.
-Meta::__defineSetter__ 'data', (data) ->
-  @content = 
-    value: @encode(data)
-    contentType: @contentType
-    charset: @charset
-    contentEncoding: @contentEncoding
-    links: @encodeLinks(@links)
-    usermeta: @encodeUsermeta(@usermeta)
-
-  delete @usermeta
-  delete @links
     
 module.exports = Meta

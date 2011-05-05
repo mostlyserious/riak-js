@@ -31,10 +31,7 @@ class ProtobufClient extends Client
 
   keys: (bucket, options...) ->
     [options, callback] = @ensure options
-    # TODO should be real Meta
-    # meta = new Meta(options)
-    meta = options
-    # TODO validate bucket exists
+    meta = new Meta(options)
     meta.bucket = bucket
     meta.serializable = true
 
@@ -55,9 +52,8 @@ class ProtobufClient extends Client
   add: (inputs) -> new Mapper this, inputs
 
   runJob: () ->
-    [meta, callback] = @ensure arguments
-    # TODO should be real Meta
-    # meta = new Meta '', '', meta
+    [options, callback] = @ensure arguments
+    meta = new Meta undefined, undefined, options
     
     meta.request = JSON.stringify(meta.data)
     meta.contentType = 'application/json'
@@ -82,15 +78,6 @@ class ProtobufClient extends Client
 
     @execute 'MapRedReq', meta, cb, processChunk
 
-  # not working
-  
-  # updateProps: (bucket, props, options...) ->
-  #   [options, callback] = @ensure options
-  #   meta = new Meta bucket, '', options
-  #   meta.serializable = true
-  #   meta.data = props
-  #   @execute 'SetBucketReq', meta, callback
-  
   ping: () ->
     [options, callback] = @ensure arguments
     meta = new Meta(options)
@@ -108,18 +95,18 @@ class ProtobufClient extends Client
 
   # private
   
-  actuallySend: (name, data, cb) ->
-    serializable = data.serializable
-    delete data.serializable # we don't need it anymore    
-    if not serializable then data = undefined
-    @connection.send(name, data, cb)
-
   send: (verb, data, cb) ->
+    
+    doSend = =>
+      serializable = data.serializable
+      delete data.serializable # we don't need it anymore    
+      if not serializable then data = undefined
+      @connection.send(verb, data, cb)
+    
     if @connection? and @connection.writable
-      @actuallySend(verb, data, cb)
+      doSend()
     else
-      @pool.start (@connection) =>
-        @actuallySend(verb, data, cb)
+      @pool.start (@connection) => doSend()
 
   execute: (verb, meta, callback, processChunk) ->
     
@@ -136,6 +123,9 @@ class ProtobufClient extends Client
       callback(err, response, meta)
     
     ##
+    
+    # load body data if present
+    meta.loadData()
         
     if processChunk?
       
