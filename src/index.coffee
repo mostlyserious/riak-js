@@ -8,8 +8,8 @@ module.exports =
     options ||= {}
     pool      = options.pool
     delete options.pool
-    pool   ||= new @ProtoBufPool options
-    cli      = new @ProtoBufClient options
+    pool   ||= new @ProtobufPool options
+    cli      = new @ProtobufClient options
     cli.pool = pool
     cli
 
@@ -23,14 +23,16 @@ module.exports =
   getSessionStore: (options) ->
     new @SessionStore options
 
-module.exports.__defineGetter__ 'ProtoBufClient', ->
-  @_pbcClient ||= require './protobuf_client'
-
-module.exports.__defineGetter__ 'ProtoBufPool', ->
-  @_pbcPool ||= require './protobuf'
+# exports
 
 module.exports.__defineGetter__ 'HttpClient', ->
   @_httpClient ||= require './http_client'
+
+module.exports.__defineGetter__ 'ProtobufClient', ->
+  @_pbcClient ||= require './protobuf_client'
+
+module.exports.__defineGetter__ 'ProtobufPool', ->
+  @_pbcPool ||= require './protobuf'
 
 module.exports.__defineGetter__ 'TestServer', ->
   @_testServer ||= require './test_server'

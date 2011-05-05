@@ -8,7 +8,7 @@ Buffer   = require('buffer').Buffer
 # Keeps a pool of Riak socket connections.
 class Pool
   constructor: (options) ->
-    @options = options ||  {}
+    @options = options or {}
     @options.port      ||= 8087
     @options.host      ||= '127.0.0.1'
     @options.max       ||= 10
@@ -29,10 +29,10 @@ class Pool
 
     @next (conn) ->
       if conn.writable
-        callback conn if callback
+        callback(conn) if callback
       else
         conn.on 'connect', ->
-          callback conn if callback
+          callback(conn) if callback
 
     true
 
@@ -51,14 +51,13 @@ class Pool
   # data - Object data to be serialized.
   #
   # Returns anonymous function that takes a single callback.
-  send: (name, data) ->
-    (callback) =>
-      @start (conn) ->
-        conn.send(name, data) (resp) ->
-          try
-            callback resp
-          finally
-            conn.finish()
+  send: (name, data, callback) ->
+    @start (conn) ->
+      conn.send name, data, (resp) ->
+        try
+          callback resp
+        finally
+          conn.finish()
 
   # Public: Returns the Connection back to the Pool.  If the Pool is
   # inactive, disconnect the Connection.
@@ -124,8 +123,7 @@ class Connection
   # data - Object data to be serialized.
   #
   # Returns anonymous function that takes a single callback.
-  send: (name, data) ->
-    (callback) =>
+  send: (name, data, callback) ->
       @callback = callback
       @conn.write @prepare(name, data)
 
@@ -158,12 +156,15 @@ class Connection
   #
   # Returns a Buffer that is ready to be sent to Riak.
   prepare: (name, data) ->
-    type = ProtoBuf[name]
+    
+    type = Protobuf[name]
+    
     if data
       buf = type.serialize(data)
       len = buf.length + 1
     else
       len = 1
+
     msg    = new Buffer(len + 4)
     msg[0] = len >>>  24
     msg[1] = len >>>  16
@@ -249,7 +250,7 @@ class Connection
                   (@chunk[@chunk_pos + 1] << 16) +
                   (@chunk[@chunk_pos + 2] <<  8) +
                    @chunk[@chunk_pos + 3]  -  1
-      @type       = ProtoBuf.type @chunk[@chunk_pos + 4]
+      @type       = Protobuf.type @chunk[@chunk_pos + 4]
       @resp       = new Buffer(@resp_len)
       @resp_pos   = 0
       @chunk_pos += 5
@@ -274,34 +275,55 @@ Connection.prototype.__defineGetter__ 'writable',  ->
 
 Pool.Connection = Connection
 
-ProtoBuf = 
-  types: ["ErrorResp", "PingReq", "PingResp", "GetClientIdReq", 
-  "GetClientIdResp", "SetClientIdReq", "SetClientIdResp", "GetServerInfoReq", 
-  "GetServerInfoResp", "GetReq", "GetResp", "PutReq", "PutResp", "DelReq", 
-  "DelResp", "ListBucketsReq", "ListBucketsResp", "ListKeysReq", 
-  "ListKeysResp", "GetBucketReq", "GetBucketResp", "SetBucketReq", 
-  "SetBucketResp", "MapRedReq", "MapRedResp"]
+Protobuf = 
+  types: [
+    "ErrorResp" # 0
+    "PingReq" # 1
+    "PingResp" # 2
+    "GetClientIdReq" # 3
+    "GetClientIdResp" # 4
+    "SetClientIdReq" # 5
+    "SetClientIdResp" # 6
+    "GetServerInfoReq" # 7
+    "GetServerInfoResp" # 8
+    "GetReq" # 9
+    "GetResp" # 10
+    "PutReq" # 11
+    "PutResp" # 12
+    "DelReq" # 13
+    "DelResp" # 14
+    "ListBucketsReq" # 15
+    "ListBucketsResp" # 16
+    "ListKeysReq" # 17
+    "ListKeysResp" # 18
+    "GetBucketReq" # 19
+    "GetBucketResp" # 20
+    "SetBucketReq" # 21
+    "SetBucketResp" # 22
+    "MapRedReq" # 23
+    "MapRedResp" # 24
+  ]
 
-  # Find a ProtoBuf type given its riak code.
+  # Find a Protobuf type given its riak code.
   type: (num) ->
     @[@types[num]]
 
   schemaFile: path.join path.dirname(module.filename), 'riak.desc'
 
 # lazily load protobuf schema
-ProtoBuf.__defineGetter__ 'schema', ->
-  @_schema ||= new (require('protobuf_for_node').Schema)(fs.readFileSync(ProtoBuf.schemaFile))
+Protobuf.__defineGetter__ 'schema', ->
+  @_schema ||= new (require('protobuf_for_node').Schema)(fs.readFileSync(Protobuf.schemaFile))
 
 # lazily load protobuf types
-ProtoBuf.types.forEach (name) ->
+Protobuf.types.forEach (name) ->
   cached_name = "_#{name}"
 
-  ProtoBuf.__defineGetter__ name, ->
+  Protobuf.__defineGetter__ name, ->
     if @[cached_name]
       @[cached_name]
     else
-      code = ProtoBuf.types.indexOf(name)
-      if sch = ProtoBuf.schema["Rpb#{name}"]
+      code = Protobuf.types.indexOf(name)
+      if sch = Protobuf.schema["Rpb#{name}"]
         sch.riak_code  = code
         @[cached_name] = sch
       else
