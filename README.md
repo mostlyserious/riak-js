@@ -22,7 +22,23 @@ Test with `cake test` or `cake -s test`. Requires [Vows](http://vowsjs.org) 0.5.
 
 Twitter: [@riakjs](http://twitter.com/riakjs)
 
+### Roadmap
+
+ - 0.4.0: Flesh out last issues and release 0.4
+ - 0.4.1: Streaming: Map/Reduce, keys (Protobuf), Luwak
+ - 0.4.1: Tests: should run way faster, integrate test backend
+ - 0.5: Decent Protobuf and seamless interface for both APIs
+
 ### Changelog
+
+#### 0.4.0rc2
+
+ - Major docs update => [http://riakjs.org](http://riakjs.org)
+ - `keys=stream` emits `keys` events
+ - `walk` now accepts `noJSON`
+ - Support Map/Reduce timeout option
+ - Protobuf interface refactor (still experimental support in 0.4)
+ - Minor bug fixes
 
 #### 0.4.0rc1
 
