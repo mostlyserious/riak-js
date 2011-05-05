@@ -18,7 +18,7 @@ class SessionStore extends Store
         if meta.statusCode >= 400 && meta.statusCode < 500
           err.errno = process.ENOENT
         
-        cb(err, null) if cb
+        cb() if cb
       else
         cb(null, data) if cb
 

@@ -43,8 +43,7 @@ suite.addBatch
           store.get 'frank', @callback
           undefined
         'successfully': (err, data) ->
-          assert.isNotNull err
-          assert.equal err.errno, process.ENOENT
+          assert.isUndefined err
           assert.isUndefined data
 
 suite.addBatch
