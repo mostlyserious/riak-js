@@ -174,7 +174,7 @@ Meta.defaults =
   contentEncoding: 'utf8'
 
   # reserved by riak-js
-  debug: true # print stuff out
+  debug: false # print stuff out
   data: undefined # attach request body data to meta
   encodeUri: false # don't escape bucket/key URI components
   
