@@ -171,6 +171,10 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
           <code>application/octet-stream</code>, otherwise you have to provide it through <code>Meta</code>.
         </p>
         
+        <h4 id="uri-encoded">URI-encoded bucket/keys</h4>
+        
+        <p>An option (<code>Meta</code> property) <code>encodeUri</code> can be set to <code>true</code> when you want to have your bucket and key URI-encoded. The default is <code>false</code> because <code>Meta</code> is implementation-agnostic, and this only makes sense for HTTP clients.</p>
+        
         <h4>Content detection</h4>
         
         <p>

@@ -176,6 +176,7 @@ Meta.defaults =
   # reserved by riak-js
   debug: true # print stuff out
   data: undefined # attach request body data to meta
+  encodeUri: false # don't escape bucket/key URI components
   
   # content-type
   # see @encode -- too complex to have just one simple default

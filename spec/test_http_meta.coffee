@@ -118,5 +118,16 @@ vows.describe('Meta for HTTP').addBatch(
     
     'knows how to create its HTTP path': (meta) ->
       assert.equal "/riak/bucket/key?r=1&w=2&dw=2&rw=2&keys=true&props=false&vtag=asweetvtag&returnbody=true&chunked=true", meta.path
+      
+  'a Meta that encodes its URI components':
+    topic: ->
+      new Meta {
+        bucket: 'spåce bucket'
+        key: 'çøµπléx–key'
+        encodeUri: true
+      }
+      
+    'should have a URI encoded path': (meta) ->
+      assert.equal "/riak/sp%C3%A5ce%20bucket/%C3%A7%C3%B8%C2%B5%CF%80l%C3%A9x%E2%80%93key", meta.path
 
 ).export module

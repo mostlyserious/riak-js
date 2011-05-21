@@ -91,11 +91,17 @@ class Meta extends CoreMeta
         if @data instanceof Buffer then @data.length else Buffer.byteLength(@data)
 
     return headers
+    
+  doEncodeUri: (component = '') ->
+    if @encodeUri
+      encodeURIComponent component.replace /\+/g, "%20"
+    else
+      component
 
 Meta::__defineGetter__ 'path', ->
   queryString = @stringifyQuery @queryProps
-  bq = if @bucket then "/#{@bucket}" else ''
-  kq = if @key then "/#{@key}" else ''
+  bq = if @bucket then "/#{@doEncodeUri @bucket}" else ''
+  kq = if @key then "/#{@doEncodeUri @key}" else ''
   qs = if queryString then "?#{queryString}" else ''
   "/" + @raw + bq + kq + qs
 
