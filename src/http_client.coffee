@@ -204,6 +204,10 @@ class HttpClient extends Client
     Client.log "#{meta.method} #{meta.path}", meta
 
     request = http.request meta, (response) =>
+      
+      # using meta as options, to which the HTTP Agent is attached
+      # we don't want to carry this around in a Meta
+      delete meta.agent
     
       response.setEncoding meta.responseEncoding
       
