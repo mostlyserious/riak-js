@@ -103,7 +103,10 @@ db.getAll('flights', { where: { ready: true }})
 var db = require('riak-js').getClient()
 
 // git clone git://github.com/frank06/riak-js.git  # or cloning the repo
-var db = require('/path/to/riak-js/lib').getClient()</code></pre>
+var db = require('/path/to/riak-js/lib').getClient()
+
+// configure the host and port
+var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</code></pre>
 
         <p>Or specify the API: <code>getClient({api: 'protobuf'})</code>.</p>
         
