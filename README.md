@@ -31,6 +31,16 @@ Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.4.0rc3
+
+ - Allow headers to override, useful for reverse proxies sitting between node and Riak
+ - URI-encoding bucket/key is now an option (encodeUri)
+ - Add documentation for map/reduce arguments
+ - Remove agent from meta, which should fix critical bug (#64, #67)
+ - Allow logging to alternate streams. And default to stderr, not stdout (thanks Mark!)
+ - Add docs for host/port (thanks Ken!)
+ - Add the new `presort` property for Riak Search (thanks Greg!)
+
 #### 0.4.0rc2
 
  - Major docs update => [http://riakjs.org](http://riakjs.org)
