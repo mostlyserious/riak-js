@@ -329,6 +329,10 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
   .run(function(err, flights) {
     console.log(flights)
   })</code></pre> 
+  
+        <p>If you need to pass-in arguments, both <code>map</code> and <code>reduce</code> accept a second argument that will end up as the third of the map function:</p>
+
+        <pre><code>db.add('flights').map(function (value, keyData, arg) { /* do something with arg == { cancelled: true } */ }, { cancelled: true })</code></pre>
         
         <p>You can also use key filters:</p>
         
