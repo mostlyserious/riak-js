@@ -198,9 +198,9 @@ class HttpClient extends Client
   # private
 
   execute: (verb, meta, callback) ->
-
+    
     meta.method = verb.toUpperCase()
-    meta.headers = meta.toHeaders()
+    meta.headers = meta.toHeaders()    
     Client.log "#{meta.method} #{meta.path}", meta
 
     request = http.request meta, (response) =>

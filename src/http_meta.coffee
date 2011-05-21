@@ -65,6 +65,7 @@ class Meta extends CoreMeta
     # ignored info: binary, raw, url, path
     
   toHeaders: ->
+    
     headers = {}
   
     # remove client id if there's no vclock
@@ -89,7 +90,11 @@ class Meta extends CoreMeta
       # don't send chunked data at least until riak #278 gets fixed or we can stream the req body
       headers['Content-Length'] =
         if @data instanceof Buffer then @data.length else Buffer.byteLength(@data)
-
+    
+    if @headers
+      for k of @headers then headers[k] = @headers[k]
+      delete @headers
+    
     return headers
     
   doEncodeUri: (component = '') ->

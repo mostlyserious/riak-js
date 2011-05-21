@@ -8,7 +8,7 @@ class Meta
     if arguments.length is 1 and bucket instanceof Object
       options = bucket # (in case the first arg is an object)
       [bucket, key] = [options.bucket, options.key]
-
+      
     @load options      
     @bucket = bucket
     @key = key    
@@ -93,7 +93,7 @@ class Meta
     options.links = [options.links] if options?.links and not Array.isArray(options.links)
     
     @usermeta = options?.usermeta or {} # get previous usermeta
-    @usermeta = Utils.mixin true, @usermeta, defaults, this, options
+    @usermeta = Utils.mixin true, @usermeta, defaults, this, options    
     delete @usermeta.usermeta # remove old, mixed-in usermeta
     
     props = Utils.uniq Meta.riakProperties
@@ -106,10 +106,7 @@ class Meta
         this[key] = value
       else
         delete this[key]
-    
-    # remove useless props that are not popped out and remain in usermeta
-    delete @usermeta.headers
-    delete @usermeta.agent
+
 
   # Pull the value at the given key from the given object, and then removes
   # it from the object.
@@ -163,6 +160,7 @@ Meta.riakProperties = [
   'range'
   'contentRange'
   'acceptRanges'
+  'headers' # http, we want to keep these so that users can override headers
 ]
 
 # Defaults for Meta properties

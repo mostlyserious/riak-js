@@ -43,11 +43,13 @@ vows.describe('Meta for HTTP').addBatch(
       assert.equal meta.contentType, 'text/rtf'
       assert.equal meta.path, '/riak/bucket/key'
 
-  'a meta with some properties':
+  'a meta with some properties and headers':
     topic: ->
       meta = new Meta 'bucket', 'key', {
         links: [{ bucket: 'test', key: 'doc%2$@', tag: 'next' }]
         fire: true
+        overridable: true
+        headers: { Authorization: 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'X-Riak-Meta-overridable': 'yes!' }
       }
       meta.toHeaders()
     
@@ -55,6 +57,10 @@ vows.describe('Meta for HTTP').addBatch(
       assert.notEqual headers.statusCode?
       assert.equal headers['X-Riak-Meta-fire'], 'true'
       assert.equal headers['Link'], '</riak/test/doc%252%24%40>; riaktag="next"'
+    
+    'overrides them correctly': (headers) ->
+      assert.equal headers['X-Riak-Meta-overridable'], 'yes!'
+      assert.equal headers['Authorization'], 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='
       
   'a meta partly loaded with POST response headers':
     topic: ->
