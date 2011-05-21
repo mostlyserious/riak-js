@@ -127,6 +127,7 @@ Meta.queryProperties = [
   'rows' # search
   'wt' # search
   'sort' # search
+  'presort' # search
 ]
 
 Meta.riakProperties = ['statusCode', 'host', 'responseEncoding']
