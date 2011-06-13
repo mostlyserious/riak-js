@@ -156,7 +156,7 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
         Examples are <code>contentType: 'application/json'</code> and <code>clientId: 'riak-js'</code>.</p>
         
        <p>Not only these are tunable per-request. If you need certain defaults to apply to the whole session, 
-          provide them at initialization time: <code>getClient({clientId: 'lan-27', raw: 'data', debug: false})</code>.</p>
+          provide them at initialization time: <code>getClient({clientId: 'lan-27', raw: 'data', debug: true})</code>.</p>
         
         <pre><code>fs.readFile("drunk-pilot.png", 'binary', function (err, image) {
   if (err) throw err;
@@ -197,8 +197,9 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
         
         <pre><code>db.save('flights', 'KLM-5034', flight)</code></pre>
         
-        <p>riak-js follows the Node convention: last argument is the callback, whose first argument is the <code>err</code> variable.
-          If you don't provide a callback the result will be logged through <code>console.log</code>.</p>
+        <p>riak-js follows the Node convention: last argument is the callback, whose first argument is the error object. Besides, the client will also emit the <code>clientError</code> event.</p>
+          
+         <p>If you don't provide a callback the result will <strong>always</strong> be logged through <code>console.log</code>. You can choose to enable debugging via the <code>{ debug: true }</code> option.</p>
 
         <h3>API</h3>
         
