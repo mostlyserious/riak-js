@@ -20,12 +20,11 @@ class Client extends EventEmitter
     callback or= (err, data, meta) -> Client.log data
     return [options or {}, callback]
 
-  @log: (string, options = {}) ->
-    if string? and console and (if options.debug? then options.debug else CoreMeta.defaults.debug)
-      if options.debug? and typeof options.debug is 'object'
-        options.debug.write string + '\n'
-      else
-        console.error string
+  @debug: (string, options = {}) ->
+    if options.debug ? CoreMeta.defaults.debug
+      console.log "[riak-js] #{string}"
+  
+  @log: console.log
 
   version: '0.4'
 
