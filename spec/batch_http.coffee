@@ -74,15 +74,7 @@ module.exports =
       
       'document update request':
         topic: ->
-          
-          callback = @callback
-        
-          db.get bucket, 'test3', (err, data) ->
-            data.updated = true
-            data.wtf = 'yes'
-            data.wee = 42
-          
-            db.save bucket, 'test3', data, { returnbody: true }, callback
+          db.update bucket, 'test3', { updated: true, wtf: 'yes', wee: 42 }, { returnbody: true }, @callback
       
         'gets updated data': (err, data, meta) ->
           assert.ok data.updated

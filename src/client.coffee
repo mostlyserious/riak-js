@@ -24,7 +24,7 @@ class Client extends EventEmitter
     if options.debug ? CoreMeta.defaults.debug
       console.log "[riak-js] #{string}"
   
-  @log: console.log
+  @log: (message) -> console.log(message) if message
 
   version: '0.4'
 

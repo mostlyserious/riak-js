@@ -95,6 +95,14 @@ class HttpClient extends Client
     verb = options.method or if key then 'PUT' else 'POST'
     @execute verb, meta, callback
 
+  update: (bucket, key, newData, options...) ->
+    [options, callback] = @ensure options
+    
+    @get bucket, key, options, (err, data) =>
+      if err then return callback(err)
+      data = Utils.mixin(true, {}, data, newData)
+      @save bucket, key, data, options, callback
+
   remove: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
