@@ -24,12 +24,16 @@ Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Roadmap
 
- - 0.4.0: Flesh out last issues and release 0.4
  - 0.4.1: Streaming: Map/Reduce, keys (Protobuf), Luwak
  - 0.4.1: Tests: should run way faster, integrate test backend
  - 0.5: Decent Protobuf and seamless interface for both APIs
 
 ### Changelog
+
+#### 0.4.0
+
+ - `db.update`: convenience method for updating documents
+ - Changed debug behaviour: always log to stdout. Not providing a callback **will** output to `console.log` regardless of the setting
 
 #### 0.4.0rc3
 
