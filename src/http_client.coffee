@@ -96,6 +96,7 @@ class HttpClient extends Client
     @execute verb, meta, callback
 
   update: (bucket, key, newData, options...) ->
+    console.warn("[riak-js] db.update is deprecated, scheduled for removal on next release. Please port your code to db.get/db.save.")
     [options, callback] = @ensure options
     
     @get bucket, key, options, (err, data) =>
