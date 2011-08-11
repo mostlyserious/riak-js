@@ -3,6 +3,9 @@ module.exports =
   # Gets a new client instance using the HTTP REST api.
   http: (options) -> new @HttpClient options
 
+  # Gets a new client instance using the HTTP REST api over SSL.
+  https: (options) -> new @HttpsClient options
+
   # Gets a new client instance using the protocol buffer api.
   protobuf: (options) ->
     options ||= {}
@@ -28,6 +31,9 @@ module.exports =
 
 module.exports.__defineGetter__ 'HttpClient', ->
   @_httpClient ||= require './http_client'
+
+module.exports.__defineGetter__ 'HttpsClient', ->
+  @_httpsClient ||= require './https_client'
 
 module.exports.__defineGetter__ 'ProtobufClient', ->
   @_pbcClient ||= require './protobuf_client'
