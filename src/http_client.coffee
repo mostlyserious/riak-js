@@ -7,7 +7,9 @@ http = require 'http'
 
 class HttpClient extends Client
   constructor: (options) ->
+    options = options || {}
     options = Utils.mixin true, {}, Meta.defaults, options
+    @_http = options.http || http
     super options
 
   get: (bucket, key, options...) ->
@@ -212,7 +214,7 @@ class HttpClient extends Client
     meta.headers = meta.toHeaders()    
     Client.debug "#{meta.method} #{meta.path}", meta
 
-    request = http.request meta, (response) =>
+    request = @_http.request meta, (response) =>
       
       # using meta as options, to which the HTTP Agent is attached
       # we don't want to carry this around in a Meta
