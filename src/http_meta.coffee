@@ -14,10 +14,11 @@ class Meta extends CoreMeta
     'last-modified': 'lastMod'
     'content-range': 'contentRange'
     'accept-ranges': 'acceptRanges'
+    'date': 'date'
 
     # other response info:
     # statusCode, X-Riak-Meta-* (=> usermeta), link (=> links) Location (=> key)
-    # ignored headers: Vary, Server, Date, Content-Length, Transfer-Encoding
+    # ignored headers: Vary, Server, Content-Length, Transfer-Encoding
 
   loadResponse: (response) ->
     headers = response.headers
