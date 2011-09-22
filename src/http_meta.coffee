@@ -143,7 +143,7 @@ Meta.queryProperties = [
   'filter' # search
 ]
 
-Meta.riakProperties = ['statusCode', 'host', 'responseEncoding']
+Meta.riakProperties = ['statusCode', 'host', 'responseEncoding', 'noError404']
 
 module.exports = Meta
 
