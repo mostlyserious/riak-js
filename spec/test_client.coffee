@@ -133,6 +133,21 @@ batches = [{
         'is not present': (err, flight) ->
           assert.ok err.notFound
           assert.equal 404, err.statusCode
+  
+  'get request':
+    'on a non-present key':
+      'by default':
+        topic: ->
+          db
+            .get flights, 'non-present', @callback
+        'returns status 404': (err, response) ->
+          assert.equal 404, err.statusCode
+      'when explicitly treating 404 not found as non-error':
+        topic: ->
+          db
+            .get flights, 'non-present', {noError404: true}, @callback
+        'does not return an error': (err, response) ->
+          assert.ok not err?
     
   'an invalid map/reduce request':
     topic: ->

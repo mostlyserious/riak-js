@@ -277,8 +277,13 @@ class HttpClient extends Client
         if buffer instanceof Error
           err = buffer
           data = buffer.message
-          err.notFound = meta?.statusCode is 404
-        
+          if meta?.statusCode is 404
+            if meta?.noError404
+              err = undefined
+              buffer = undefined
+            else
+              err.notFound = true
+                      
         callback err, buffer, meta
 
     if meta.data
