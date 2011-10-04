@@ -141,6 +141,7 @@ Meta.queryProperties = [
   'sort' # search
   'presort' # search
   'filter' # search
+  'fl' #search
 ]
 
 Meta.riakProperties = ['statusCode', 'host', 'responseEncoding', 'noError404']
