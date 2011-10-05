@@ -24,11 +24,17 @@ Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Roadmap
 
- - 0.4.1: Streaming: Map/Reduce, keys (Protobuf), Luwak
- - 0.4.1: Tests: should run way faster, integrate test backend
- - 0.5: Decent Protobuf and seamless interface for both APIs
+ - 1.0: Pure Javascript, simplify code, first-class support for streams, faster and reliable tests (via test backend), support for Riak 1.0 features. Soon to be found in branch `js`
 
 ### Changelog
+
+#### 0.4.1
+
+ - Add search params [gpascale]
+ - SSL client [isaacs]
+ - Last-modified date patch [siculars]
+ - Add `meta.noError404` so that you can prevent 404s from showing up as errors [syrio]
+ - Deprecation warnings
 
 #### 0.4.0
 
