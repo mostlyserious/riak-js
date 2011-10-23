@@ -10,13 +10,13 @@ module.exports =
 
     data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
       if (md = part.split /\r?\n\r?\n/)
-        [headers, body, content] = md
+        [none, headers, body] = md
         hs = {}
         headers.split(/\r?\n/).forEach (header) ->
           [k,v] = header.split(': ')
           hs[k.toLowerCase()] = v
 
-        { headers: hs, body: body, data: content }
+        { headers: hs, body: (body.split "\r\n--")[0] }
 
     .filter (e) -> !!e
 

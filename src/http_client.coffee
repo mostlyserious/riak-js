@@ -282,9 +282,8 @@ class HttpClient extends Client
           buffer = Utils.parseMultipartWithContent(buffer, boundary).map (doc) =>
             _meta = new Meta(meta.bucket, meta.key)
             _meta.loadResponse { headers: doc.headers, statusCode: meta.statusCode }
-            #_meta.vclock = meta.vclock
-            console.log "BODY>>>!!!!!!", doc
-            #{ meta: _meta, data: @decodeBuffer(doc.body, _meta, verb) }
+            _meta.vclock = meta.vclock
+            { meta: _meta, data: @decodeBuffer(doc.body, _meta, verb) }
 
         if meta.statusCode is 300 and meta.contentType.match /^multipart\/mixed/ # multiple choices
           boundary = Utils.extractBoundary meta.contentType
