@@ -1,27 +1,43 @@
 module.exports =
-  
+
   toJSON: (data) -> JSON.stringify data, (key, val) -> if typeof val is 'function' then val.toString() else val
 
-  parseMultipart: (data, boundary) ->
-    
-    escape = (text) -> text.replace /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"
-    
-    data = data.split(new RegExp("\r?\n--#{escape boundary}--\r?\n"))?[0] or ""
-    
-    data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
+  parseMultipartWithContent: (data, boundary) ->
 
+    escape = (text) -> text.replace /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"
+
+    data = data.split(new RegExp("\r?\n--#{escape boundary}--\r?\n"))?[0] or ""
+
+    data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
       if (md = part.split /\r?\n\r?\n/)
-        [headers, body] = md
-        
+        [headers, body, content] = md
         hs = {}
         headers.split(/\r?\n/).forEach (header) ->
           [k,v] = header.split(': ')
           hs[k.toLowerCase()] = v
-          
-        { headers: hs, body: body }
-          
+
+        { headers: hs, body: body, data: content }
+
     .filter (e) -> !!e
-    
+
+  parseMultipart: (data, boundary) ->
+
+    escape = (text) -> text.replace /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"
+
+    data = data.split(new RegExp("\r?\n--#{escape boundary}--\r?\n"))?[0] or ""
+
+    data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
+      if (md = part.split /\r?\n\r?\n/)
+        [headers, body] = md
+        hs = {}
+        headers.split(/\r?\n/).forEach (header) ->
+          [k,v] = header.split(': ')
+          hs[k.toLowerCase()] = v
+
+        { headers: hs, body: body }
+
+    .filter (e) -> !!e
+
   extractBoundary: (header_string) -> if (c = header_string.match /boundary=([A-Za-z0-9\'()+_,-.\/:=?]+)/) then c[1]
 
   mixin: `function() {
@@ -73,7 +89,7 @@ module.exports =
       // Return the modified object
       return target;
     }`
-    
+
   uniq: `function(array) {
         var a = [];
         var l = array.length;
@@ -87,15 +103,16 @@ module.exports =
         }
         return a;
       }`
-    
+
   # mixin: (a, b) ->
   #   if not b then return a
   #   target = a
-  # 
+  #
   #   for key, value of b
   #     if typeof value is 'object'
   #       target = this.mixin (target[key] or= {}), value
   #     else
   #       target[key] = value
-  # 
+  #
   #   return a
+

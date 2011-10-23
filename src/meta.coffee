@@ -8,10 +8,11 @@ class Meta
     if arguments.length is 1 and bucket instanceof Object
       options = bucket # (in case the first arg is an object)
       [bucket, key] = [options.bucket, options.key]
-      
-    @load options      
+
+    @load options
     @bucket = bucket
-    @key = key    
+    @key = key
+    @links_url = options.links_url if options
 
   # Parses a Riak value into a Javascript object, and from
   # available information does its best to determine a suitable encoder.
@@ -32,10 +33,10 @@ class Meta
   #  - content type
   #  - binary (true/false)
   #  - instance type (Buffer/String)
-  # 
+  #
   #   meta.encode({a: 1}) # => "{\"a\":1}"
   encode: (data) ->
-    
+
     # content-type: guess if not present
     @contentType =
       if @contentType?
@@ -50,14 +51,14 @@ class Meta
           @resolveType 'json'
         else
           @resolveType 'plain'
-    
+
     # binary
     @binary = @checkBinary @contentType
-    
+
     # instance
     if @binary and not data instanceof Buffer
       data = new Buffer(data, 'binary')
-    
+
     switch @contentType
       when "application/json"
         json or JSON.stringify data  # in case it was already done
@@ -79,27 +80,27 @@ class Meta
       when 'jpeg', 'gif', 'png'   then "image/#{type}"
       when 'binary'               then 'application/octet-stream'
       else                        type
-      
+
   # Checks if the given content type is a binary format
   checkBinary: (type) -> /octet|^image|^video/.test type
 
   # Loads the given options into this Meta object.  Any Riak properties are set
-  # on the object directly. Anything custom is assumed to be custom Riak 
+  # on the object directly. Anything custom is assumed to be custom Riak
   # userdata, and will live on meta.usermeta.
   load: (options, additionalProperties, additionalDefaults, coreDefaults) ->
     defaults = Utils.mixin true, {}, Meta.defaults, additionalDefaults, coreDefaults
 
     # ensure links is an array
     options.links = [options.links] if options?.links and not Array.isArray(options.links)
-    
+
     @usermeta = options?.usermeta or {} # get previous usermeta
-    @usermeta = Utils.mixin true, @usermeta, defaults, this, options    
+    @usermeta = Utils.mixin true, @usermeta, defaults, this, options
     delete @usermeta.usermeta # remove old, mixed-in usermeta
-    
+
     props = Utils.uniq Meta.riakProperties
       .concat(additionalProperties)
       .concat(Object.keys defaults)
-    
+
     props.forEach (key) =>
       value = @popKey(key) ? Meta.defaults[key]
       if value?
@@ -114,16 +115,16 @@ class Meta
     value = @usermeta[key]
     delete  @usermeta[key]
     value
-    
+
   # query properties to string
 
   stringifyQuery: (query) ->
     for key, value of query
       query[key] = String(value) if typeof value is 'boolean' # stringify booleans
     querystring.stringify(query)
-  
-  # operations on links  
-  
+
+  # operations on links
+
   addLink: (link) ->
     if link
       dupe = @links.some (l) ->
@@ -134,9 +135,9 @@ class Meta
     if link
       @links = @links.filter (l) ->
         l.bucket isnt link.bucket or l.key isnt link.key or (l.tag isnt link.tag and l.tag isnt '_')
-    
 
-# Any set properties that aren't in this array are assumed to be custom 
+
+# Any set properties that aren't in this array are assumed to be custom
 # headers for a Riak value.
 Meta.riakProperties = [
   'bucket' # both
@@ -175,8 +176,9 @@ Meta.defaults =
   debug: false # print stuff out
   data: undefined # attach request body data to meta
   encodeUri: false # don't escape bucket/key URI components
-  
+
   # content-type
   # see @encode -- too complex to have just one simple default
 
 module.exports = Meta
+

@@ -17,6 +17,18 @@ class HttpClient extends Client
     meta = new Meta bucket, key, options
     @execute 'GET', meta, callback
 
+
+  links: (bucket, key, spec, options...) ->
+    [options, callback] = @ensure options
+    linkPhases = spec.map (unit) ->
+      (unit[0] or '_') + "," + (unit[1] or '_') + "," + unit[2]
+    linksUrl = linkPhases.join "/"
+    console.log "LP", linksUrl
+    options.links_url = linksUrl
+    meta = new Meta bucket, key, options
+    @execute 'GET', meta, callback
+
+
   head: (bucket, key, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, key, options
@@ -43,17 +55,17 @@ class HttpClient extends Client
         if keys.some((k) -> options.where[k] isnt data[k]) then return []
       delete v.values
       [{ meta: v, data: data }]
-      
+
     @add(bucket).map(mapfunc, options).run(callback)
 
   keys: (bucket, options...) ->
     [options, callback] = @ensure options
     meta = new Meta bucket, undefined, options
     meta.keys or= true
-    
+
     if meta.keys == 'stream'
       meta._emitter = new EventEmitter()
-    
+
       meta._emitter.start = =>
         @execute 'GET', meta, (err, data, meta) ->
           delete meta._emitter if meta
@@ -69,10 +81,10 @@ class HttpClient extends Client
     [options, callback] = @ensure options
     options.keys = 'stream'
     buffer = []
-    
+
     stream = @keys bucket, options, (err, data, meta) ->
       callback(err, buffer.length, meta)
-    
+
     stream.on 'keys', (keys) -> for k in keys then buffer.push(k)
     stream.start()
 
@@ -100,7 +112,7 @@ class HttpClient extends Client
   update: (bucket, key, newData, options...) ->
     console.warn("[riak-js] db.update is deprecated, scheduled for removal on next release. Please port your code to db.get/db.save.")
     [options, callback] = @ensure options
-    
+
     @get bucket, key, options, (err, data) =>
       if err then return callback(err)
       data = Utils.mixin(true, {}, data, newData)
@@ -139,7 +151,7 @@ class HttpClient extends Client
     [options, callback] = @ensure options
     options.method = 'PUT'
     @save bucket, undefined, { props: props }, options, callback
-    
+
   # search
 
   enableIndex: (bucket, options...) ->
@@ -154,7 +166,7 @@ class HttpClient extends Client
     @getProps bucket, options, (err, props) =>
       props.precommit = for p in props.precommit when p.mod isnt 'riak_search_kv_hook' then p
       @updateProps bucket, props, options, callback
-      
+
   search: (index, query, options...) ->
     [options, callback] = @ensure options
     options.raw or= 'solr'
@@ -189,7 +201,7 @@ class HttpClient extends Client
     [options, callback] = @ensure options
     options.raw or= 'luwak'
     @remove undefined, key, options, callback
-    
+
   # node commands
 
   ping: () ->
@@ -209,25 +221,25 @@ class HttpClient extends Client
   # private
 
   execute: (verb, meta, callback) ->
-    
+
     meta.method = verb.toUpperCase()
-    meta.headers = meta.toHeaders()    
+    meta.headers = meta.toHeaders()
     Client.debug "#{meta.method} #{meta.path}", meta
 
     request = @_http.request meta, (response) =>
-      
+
       # using meta as options, to which the HTTP Agent is attached
       # we don't want to carry this around in a Meta
       delete meta.agent
-    
+
       response.setEncoding meta.responseEncoding
-      
+
       buffer = ''
       firstChunk = false
       tempBuffer = ''
 
       response.on 'data', (chunk) ->
-      
+
         if meta._emitter
 
           unless firstChunk # only buffer the first chunk, the rest will be emitted
@@ -235,15 +247,15 @@ class HttpClient extends Client
             firstChunk = true
 
           else
-          
+
             tempBuffer += chunk
-          
+
             m = tempBuffer.match /\}\{?/
             if m?.index  # contiguous chunks
               head = tempBuffer.substr(0, m.index+1)
               tail = tempBuffer.substr(m.index+1)
               tempBuffer = tail
-            
+
               try
                 meta._emitter.emit 'keys', JSON.parse(head).keys
               catch err
@@ -251,9 +263,9 @@ class HttpClient extends Client
 
         else
           buffer += chunk
-      
+
       response.on 'end', =>
-      
+
         if meta._emitter
           meta._emitter.emit 'end'
 
@@ -265,6 +277,14 @@ class HttpClient extends Client
           err.statusCode = meta.statusCode # handier access to the HTTP status in case of an error
           err
         else @decodeBuffer(buffer, meta, verb)
+        if meta.statusCode is 200 and meta.contentType.match /^multipart\/mixed/ # links walking via URL-syntax
+          boundary = Utils.extractBoundary meta.contentType
+          buffer = Utils.parseMultipartWithContent(buffer, boundary).map (doc) =>
+            _meta = new Meta(meta.bucket, meta.key)
+            _meta.loadResponse { headers: doc.headers, statusCode: meta.statusCode }
+            #_meta.vclock = meta.vclock
+            console.log "BODY>>>!!!!!!", doc
+            #{ meta: _meta, data: @decodeBuffer(doc.body, _meta, verb) }
 
         if meta.statusCode is 300 and meta.contentType.match /^multipart\/mixed/ # multiple choices
           boundary = Utils.extractBoundary meta.contentType
@@ -283,20 +303,20 @@ class HttpClient extends Client
               buffer = undefined
             else
               err.notFound = true
-                      
+
         callback err, buffer, meta
 
     if meta.data
       request.write meta.data, meta.contentEncoding
       delete meta.data
-    
+
     request.on 'error', (err) =>
       @emit 'clientError', err
       callback err
-    
+
     request.end()
     return undefined # otherwise the repl prints out the returned value by request.end()
-    
+
   # http client utils
 
   decodeBuffer: (buffer, meta, verb) ->
@@ -308,3 +328,4 @@ class HttpClient extends Client
       new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
 
 module.exports = HttpClient
+
