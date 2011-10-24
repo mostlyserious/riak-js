@@ -16,7 +16,8 @@ module.exports =
           [k,v] = header.split(': ')
           hs[k.toLowerCase()] = v
 
-        { headers: hs, body: (body.split "\r\n--")[0] }
+        bodyData = (body.split "\r\n--")[0] if body
+        { headers: hs, body: bodyData }
 
     .filter (e) -> !!e
 
