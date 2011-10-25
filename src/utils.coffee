@@ -10,6 +10,7 @@ module.exports =
 
     data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
       if (md = part.split /\r?\n\r?\n/)
+        # variable `none` shouldn't be used
         [none, headers, body] = md
         hs = {}
         headers.split(/\r?\n/).forEach (header) ->
