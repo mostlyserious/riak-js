@@ -43,6 +43,3 @@ module.exports.__defineGetter__ 'ProtobufPool', ->
 
 module.exports.__defineGetter__ 'TestServer', ->
   @_testServer ||= require './test_server'
-
-module.exports.__defineGetter__ 'SessionStore', ->
-  @_sessionStore ||= require './session_store'
