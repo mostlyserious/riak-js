@@ -315,14 +315,6 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
         
         <pre><code>db.save('flights', 'KLM-5034', flight, { returnbody: true, dw: 'quorum', method: 'POST' })</code></pre>
         
-        <h4>Update</h4>
-        
-        <pre><code>db.update('airlines', 'ARG', { fleet: 41 })</code></pre>
-        
-        <p>You may remove properties by setting them to <code>undefined</code>:</p>
-        
-        <pre><code>db.update('airlines', 'ARG', { european: undefined })</code></pre>
-        
         <h4>Remove</h4>
         
         <pre><code>db.remove('airlines', 'KLM')</code></pre>

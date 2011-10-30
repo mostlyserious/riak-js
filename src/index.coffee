@@ -23,10 +23,6 @@ module.exports =
     options.api or= module.exports.defaults.api
     module.exports[options.api] options
 
-  getSessionStore: (options) ->
-    console.warn("[riak-js] SessionStore is deprecated, scheduled for removal on next release. Please port your code to https://github.com/frank06/connect-riak.")
-    new @SessionStore options
-
 # exports
 
 module.exports.__defineGetter__ 'HttpClient', ->
