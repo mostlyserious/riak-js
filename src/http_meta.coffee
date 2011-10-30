@@ -73,13 +73,18 @@ class Meta extends CoreMeta
     delete @requestMappings.clientId unless this.vclock?
   
     for k,v of @requestMappings then headers[v] = this[k] if this[k]
-      
+
+    # 2i
+    for k,v of @index
+      type = if typeof v is 'number' then 'int' else 'bin'
+      headers["X-Riak-index-#{k}_#{type}"] = v
+
     # usermeta
     for k,v of @usermeta then headers["X-Riak-Meta-#{k}"] = String(v)
   
     # links
     headers['Link'] = linkUtils.linksToString(@links, @raw) if @links.length > 0
-
+    
     if @data?
     
       # now we need to encode the data to calculate its type and length
@@ -144,7 +149,7 @@ Meta.queryProperties = [
   'fl' #search
 ]
 
-Meta.riakProperties = ['statusCode', 'host', 'responseEncoding', 'noError404']
+Meta.riakProperties = ['statusCode', 'host', 'responseEncoding', 'noError404', 'index']
 
 module.exports = Meta
 

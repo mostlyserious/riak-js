@@ -190,6 +190,27 @@ class HttpClient extends Client
     options.raw or= 'luwak'
     @remove undefined, key, options, callback
     
+  # 2i
+  
+  query: (bucket, q = {}, options...) ->
+    [options, callback] = @ensure options
+    options.raw or= 'buckets'
+    options.doEncodeUri = false  # we don't want '/' to be part of the key
+    
+    field = Object.keys(q)[0]
+    value = q[field]
+    
+    if Array.isArray(value)
+      end = value[1]
+      value = value[0]
+
+    type = if typeof value is 'number' then 'int' else 'bin'    
+    key = "index/#{field}_#{type}/#{encodeURIComponent(value)}"
+    if end then key += "/#{encodeURIComponent(end)}"
+    
+    @get bucket, key, options, (err, data) ->
+      callback(err, data?.keys)
+
   # node commands
 
   ping: () ->
