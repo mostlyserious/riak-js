@@ -72,15 +72,6 @@ module.exports =
           assert.ok key.match /^test/
           assert.ok name.match /^Testing/
       
-      'document update request':
-        topic: ->
-          db.update bucket, 'test3', { updated: true, wtf: 'yes', wee: 42 }, { returnbody: true }, @callback
-      
-        'gets updated data': (err, data, meta) ->
-          assert.ok data.updated
-          assert.equal data.wtf, 'yes'
-          assert.equal data.wee, 42
-          
       'a Buffer':
         topic: ->
           db.save bucket, 'test-buffer', new Buffer('hello'), { contentType: 'application/x-play', responseEncoding: 'binary', returnbody: true }, @callback
