@@ -7,6 +7,7 @@ riak-js 1.0
  - key listing should *always* stream, client will do buffering
  - test everything: seq + assert; use test backend
  - drop riakjs.org, put docs in README
+ - align codebase documentation (see format used in connect-riak)
  - new BSD license
  - hooks: onpresave('users')
  - conflict resolution strategies (see java client)
