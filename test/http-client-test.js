@@ -11,6 +11,7 @@ seq()
   .seq(function() {
     test('Save');
     db.save('users', 'test@gmail.com', { email: 'test@gmail.com', name: 'Testy Test' }, function(err, data, meta) {
+      assert.ok(meta.statusCode, 204);
       assert.ok(!data);
       assert.equal(meta.responseEncoding, 'utf8');
       assert.equal(meta.key, 'test@gmail.com');
@@ -75,6 +76,16 @@ seq()
     }.bind(this));
     
     db2.get('users', 'test@gmail.com');
+  })
+  
+  .seq(function() {
+    test('Saving with returnbody=true actually returns the body');
+    db.save('users', 'test2@gmail.com', { user: 'test2@gmail.com' }, { returnbody: true }, this);
+  })
+  .seq(function(doc) {
+    assert.ok(doc);
+    assert.equal(doc.user, 'test2@gmail.com')
+    this.ok();
   })
   
   .seq(function() {
