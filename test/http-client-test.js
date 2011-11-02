@@ -89,6 +89,16 @@ seq()
   })
   
   .seq(function() {
+    test('Map/Reduce');
+    db.add('users').map('Riak.mapValuesJson').run(this);
+  })
+  .seq(function(data) {
+    assert.ok(data);
+    // TODO assert more stuff
+    this.ok();
+  })
+  
+  .seq(function() {
     console.log('All ok');
   })
   
