@@ -1,0 +1,49 @@
+riak-js 1.0
+
+ - javascript so that more people can contribute, and better debug in production
+ - make it generic, but no support for protobuf -- patches accepted
+ - should be suitable for client side impl (pure js)
+ - accept streams whenever possible (for logging, map/reduce, luwak, key listing)
+ - key listing should *always* stream, client will do buffering
+ - test everything: seq + assert; use test backend
+ - drop riakjs.org, put docs in README
+ - new BSD license
+ - hooks: onpresave('users')
+ - conflict resolution strategies (see java client)
+ 
+META
+
+ - simplified
+ - has shortcuts (contentType, links, r, etc)
+ - the non-recognized ones will simply be ignored
+ - extra http headers can be passed in via `headers` (for instance custom usermeta, `X-Riak-Meta-*`). these *will* override whatever has been set elsewhere
+
+LICENSE
+
+Simplified BSD License
+
+Copyright 2011 Francisco Treacy. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are
+permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice, this list of
+      conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice, this list
+      of conditions and the following disclaimer in the documentation and/or other materials
+      provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY FRANCISCO TREACY ''AS IS'' AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL FRANCISCO TREACY OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The views and conclusions contained in the software and documentation are those of the
+authors and should not be interpreted as representing official policies, either expressed
+or implied, of Francisco Treacy.
