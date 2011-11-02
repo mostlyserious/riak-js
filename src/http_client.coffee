@@ -232,9 +232,9 @@ class HttpClient extends Client
       # we don't want to carry this around in a Meta
       delete meta.agent
     
-      response.setEncoding meta.responseEncoding
-      
-      buffer = ''
+      size       = parseInt response.headers['content-length']
+      bytesRead  = 0
+      buffer     = new Buffer size
       firstChunk = false
       tempBuffer = ''
 
@@ -243,7 +243,7 @@ class HttpClient extends Client
         if meta._emitter
 
           unless firstChunk # only buffer the first chunk, the rest will be emitted
-            buffer += chunk
+            buffer = chunk
             firstChunk = true
 
           else
@@ -262,7 +262,8 @@ class HttpClient extends Client
                 @emit 'clientError', err
 
         else
-          buffer += chunk
+          chunk.copy buffer, bytesRead, 0
+          bytesRead += chunk.length
       
       response.on 'end', =>
       
