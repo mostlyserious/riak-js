@@ -94,8 +94,7 @@ class Meta extends CoreMeta
       headers['Content-Type'] = @contentType
     
       # don't send chunked data at least until riak #278 gets fixed or we can stream the req body
-      headers['Content-Length'] =
-        if @data instanceof Buffer then @data.length else Buffer.byteLength(@data)
+      headers['Content-Length'] = @data.length
     
     if @headers
       for k of @headers then headers[k] = @headers[k]
