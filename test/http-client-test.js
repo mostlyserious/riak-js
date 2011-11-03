@@ -99,6 +99,16 @@ seq()
   })
   
   .seq(function() {
+    test('Map/Reduce with search');
+    db.addSearch('users', 'email:test2@gmail.com').map('Riak.mapValuesJson').run(this);
+  })
+  .seq(function(data) {
+    assert.ok(data);
+    // TODO assert more stuff, indexing stuff beforehand
+    this.ok();
+  })
+  
+  .seq(function() {
     test('Buckets is an Array');
     db.buckets(this);
   })
