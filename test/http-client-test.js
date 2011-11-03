@@ -99,6 +99,15 @@ seq()
   })
   
   .seq(function() {
+    test('Buckets is an Array');
+    db.buckets(this);
+  })
+  .seq(function(buckets) {
+    assert.ok(Array.isArray(buckets));
+    this.ok();
+  })
+  
+  .seq(function() {
     console.log('All ok');
   })
   
