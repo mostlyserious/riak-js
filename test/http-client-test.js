@@ -108,6 +108,24 @@ seq()
   })
   
   .seq(function() {
+    test('Ping');
+    db.ping(this);
+  })
+  .seq(function(pong) {
+    assert.ok(pong);
+    this.ok()
+  })
+  
+  .seq(function() {
+    test('Stats');
+    db.stats(this);
+  })
+  .seq(function(stats) {
+    assert.ok(stats.riak_core_version);
+    this.ok();
+  })
+  
+  .seq(function() {
     console.log('All ok');
   })
   
