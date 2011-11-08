@@ -38,7 +38,7 @@
            "url": "git://github.com/frank06/riak-js.git" 
        } 
    ],
-   "main": "index",
+   "main": "./lib/index",
    "directories": {
        "lib": "./lib"
    },
