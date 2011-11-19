@@ -6,7 +6,7 @@ module.exports =
     
     escape = (text) -> text.replace /[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"
     
-    data = data.split(new RegExp("\r?\n--#{escape boundary}--\r?\n"))?[0] or ""
+    data = data.toString().split(new RegExp("\r?\n--#{escape boundary}--\r?\n"))?[0] or ""
     
     data.split(new RegExp("\r?\n--#{escape boundary}\r?\n")).filter((e) -> !!e).map (part) ->
 
