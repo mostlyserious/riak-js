@@ -9,9 +9,20 @@ var db = new HttpClient(),
 seq()
 
   .seq(function() {
+    test('Save with returnbody');
+    db.save('users', 'test-returnbody@gmail.com', { email: 'test@gmail.com', name: 'Testy Test', a: [1,2], returbody: 'yes please' }, { returnbody: true }, function(err, data, meta) {
+      assert.equal(meta.statusCode, 200);
+      assert.ok(data);
+      assert.deepEqual(data.a, [1,2]);
+      assert.equal(meta.key, 'test-returnbody@gmail.com');
+      this.ok();
+    }.bind(this));
+  })
+
+  .seq(function() {
     test('Save');
     db.save('users', 'test@gmail.com', { email: 'test@gmail.com', name: 'Testy Test' }, function(err, data, meta) {
-      assert.ok(meta.statusCode, 204);
+      assert.equal(meta.statusCode, 204);
       assert.ok(!data);
       assert.equal(meta.responseEncoding, 'utf8');
       assert.equal(meta.key, 'test@gmail.com');
@@ -21,7 +32,7 @@ seq()
 
   .seq(function() {
     test('Get with headers');
-    db.get('users', 'test@gmail.com', { headers: { 'Host': '127.0.0.2' }, contentType: '2' }, this);
+    db.get('users', 'test@gmail.com', { headers: { 'Content-Type': 'application/json' } }, this);
   })
   .seq(function(doc1) {
     assert.ok(doc1);
@@ -132,13 +143,9 @@ seq()
   })
   .seq(function(stats) {
     assert.ok(stats.riak_core_version);
-    this.ok();
   })
-  
-  .seq(function() {
-    console.log('All ok');
-  })
-  
+    
   .catch(function(err) {
     console.log(err.stack);
+    process.exit(1);
   });
