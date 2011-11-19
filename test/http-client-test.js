@@ -3,14 +3,14 @@ var HttpClient = require('../lib/http-client'),
   assert = require('assert'),
   test = require('../lib/utils').test;
 
-var db = new HttpClient(),
-  db2 = new HttpClient({ port: 1 });
+var db = new HttpClient({ port: 7098 }),
+  db2 = new HttpClient({ port: 64208 });
   
 seq()
 
   .seq(function() {
     test('Save with returnbody');
-    db.save('users', 'test-returnbody@gmail.com', { email: 'test@gmail.com', name: 'Testy Test', a: [1,2], returbody: 'yes please' }, { returnbody: true }, function(err, data, meta) {
+    db.save('users', 'test-returnbody@gmail.com', { email: 'test@gmail.com', name: 'Testy Test', a: [1,2], returnbody: 'yes please' }, { returnbody: true }, function(err, data, meta) {
       assert.equal(meta.statusCode, 200);
       assert.ok(data);
       assert.deepEqual(data.a, [1,2]);
@@ -66,20 +66,17 @@ seq()
 
   .seq(function() {
     test('Document exists');
-    db.exists('users', 'test@gmail.com', this);
-  })
-  .catch(function(err) {
-    assert.equal(err.statusCode, 404);
-  })
-  .seq(function(does) {
-    assert.notEqual(does, true);
-    this.ok();
+    db.exists('users', 'test@gmail.com', function(err, does, meta) {
+      assert.equal(meta.statusCode, 404);
+      assert.equal(does, false);
+      this.ok();
+    }.bind(this));
   })
   
   .seq(function() {
     test('Ensure a second riak-js instance does not inherit settings from the first one');
     
-    // we're expecting this instance (supposedly listening on port 1) to be down
+    // we're expecting this instance to be down (listening on port 64208)
     db2.on('error', function(err) {
       assert.ok(err);
       this.ok();
@@ -94,8 +91,8 @@ seq()
   })
   .seq(function(doc) {
     assert.ok(doc);
-    assert.equal(doc.user, 'test2@gmail.com')
-    this.ok();
+    assert.equal(doc.user, 'test2@gmail.com');
+    setTimeout(this.ok, 3000); // wait for damn dead horse riak; see https://issues.basho.com/show_bug.cgi?id=1269
   })
   
   .seq(function() {
