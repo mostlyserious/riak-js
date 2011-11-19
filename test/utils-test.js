@@ -1,7 +1,6 @@
 var assert = require('assert'),
   utils = require('../lib/utils'),
-  test = utils.test,
-  fail = utils.fail;
+  test = utils.test;
   
 test('Utils mixin');
 
