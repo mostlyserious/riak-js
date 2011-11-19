@@ -93,11 +93,6 @@ test('Does not send clientId if there is no vclock');
 headers = new Meta().headers;
 assert.equal(headers['X-Riak-ClientId'], undefined);
 
-test('responseEncoding is a Riak property');
-
-meta = new Meta({ data: new Buffer('binary-data'), responseEncoding: 'binary' });
-assert.equal(meta.responseEncoding, 'binary');
-
 test('It returns its full path including query properties');
 
 meta = new Meta({

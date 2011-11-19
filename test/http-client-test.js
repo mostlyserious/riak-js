@@ -24,7 +24,6 @@ seq()
     db.save('users', 'test@gmail.com', { email: 'test@gmail.com', name: 'Testy Test' }, function(err, data, meta) {
       assert.equal(meta.statusCode, 204);
       assert.ok(!data);
-      assert.equal(meta.responseEncoding, 'utf8');
       assert.equal(meta.key, 'test@gmail.com');
       this.ok();
     }.bind(this));
