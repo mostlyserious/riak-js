@@ -27,7 +27,6 @@ test('Is able to detect the content type');
 
 meta = new Meta({ data: { a: 1 } });
 assert.equal(meta.contentType, 'application/json');
-assert.equal(meta.binary, false);
 
 meta = new Meta({ contentType: 'xml', data: '<a>b</a>' })
 assert.equal(meta.contentType, 'text/xml');
