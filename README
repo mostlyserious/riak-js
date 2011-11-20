@@ -17,16 +17,25 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 #### 1.0.0
 
  - Complete rewrite in Javascript (two reasons: better debugging in production deployments, and more people can contribute)
- - Better documented code
  - Support Riak 1.0 features
  - First class support for streams (Luwak, key listing, Map/Reduce, logging)
- - Faster testing with node-seq + assert, test backend integration
+ - Faster testing with node-seq + assert
  - Extra HTTP headers can now be passed in via `headers` (for instance custom usermeta, `X-Riak-Meta-*`) - these *will* override whatever has been set elsewhere
  - `addSearch` is now `search`
- - Conflict resolution strategies [soon]
  - The project is open for other implementations
  - Removed Protocol Buffers support – contributions welcome (extend `Client` in a file called `protobuf-client.js` along with a `protobuf-meta.js`)
  - A client-side impl is also possible (look at https://github.com/ded/reqwest)
+
+##### TODO
+
+ - key listing should *always* stream, client will do buffering; count
+ - get rid of setters? `.headers`, `.data`
+ - HTTP 300 and multipart/mixed responses
+ - Link-walking (see https://github.com/frank06/riak-js/pull/98), and test everything related to links
+ - Unify `meta` in all responses (check `getAll`)
+ - Document code like in `connect-riak`
+ - Integrate test backend
+ - Conflict resolution strategies
 
 #### 0.4.1
 
