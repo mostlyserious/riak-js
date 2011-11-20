@@ -21,7 +21,7 @@ seq()
 
   .seq(function() {
     test('Save');
-    db.save('users', 'test@gmail.com', { email: 'test@gmail.com', name: 'Testy Test' }, function(err, data, meta) {
+    db.save('users', 'test@gmail.com', "Some text", function(err, data, meta) {
       assert.equal(meta.statusCode, 204);
       assert.ok(!data);
       assert.equal(meta.key, 'test@gmail.com');
@@ -30,20 +30,21 @@ seq()
   })
 
   .seq(function() {
-    test('Get with headers');
-    db.get('users', 'test@gmail.com', { headers: { 'Content-Type': 'application/json' } }, this);
-  })
-  .seq(function(doc1) {
-    assert.ok(doc1);
-    this.ok();
-  })
-  
-  .seq(function() {
     test('Get with no options or callback');
     db.get('users', 'test@gmail.com', this);    
   })
   .seq(function(doc2) {
-    assert.equal(doc2.email, 'test@gmail.com');
+    assert.equal(doc2, "Some text");
+    this.ok();
+  })
+  
+  .seq(function() {
+    test("Get all");
+    db.getAll('users', this);
+  })
+  .seq(function(users) {
+    assert.ok(Array.isArray(users));
+    assert.ok(users.some(function(u) { return u == "Some text" }));
     this.ok();
   })
   
@@ -97,6 +98,7 @@ seq()
   
   .seq(function() {
     test('Map/Reduce');
+    // we can be sure the whole bucket is application/json because we previously removed the only text/plain document
     db.add('users').map('Riak.mapValuesJson').run(this);
   })
   .seq(function(data) {
