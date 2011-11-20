@@ -1,7 +1,7 @@
 {
    "name": "riak-js",
    "version": "1.0.0",
-   "description": "Riak client for Javascript",
+   "description": "Node.js client for Riak",
    "keywords": [
        "riak",
        "nosql",
