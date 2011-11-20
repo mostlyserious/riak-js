@@ -106,6 +106,25 @@ seq()
   })
   
   .seq(function() {
+    test("Secondary indices");
+    db.save('users', 'fran@gmail.com', { age: 28 }, { index: { age: 28, alias: 'fran' } }, this);
+  })
+  .seq(function() {
+    db.query('users', { age: [20,30] }, this);
+  })
+  .seq(function(keys) {
+    assert.equal(keys[0], 'fran@gmail.com');
+    this.ok();
+  })
+  .seq(function() {
+    db.query('users', { alias: 'fran' }, this);
+  })
+  .seq(function(keys) {
+    assert.equal(keys[0], 'fran@gmail.com');
+    this.ok();
+  })
+  
+  .seq(function() {
     test('Buckets is an Array');
     db.buckets(this);
   })
