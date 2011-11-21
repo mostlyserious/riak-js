@@ -6,6 +6,8 @@ var HttpClient = require('../lib/http-client'),
 var db = new HttpClient({ port: 7098 }),
   db2 = new HttpClient({ port: 64208 });
   
+var many = []; for (var i = 0; i < 600; i++) many.push(String(i));
+
 seq()
 
   .seq(function() {
@@ -87,13 +89,46 @@ seq()
   })
   
   .seq(function() {
-    test('Saving with returnbody=true actually returns the body');
+    test('Save with returnbody=true actually returns the body');
     db.save('users', 'test2@gmail.com', { user: 'test2@gmail.com' }, { returnbody: true }, this);
   })
   .seq(function(doc) {
     assert.ok(doc);
     assert.equal(doc.user, 'test2@gmail.com');
     setTimeout(this.ok, 3000); // wait for damn dead horse riak; see https://issues.basho.com/show_bug.cgi?id=1269
+  })
+  
+  .set(many)
+  .flatten()
+  .parEach(20, function(key) {
+    db.save('test', key, key, this);
+  })
+  
+  .seq(function() {
+    test("Stream keys");
+    var buf = [],
+      keys = function(keys) { buf = buf.concat(keys) },
+      end = function() {
+        // keys come in random order, need to sort both arrays by string in order to compare
+        buf = buf.sort(); many = many.sort();
+        assert.deepEqual(many, buf);
+        this.ok();
+      }.bind(this);
+
+    db
+      .keys('test')
+      .on('keys', keys)
+      .on('end', end)
+      .start();
+  })
+  
+  .seq(function() {
+    test("Count keys");
+    db.count('test', this);
+  })
+  .seq(function(total) {
+    assert.equal(total, many.length);
+    this.ok();
   })
   
   .seq(function() {
