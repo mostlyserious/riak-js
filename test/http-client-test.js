@@ -181,6 +181,15 @@ seq()
   })
   
   .seq(function() {
+    test("List resources");
+    db.resources(this);
+  })
+  .seq(function(resources) {
+    assert.ok(resources && resources.riak_kv_wm_buckets);
+    this.ok();
+  })
+  
+  .seq(function() {
     test('Ping');
     db.ping(this);
   })
