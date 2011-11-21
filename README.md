@@ -36,6 +36,8 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
  - Document code like in `connect-riak`
  - Integrate test backend
  - Conflict resolution strategies
+ - Checklist: go through old bug reports and patches, ensure the current behavior is correct
+ - Pass urls as Array? check with the "new format" -- i.e. `/buckets/bucket/keys?keys=stream`
 
 #### 0.4.1
 
