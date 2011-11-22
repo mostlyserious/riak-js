@@ -36,6 +36,22 @@ test("Manual content type setting has priority over detection");
 meta.data = 'some text';
 assert.notEqual(meta.contentType, 'text/plain');
 
+test("Can be passed multiple option objects, and it mixes in correctly");
+
+meta = new Meta({ bucket: '?', stream: true, key: 'key' }, { bucket: '_', callback: function() { console.log('test') }}, { bucket: 'bucket' });
+
+assert.equal(meta.bucket, 'bucket');
+assert.equal(meta.key, 'key');
+assert.ok(meta.stream);
+assert.equal(meta.callback, 'function () { console.log(\'test\') }')
+
+test("A Meta fed with another Meta results in identity");
+
+var meta = new Meta({ bucket: 'bucket', key: 'key' }),
+  meta2 = new Meta(meta);
+
+assert.deepEqual(meta, meta2);
+
 //       keyless.addLink { bucket: 'bucket', key: 'test' }
 //       keyless.addLink { bucket: 'bucket', key: 'test2', tag: '_' }
 //       keyless.addLink { bucket: 'bucket', key: 'test', tag: 'tag' }

@@ -28,7 +28,6 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ##### TODO
 
- - key listing should *always* stream, client will do buffering; count
  - get rid of setters? `.headers`, `.data`
  - HTTP 300 and multipart/mixed responses
  - Link-walking (see https://github.com/frank06/riak-js/pull/98), and test everything related to links
