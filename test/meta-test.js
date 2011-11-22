@@ -4,7 +4,7 @@ var Meta = require('../lib/meta'),
 
 test('Sets its attributes');
 
-var meta = new Meta({ bucket: 'bucket', key: 'key', contentType: 'png', data: 'd32n92390XMIW0', host: '192.168.1.2', myown: 'field' });
+var meta = new Meta({ path: ['bucket', 'key'], contentType: 'png', data: 'd32n92390XMIW0', host: '192.168.1.2', myown: 'field' });
 
 assert.equal(meta.bucket, 'bucket');
 assert.equal(meta.key, 'key');

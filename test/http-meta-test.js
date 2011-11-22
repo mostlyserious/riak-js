@@ -4,8 +4,8 @@ var Meta = require('../lib/http-meta'),
 
 test('Sets its attributes');
 
-var meta = new Meta({ bucket: 'bucket', key: 'key', contentType: 'png', data: 'd32n92390XMIW0' });
-
+var meta = new Meta({ path: ['bucket','key'], contentType: 'png', data: 'd32n92390XMIW0' });
+meta.path;
 assert.equal(meta.bucket, 'bucket');
 assert.equal(meta.key, 'key');
 assert.equal(meta.vclock, null);
@@ -14,11 +14,11 @@ assert.equal(meta.data, 'd32n92390XMIW0');
 
 test('Gives back its HTTP path');
 
-meta = new Meta({ bucket: 'bucket', key: 'key' });
+meta = new Meta({ path: ['bucket', 'key'] });
 assert.equal("/riak/bucket/key", meta.path);
 
 meta.resource = 'luwak';
-meta.bucket = '';
+meta.path = ['key'];
 assert.equal("/luwak/key", meta.path);
 
 test('Parses headers when loaded with a Riak HTTP response');
@@ -40,7 +40,7 @@ var riakResponse = {
   statusCode: 200
 }
 
-meta = new Meta({ bucket: 'bucket', key: 'key' });
+meta = new Meta({ path: ['bucket', 'key'] });
 meta.loadResponse(riakResponse);
 
 // assert.deepEqual(meta.usermeta, { acl: 'users:r,administrators:f' }); -- usermeta is not supported
@@ -54,7 +54,7 @@ assert.equal(meta.path, '/riak/bucket/key');
 test('Custom headers are correctly included and override');
 
 meta = new Meta({
-  links: [{ bucket: 'test', key: 'doc%2$@', tag: 'next' }],
+  links: [{ path: ['bucket', 'doc%2$@'], tag: 'next' }],
   headers: { Authorization: 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'X-Riak-Meta-fire': 'yes' }
 });
 
@@ -77,7 +77,7 @@ riakResponse = {
 meta = new Meta();
 meta.loadResponse(riakResponse);
 
-assert.equal(meta.bucket, 'test');
+meta.path;
 assert.equal(meta.key, 'bzPygTesROPtGGVUKfyvp2RR49');
 assert.equal(meta.statusCode, 201);
 
@@ -96,8 +96,7 @@ assert.equal(headers['X-Riak-ClientId'], undefined);
 test('It returns its full path including query properties');
 
 meta = new Meta({
-  bucket: 'bucket',
-  key: 'key',
+  path: ['bucket', 'key'],
   r: 1,
   w: 2,
   dw: 2,
@@ -114,8 +113,7 @@ assert.equal("/riak/bucket/key?r=1&w=2&dw=2&rw=2&keys=true&props=false&vtag=aswe
 test('Returns an URI-encoded path if used with encodeUri option');
 
 meta = new Meta({
-  bucket: 'spåce bucket',
-  key: 'çøµπléx–key',
+  path: ['spåce bucket', 'çøµπléx–key'],
   encodeUri: true
 });
 
