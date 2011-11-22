@@ -70,7 +70,9 @@ seq()
     var out = fs.createWriteStream(filename3);
     stream.pipe(out);
     
-    setTimeout(this.ok, 300);
+    out.on('close', function() {
+      this.ok();
+    }.bind(this));
     
   })
   
