@@ -75,6 +75,15 @@ seq()
       this.ok();
     }.bind(this));
   })
+
+  .seq(function() {
+    test('Get non-existent document');
+    db.get('users', 'test@gmail.com', function(err, does, meta) {
+      assert.equal(err.message, 'not found');
+      assert.equal(meta.statusCode, 404);
+      this.ok();
+    }.bind(this));
+  })
   
   .seq(function() {
     test('Ensure a second riak-js instance does not inherit settings from the first one');
