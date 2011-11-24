@@ -29,18 +29,20 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 ##### TODO
 
  - get rid of setters? `.headers`, `.data`
- - Unify `meta` in all responses (check `getAll`)
+ - More demanding test suite
  
- - HTTP 300 and multipart/mixed responses
- - Conflict resolution strategies
  - Link-walking (see https://github.com/frank06/riak-js/pull/98), and test everything related to links
+ - HTTP 300 and multipart/mixed responses
+ - Unify `meta` in all responses (check `getAll`)
+ - Conflict resolution strategies
 
- - Document code like in `connect-riak`
- - Integrate test backend; more complete tests
  - Checklist: go through old bug reports and patches, ensure the current behavior is correct
+ - Port documentation, update and deploy to `gh-pages`
 
- - Pass urls as Array? check with the "new format" -- i.e. `/buckets/bucket/keys?keys=stream` [not sure, see branch `path`]
-
+##### MAYBE
+ - Pass urls as Array? check with the "new format" -- i.e. `/buckets/bucket/keys?keys=stream` [see branch `path`]
+ - Integrate test backend
+ 
 #### 0.4.1
 
  - Add search params [gpascale]
