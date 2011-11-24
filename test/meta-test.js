@@ -33,7 +33,7 @@ assert.equal(meta.contentType, 'text/xml');
 
 test("Manual content type setting has priority over detection");
 
-meta.data = 'some text';
+meta.loadData('some text');
 assert.notEqual(meta.contentType, 'text/plain');
 
 test("Can be passed multiple option objects, and it mixes in correctly");
