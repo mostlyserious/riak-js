@@ -29,14 +29,17 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 ##### TODO
 
  - get rid of setters? `.headers`, `.data`
- - HTTP 300 and multipart/mixed responses
- - Link-walking (see https://github.com/frank06/riak-js/pull/98), and test everything related to links
  - Unify `meta` in all responses (check `getAll`)
+ 
+ - HTTP 300 and multipart/mixed responses
+ - Conflict resolution strategies
+ - Link-walking (see https://github.com/frank06/riak-js/pull/98), and test everything related to links
+
  - Document code like in `connect-riak`
  - Integrate test backend
- - Conflict resolution strategies
  - Checklist: go through old bug reports and patches, ensure the current behavior is correct
- - Pass urls as Array? check with the "new format" -- i.e. `/buckets/bucket/keys?keys=stream`
+
+ - Pass urls as Array? check with the "new format" -- i.e. `/buckets/bucket/keys?keys=stream` [not sure, see branch `path`]
 
 #### 0.4.1
 
