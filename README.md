@@ -28,10 +28,9 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ##### TODO
 
+ - HTTP 300 and conflict resolution strategies
+ - Unify `meta` in all responses (check `getAll`, chunked map/reduce) - meta should allow for fine-grained mappings
  - Link-walking (see https://github.com/frank06/riak-js/pull/98), and test everything related to links
- - HTTP 300 and multipart/mixed responses
- - Unify `meta` in all responses (check `getAll`)
- - Conflict resolution strategies
 
  - Checklist: go through old bug reports and patches, ensure the current behavior is correct
  - More rigorous test suite (port from master)
