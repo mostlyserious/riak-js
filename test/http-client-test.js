@@ -90,6 +90,12 @@ seq()
   })
   
   .seq(function() {
+    test('Get non-existent document, ignoring the not found error');
+    db.get('users', 'test@gmail.com', { noError404: true }, this);
+    // no error should be returned
+  })
+  
+  .seq(function() {
     test('Ensure a second riak-js instance does not inherit settings from the first one');
     
     // we're expecting this instance to be down (listening on port 64208)
