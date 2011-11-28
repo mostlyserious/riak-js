@@ -1,12 +1,16 @@
 var HttpClient = require('../lib/http-client'),
+  HttpMeta = require('../lib/http-meta'),
   seq = require('seq'),
+  util = require('util'),
   assert = require('assert'),
   test = require('../lib/utils').test;
 
 var db = new HttpClient({ port: 7098 }),
-  db2 = new HttpClient({ port: 64208 });
-  
-var many = []; for (var i = 0; i < 600; i++) many.push(String(i));
+  db2 = new HttpClient({ port: 64208 }),
+  many = [];
+for (var i = 0; i < 600; i++) many.push(String(i));
+
+/* Tests */
 
 seq()
 
@@ -213,9 +217,35 @@ seq()
   })
   .seq(function(stats) {
     assert.ok(stats.riak_core_version);
+    this.ok();
+  })
+  
+  .seq(function() {
+    test('Custom Meta');
+    var meta = new CustomMeta();
+    db.get('users', 'test2@gmail.com', meta, this);
+  })
+  .seq(function(user) {
+    assert.equal(user.intercepted, true);
+    this.ok();
   })
     
   .catch(function(err) {
     console.log(err.stack);
     process.exit(1);
   });
+  
+/* Custom Meta */
+
+var CustomMeta = function() {
+  var args = Array.prototype.slice.call(arguments);
+  HttpMeta.apply(this, args);
+}
+
+util.inherits(CustomMeta, HttpMeta);
+
+CustomMeta.prototype.parse = function(data) {
+  var result = HttpMeta.prototype.parse.call(this, data);
+  if (result instanceof Object) result.intercepted = true;
+  return result;
+}
