@@ -30,14 +30,13 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
  - HTTP 300 and conflict resolution strategies
  - Unify `meta` in all responses (check `getAll`, chunked map/reduce) - meta should allow for fine-grained mappings
- - Link-walking (see https://github.com/frank06/riak-js/pull/98), and test everything related to links
-
- - Checklist: go through old bug reports and patches, ensure the current behavior is correct
+ - Links + Link-walking (see `link` issues)
+ - SSL support
+ - Use path internally but don't expose it as API (see `path` branch), to prepare for new URIs in Riak 1.0
  - More rigorous test suite (port from master)
  - Port documentation, update and deploy to `gh-pages`
 
-##### MAYBE
- - Pass urls as Array? check with the "new format" -- i.e. `/buckets/bucket/keys?keys=stream` [see branch `path`]
+##### LATER
  - Integrate test backend
  
 #### 0.4.1
