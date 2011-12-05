@@ -14,15 +14,17 @@ class TestServer extends EventEmitter
   @defaults =
     appConfig:
       riak_core:
-        web_ip: "127.0.0.1"
-        web_port: 9000
+        http:
+          "127.0.0.1": {atom: 9000}
         handoff_port: 9001
         ring_creation_size: 64
       riak_kv:
         storage_backend: {atom: "riak_kv_test_backend"}
         pb_ip: "127.0.0.1"
         pb_port: 9002
-        js_vm_count: 8
+        map_js_vm_count: 8
+        reduce_js_vm_count: 6
+        hook_js_vm_count: 2
         js_max_vm_mem: 8
         js_thread_stack: 16
         riak_kv_stat: true
@@ -181,6 +183,8 @@ class TestServer extends EventEmitter
         printable = @toErlangConfig(value, depth+1)
       else
         printable = value.toString()
+      if !key.match(/^[a-z][a-zA-Z0-9@_]*$/)
+        key = "\"#{key}\""
       "{#{key}, #{printable}}"
 
     values = values.join(",\n#{padding}")
