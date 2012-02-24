@@ -124,7 +124,7 @@ class HttpClient extends Client
   getProps: (bucket, options...) ->
     [options, callback] = @ensure options
     @get bucket, undefined, options, (err, obj) ->
-      callback(err, obj.props)
+      callback(err, obj?.props)
 
   updateProps: (bucket, props, options...) ->
     [options, callback] = @ensure options
