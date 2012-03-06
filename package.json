@@ -25,7 +25,7 @@
        }   
    ],
    "bugs": {
-       "web": "http://github.com/frank06/riak-js/issues" 
+       "url": "http://github.com/frank06/riak-js/issues" 
    },
    "licenses": [
        {
