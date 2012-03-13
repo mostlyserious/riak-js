@@ -37,7 +37,7 @@ class HttpClient extends Client
     [options, callback] = @ensure options
 
     mapfunc = (v, k, options) ->
-      data = if options.noJSON then Riak.mapValues(v)[0] else Riak.mapValuesJson(v)[0]
+      data = if options.noJSON then Riak.mapValues(v)[0] else if v.values[0].data.length > 0 then Riak.mapValuesJson(v)[0] else {}
       if options.where and not options.noJSON
         keys = []; `for (var i in options.where) keys.push(i)`
         if keys.some((k) -> options.where[k] isnt data[k]) then return []
@@ -315,7 +315,7 @@ class HttpClient extends Client
   decodeBuffer: (buffer, meta, verb) ->
     try
       if meta.statusCode is 204 or verb is 'HEAD' then undefined
-      else if buffer == "" then buffer
+      else if buffer.length == 0 then buffer
       else meta.decode(buffer)
     catch e
       new Error "Cannot convert response into #{meta.contentType}: #{e.message} -- Response: #{buffer}"
