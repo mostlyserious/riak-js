@@ -226,8 +226,6 @@ class HttpClient extends Client
     meta.headers = meta.toHeaders()
     Client.debug "#{meta.method} #{meta.path}", meta
 
-    meta.headers['Connection'] = 'keep-alive'
-
     request = @_http.request meta, (response) =>
 
       # using meta as options, to which the HTTP Agent is attached
