@@ -43,7 +43,7 @@
    "directories": {
        "lib": "./lib"
    },
-   "os": [ "linux", "darwin" ],
+   "os": [ "linux", "darwin", "sunos" ],
    "dependencies": {},
    "devDependencies": {
      "vows": "*",
