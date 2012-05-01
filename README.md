@@ -1,3 +1,9 @@
+## PLEASE NOTE
+
+I am no longer maintaining this project. You can find the new official repository at [senchalabs/riak-js](https://github.com/senchalabs/riak-js).
+
+Please submit issues and pull requests there.
+
 # riak-js
 
 [Node.js](http://nodejs.org/) client for [Riak](http://riak.basho.com) with support for HTTP and Protocol Buffers.
