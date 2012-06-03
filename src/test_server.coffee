@@ -122,12 +122,12 @@ class TestServer extends EventEmitter
         callback()
       else
         currDir = subdirs.shift()
-        fs.mkdir currDir, 0700, createDir
+        fs.mkdir currDir, 0o0700, createDir
     rmrf = spawn("rm", ["-rf", @options.tempDir])
     rmrf.on 'exit', createDir
 
   writeRiakScript: (callback) ->
-    outScript = fs.createWriteStream @riakScript, {encoding: 'utf8', mode: 0700}
+    outScript = fs.createWriteStream @riakScript, {encoding: 'utf8', mode: 0o0700}
     inScript = fs.createReadStream "#{@options.binDir}/riak", encoding: 'utf8'
 
     inScript.on 'error', (err) ->
