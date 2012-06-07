@@ -1,6 +1,6 @@
 ## PLEASE NOTE
 
-I am no longer maintaining this project. You can find the new official repository at [senchalabs/riak-js](https://github.com/senchalabs/riak-js).
+I am no longer maintaining this project. You can find the new official repository at [mostlyserious/riak-js](https://github.com/mostlyserious/riak-js).
 
 Please submit issues and pull requests there.
 
