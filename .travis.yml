@@ -4,5 +4,3 @@ node_js:
 services:
 script:
   - make test
-notifications:
-  email: meyer@paperplanes.de
