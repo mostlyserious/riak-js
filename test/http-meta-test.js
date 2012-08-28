@@ -144,3 +144,5 @@ var multipartResponse = {
 test("Sets a boundary when response is multipart");
 meta.loadResponse(multipartResponse);
 assert.equal('59RSLp9FHlsTnSGjjlVsrs0Aud', meta.boundary)
+
+test("Parsing the a multipart body")
