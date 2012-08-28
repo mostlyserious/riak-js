@@ -120,3 +120,27 @@ meta = new Meta({
 });
 
 assert.equal("/riak/sp%C3%A5ce%20bucket/%C3%A7%C3%B8%C2%B5%CF%80l%C3%A9x%E2%80%93key", meta.path);
+
+meta = new Meta({
+});
+
+var multipartResponse = {
+  httpVersion: '1.1',
+  headers: {
+    vary: 'Accept-Encoding',
+    server: 'MochiWeb/1.1 WebMachine/1.7.1 (participate in the frantic)',
+    'x-riak-vclock': 'a85hYGBgzGDKBVIsbLvm1WYwJTLmsTLcjeE5ypcFAA==',
+    'x-riak-meta-acl': 'users:r,administrators:f',
+    link: '</riak/test>; rel="up", </riak/test/doc%252%24%40>; riaktag="next"',
+    'last-modified': 'Wed, 10 Mar 2010 18:11:41 GMT',
+    etag: '6dQBm9oYA1mxRSH0e96l5W',
+    date: 'Wed, 10 Mar 2010 18:11:52 GMT',
+    'content-type': 'multipart/mixed; boundary=59RSLp9FHlsTnSGjjlVsrs0Aud',
+    'content-length': '2946'
+  },
+  statusCode: 200
+}
+
+test("Sets a boundary when response is multipart");
+meta.loadResponse(multipartResponse);
+assert.equal('59RSLp9FHlsTnSGjjlVsrs0Aud', meta.boundary)
