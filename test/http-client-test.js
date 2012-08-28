@@ -5,7 +5,7 @@ var HttpClient = require('../lib/http-client'),
   assert = require('assert'),
   test = require('../lib/utils').test;
 
-var db = new HttpClient({ port: 7098 }),
+var db = new HttpClient({ port: 8098 }),
   db2 = new HttpClient({ port: 64208 }),
   many = [];
 for (var i = 0; i < 600; i++) many.push(String(i));

@@ -34,6 +34,7 @@ function exec(test, callback) {
     console.log();
     if (code == 0) return callback(null);
     console.error('[\033[31m' + 'FAILURE' + '\033[39m] ' + test + " returned with code " + code);
+    process.exit(code);
   });
   
 }
