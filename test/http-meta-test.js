@@ -45,7 +45,7 @@ meta.loadResponse(riakResponse);
 
 // assert.deepEqual(meta.usermeta, { acl: 'users:r,administrators:f' }); -- usermeta is not supported
 assert.equal(meta.statusCode, 200);
-assert.equal(meta.date, undefined);
+assert.equal(new Date(meta.date).getTime(), 1268244712000);
 assert.equal(new Date(meta.lastMod).getTime(), 1268244701000);
 // assert.deepEqual(meta.links, [{ bucket: 'test', key: 'doc%2$@', tag: 'next' }]); -- not yet implemented
 assert.equal(meta.contentType, 'text/rtf');
