@@ -5,3 +5,5 @@ services:
   - riak
 script:
   - make test
+notifications:
+  email: meyer@paperplanes.de
