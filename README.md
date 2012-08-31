@@ -18,7 +18,7 @@ Test with `cake test` or `cake -s test`. Requires [Vows](http://vowsjs.org) 0.5.
 
 ### Features and documentation
 
-[http://riakjs.org](http://riakjs.org)
+[http://riakjs.org](http://riakjs.com)
 
 Twitter: [@riakjs](http://twitter.com/riakjs)
 
