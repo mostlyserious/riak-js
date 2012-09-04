@@ -25,7 +25,7 @@
        }   
    ],
    "bugs": {
-       "url": "http://github.com/frank06/riak-js/issues" 
+       "url": "http://github.com/mostlyserious/riak-js/issues" 
    },
    "licenses": [
        {
@@ -36,7 +36,7 @@
    "repositories": [
        {
            "type": "git",
-           "url": "git://github.com/frank06/riak-js.git" 
+           "url": "git://github.com/mostlyserious/riak-js.git" 
        } 
    ],
    "main": "index",
