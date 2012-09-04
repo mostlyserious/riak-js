@@ -1,0 +1,23 @@
+--59RSLp9FHlsTnSGjjlVsrs0Aud
+Content-Type: application/octet-stream
+Link: </riak/siblings>; rel="up"
+Etag: 3wEcwFuyRNwwMciWXuov3L
+Last-Modified: Tue, 04 Sep 2012 07:10:11 GMT
+X-Riak-Deleted: true
+
+
+--59RSLp9FHlsTnSGjjlVsrs0Aud
+Content-Type: application/json
+Link: </riak/siblings>; rel="up"
+Etag: 4w0Pmt0N1yXnR1ecZiFxPi
+Last-Modified: Tue, 04 Sep 2012 07:10:11 GMT
+
+{"likes":"lebkuchen"}
+--59RSLp9FHlsTnSGjjlVsrs0Aud
+Content-Type: application/json
+Link: </riak/siblings>; rel="up"
+Etag: p8gYGbYxc78iCllp9PqkK
+Last-Modified: Tue, 04 Sep 2012 07:10:11 GMT
+
+{"eats":"lebkuchen"}
+--59RSLp9FHlsTnSGjjlVsrs0Aud

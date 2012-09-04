@@ -1,6 +1,7 @@
 var Meta = require('../lib/http-meta'),
   assert = require('assert'),
-  test = require('../lib/utils').test;
+  test = require('../lib/utils').test,
+  fs = require('fs');
 
 test('Sets its attributes');
 
@@ -145,4 +146,23 @@ test("Sets a boundary when response is multipart");
 meta.loadResponse(multipartResponse);
 assert.equal('59RSLp9FHlsTnSGjjlVsrs0Aud', meta.boundary)
 
-test("Parsing the a multipart body")
+test("Parsing the multipart body");
+var multipartMessage = fs.readFileSync(__dirname + '/fixtures/multipart');
+var parts = meta._parseMultipartMixed(multipartMessage);
+
+assert.equal(2, parts.length);
+assert.equal(parts[0].body, '{"likes":"lebkuchen"}');
+assert.equal(parts[1].body, '{"eats":"lebkuchen"}');
+
+test("Set content-type header for each sibling");
+assert.equal(parts[0].headers['content-type'], 'application/json');
+assert.equal(parts[1].headers['content-type'], 'application/json');
+
+test("Set an etag for each sibling");
+assert.equal(parts[0].headers['etag'], '4w0Pmt0N1yXnR1ecZiFxPi');
+assert.equal(parts[1].headers['etag'], 'p8gYGbYxc78iCllp9PqkK');
+
+test("Parses more than two siblings");
+multipartMessage = fs.readFileSync(__dirname + '/fixtures/big_multipart');
+parts = meta._parseMultipartMixed(multipartMessage);
+assert.equal(8, parts.length);
