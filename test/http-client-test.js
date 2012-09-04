@@ -48,6 +48,7 @@ seq()
     test("Get all");
     db.getAll('users', this);
   })
+
   .seq(function(users) {
     assert.ok(Array.isArray(users));
     assert.ok(users.some(function(u) { return u == "Some text" }));
@@ -153,7 +154,7 @@ seq()
   .seq(function() {
     test('Map/Reduce');
     // we can be sure the whole bucket is application/json because we previously removed the only text/plain document
-    db.add('users').map('Riak.mapValuesJson').run(this);
+    db.mapreduce.add('users').map('Riak.mapValuesJson').run(this);
   })
   .seq(function(data) {
     assert.ok(data);
