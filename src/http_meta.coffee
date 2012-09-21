@@ -68,6 +68,7 @@ class Meta extends CoreMeta
   toHeaders: ->
     
     headers = {}
+    length = 0 // nginx 411 fix
   
     # remove client id if there's no vclock
     delete @requestMappings.clientId unless this.vclock?
@@ -94,11 +95,13 @@ class Meta extends CoreMeta
       headers['Content-Type'] = @contentType
     
       # don't send chunked data at least until riak #278 gets fixed or we can stream the req body
-      headers['Content-Length'] = @data.length
+      length = @data.length
     
     if @headers
       for k of @headers then headers[k] = @headers[k]
       delete @headers
+    
+    headers['Content-Length'] = length // Nginx 411 fix
     
     return headers
     
