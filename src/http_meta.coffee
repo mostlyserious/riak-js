@@ -68,7 +68,7 @@ class Meta extends CoreMeta
   toHeaders: ->
     
     headers = {}
-    length = 0 // nginx 411 fix
+    length = 0 # nginx 411 fix
   
     # remove client id if there's no vclock
     delete @requestMappings.clientId unless this.vclock?
@@ -101,7 +101,7 @@ class Meta extends CoreMeta
       for k of @headers then headers[k] = @headers[k]
       delete @headers
     
-    headers['Content-Length'] = length // Nginx 411 fix
+    headers['Content-Length'] = length # Nginx 411 fix
     
     return headers
     
