@@ -48,6 +48,7 @@ seq()
     test("Get all");
     db.getAll('users', this);
   })
+
   .seq(function(users) {
     assert.ok(Array.isArray(users));
     assert.ok(users.some(function(u) { return u == "Some text" }));
@@ -149,18 +150,6 @@ seq()
     assert.equal(total, many.length);
     this.ok();
   })
-  
-  .seq(function() {
-    test('Map/Reduce');
-    // we can be sure the whole bucket is application/json because we previously removed the only text/plain document
-    db.add('users').map('Riak.mapValuesJson').run(this);
-  })
-  .seq(function(data) {
-    assert.ok(data);
-    // TODO assert more stuff
-    this.ok();
-  })
-  
   .seq(function() {
     test("Secondary indices");
     db.save('users', 'fran@gmail.com', { age: 28 }, { index: { age: 28, alias: 'fran' } }, this);

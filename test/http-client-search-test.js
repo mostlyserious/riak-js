@@ -34,7 +34,7 @@ seq()
   
   .seq(function() {
     test('Map/Reduce with search');
-    db.search('users', 'email:test-search@gmail.com').map('Riak.mapValuesJson').run(this);
+    db.mapreduce.search('users', 'email:test-search@gmail.com').map('Riak.mapValuesJson').run(this);
   })
   .seq(function(data) {
     assert.equal(data[0].email, "test-search@gmail.com");
