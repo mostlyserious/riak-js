@@ -71,6 +71,25 @@ seq()
     assert.equal(data.length, 1);
     this.ok();
   })
+  .seq(function() {
+    test('Map Erlang functions');
+    db.mapreduce.add('map-users').map({language: 'erlang', module: 'riak_kv_mapreduce', function: 'map_object_value'}).run(this);
+  })
+  .seq(function(data) {
+    test('Erlang response');
+    assert.equal(data.length, 2);
+    this.ok();
+  })
+  .seq(function() {
+    test('Chain phases with bucket inputs');
+    db.mapreduce.add([['map-users', 'test@gmail.com']]).map(function(value) {
+      return [['map-users', 'other@gmail.com']];
+    }).map('Riak.mapValuesJson').run(this);
+  })
+  .seq(function(data) {
+    assert.equal(data[0].name, "Mathias Meyer");
+    this.ok();
+  })
   .catch(function(err) {
     console.log(err)
     console.log(err.stack);
