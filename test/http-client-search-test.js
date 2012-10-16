@@ -75,7 +75,7 @@ seq()
   })
   .seq(function() {
     test('Remove the added document');
-    db.search.remove('users', ['test-add-search@gmail.com'], function(err) {
+    db.search.remove('users', {id: 'test-add-search@gmail.com'}, function(err) {
       assert.equal(err, null);
       this.ok();
     }.bind(this));
