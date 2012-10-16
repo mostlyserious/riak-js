@@ -76,6 +76,7 @@ seq()
   .seq(function() {
     test('Remove document');
     db.remove('users', 'test-search@gmail.com', this);
+    this.ok();
   })
   .catch(function(err) {
     console.log(err.stack);
