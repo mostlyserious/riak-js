@@ -53,6 +53,25 @@ seq()
   .seq(function(data) {
     test('Includes the document');
     assert.equal(data.response.docs[0].fields.email, "test-search@gmail.com");
+    this.ok();
+  })
+  .seq(function() {
+    test('Add a document');
+    db.search.add('users', {id: "test-add-search@gmail.com", name: "Sean Cribbs"}, function(err) {
+      assert.equal(err, null);
+      this.ok();
+    }.bind(this));
+  })
+  .seq(function() {
+    test('Find added document');
+    db.search.find('users', 'name:"Sean Cribbs"', function(err, data) {
+      this.ok(data);
+    }.bind(this));
+  })
+  .seq(function(data) {
+    test('Includes the added document');
+    assert.equal(data.response.docs[0].fields.name, "Sean Cribbs");
+    this.ok();
   })
   .seq(function() {
     test('Remove document');
