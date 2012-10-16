@@ -74,6 +74,23 @@ seq()
     this.ok();
   })
   .seq(function() {
+    test('Remove the added document');
+    db.search.remove('users', {id: 'test-add-search@gmail.com'}, function(err) {
+      assert.equal(err, null);
+      this.ok();
+    }.bind(this));
+  })
+  .seq(function() {
+    test('Should have removed the added document');
+    db.search.find('users', 'name:"Sean Cribbs"', function(err, data) {
+      this.ok(data);
+    }.bind(this));
+  })
+  .seq(function(data) {
+    assert.equal(data.response.numFound, 0);
+    this.ok();
+  })
+  .seq(function() {
     test('Remove document');
     db.remove('users', 'test-search@gmail.com', this);
     this.ok();
