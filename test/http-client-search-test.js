@@ -21,7 +21,6 @@ seq()
     assert.equal(props.search, true);
     this.ok();
   })
-
   .seq(function() {
     test('Save');
     db.save('users', 'test-search@gmail.com', { email: 'test-search@gmail.com', name: 'Testy Test for Riak Search' }, function(err, data, meta) {
@@ -31,7 +30,6 @@ seq()
       this.ok();
     }.bind(this));
   })
-  
   .seq(function() {
     test('Map/Reduce with search');
     db.mapreduce.search('users', 'email:test-search@gmail.com').map('Riak.mapValuesJson').run(this);
@@ -40,12 +38,26 @@ seq()
     assert.equal(data[0].email, "test-search@gmail.com");
     this.ok();
   })
-  
+  .seq(function() {
+    test('Searching via Solr interface');
+    db.search.find('users', 'email:test-search@gmail.com', function(err, data) {
+      this.ok(data);
+    }.bind(this));
+  })
+  .seq(function(data) {
+    test('Finds one result');
+    assert.equal(data.response.numFound, 1);
+    assert.equal(data.response.docs[0].id, "test-search@gmail.com");
+    this.ok(data)
+  })
+  .seq(function(data) {
+    test('Includes the document');
+    assert.equal(data.response.docs[0].fields.email, "test-search@gmail.com");
+  })
   .seq(function() {
     test('Remove document');
     db.remove('users', 'test-search@gmail.com', this);
   })
-  
   .catch(function(err) {
     console.log(err.stack);
     process.exit(1);
