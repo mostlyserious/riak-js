@@ -43,7 +43,9 @@
        "lib": "./lib"
    },
    "os": [ "linux", "darwin" ],
-   "dependencies": {},
+   "dependencies": {
+     "xml": "0.0.7"
+   },
    "devDependencies": {
      "seq": "0.3.5"
    },
