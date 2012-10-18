@@ -25,6 +25,11 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
  - The project is open for other implementations
  - Removed Protocol Buffers support – contributions welcome (extend `Client` in a file called `protobuf-client.js` along with a `protobuf-meta.js`)
  - A client-side impl is also possible (look at https://github.com/ded/reqwest)
+ - Support for Riak Search, including adding and removing documents directly.
+   Search is namespaced on the client separately: `riak.search.find('users',
+   'email:test@example.com')`
+ - Moved MapReduce to a separate namespace on the client to separate concerns in
+   a nicer way: `riak.mapreduce.add('')`
 
 ##### TODO
 
