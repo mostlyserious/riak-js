@@ -105,10 +105,8 @@ var db = require('riak-js').getClient()
 var db = require('/path/to/riak-js/lib').getClient()
 
 // configure the host and port
-var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</code></pre>
+var db = require('riak-js').getClient({host: "riak.myhost", port: "8098"});</code></pre>
 
-        <p>Or specify the API: <code>getClient({api: 'protobuf'})</code>.</p>
-        
         <h2>Guide</h2>
 
         <pre>
@@ -322,16 +320,16 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
         
         <p>Three variations of the same query:</p>
 
-        <pre><code>db.add('albums').map('Riak.mapValuesJson').run()</code></pre>
+        <pre><code>db.mapreduce.add('albums').map('Riak.mapValuesJson').run()</code></pre>
         
-        <pre><code>db.add('albums').map({name: 'Riak.mapValuesJson', keep: true }).run()</code></pre>
+        <pre><code>db.mapreduce.add('albums').map({name: 'Riak.mapValuesJson', keep: true }).run()</code></pre>
 
-        <pre><code>db.add('albums').map(function(v) { return [Riak.mapValuesJson(v)[0]] }).run()</code></pre>
+        <pre><code>db.mapreduce.add('albums').map(function(v) { return [Riak.mapValuesJson(v)[0]] }).run()</code></pre>
 
         <p>You can chain any number of phases or pass arrays, too:</p> 
 
         <pre>
-<code>db
+<code>db.mapreduce
   .add('airlines')
   .link({ bucket: 'flights', keep: false })
   .map('Riak.mapValuesJson')
@@ -342,24 +340,24 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
   
         <p>If you need to pass-in arguments, both <code>map</code> and <code>reduce</code> accept a second argument that will end up as the third of the map function:</p>
 
-        <pre><code>db.add('flights').map(function (value, keyData, arg) { /* do something with arg == { cancelled: true } */ }, { cancelled: true })</code></pre>
+        <pre><code>db.mapreduce.add('flights').map(function (value, keyData, arg) { /* do something with arg == { cancelled: true } */ }, { cancelled: true })</code></pre>
         
         <p>You can also use key filters:</p>
         
-        <pre><code>db.add({ bucket: 'flights', key_filters: [["matches", "KLM"]] }).map('Riak.mapValuesJson').run()</code></pre>
+        <pre><code>db.mapreduce.add({ bucket: 'flights', key_filters: [["matches", "KLM"]] }).map('Riak.mapValuesJson').run()</code></pre>
         
         <p>For input syntax <a href="http://wiki.basho.com/Key-Filters.html#Example-query-solutions">follow the API</a>. <code>add</code> simply takes the value of the <code>inputs</code> property.</p>
 
         <h4>Luwak</h4>
         
-        <p>These commands (<code>getLarge</code>, <code>saveLarge</code>, <code>removeLarge</code>) behave much like
+        <p>These commands (<code>getFile</code>, <code>saveFile</code>, <code>removeFile</code>) behave much like
            their counterparts <code>get</code>, <code>save</code>, <code>remove</code>.
           Except they don't take a <code>bucket</code> argument, internally reference the <code>luwak</code>
            raw resource, and always use <code>responseEncoding = 'binary'</code> therefore returning <code>Buffer</code>s.</p>
           
-        <pre><code>db.getLarge('lowcost-pilot')</code></pre>
-        <pre><code>db.saveLarge('lowcost-pilot', buffer)</code></pre>
-        <pre><code>db.removeLarge('lowcost-pilot')</code></pre>
+        <pre><code>db.getFile('lowcost-pilot')</code></pre>
+        <pre><code>db.saveFile('lowcost-pilot', buffer)</code></pre>
+        <pre><code>db.removeFile('lowcost-pilot')</code></pre>
 
         <h4>Ping</h4>
         
@@ -375,22 +373,22 @@ var db = require('riak-js').getClient({host: "riak.myhost", port: "8098" });</co
         
         <h4>Update bucket properties</h4>        
         
-        <pre><code>db.updateProps('airlines', { n_val: 8, allow_mult: true })</code></pre>
+        <pre><code>db.saveBucket('airlines', {n_val: 8, allow_mult: true})</code></pre>
 
         <h4>Get bucket properties</h4>    
         
-        <pre><code>db.getProps('airlines')</code></pre>
+        <pre><code>db.getBucket('airlines').props</code></pre>
         
         
         <h4>Search</h4>
         
-        <pre><code>db.enableIndex('airlines')
+        <pre><code>db.saveBucket('airlines', {search: true})
 db.save('airlines', 'FYI-8098', 'this is a plain text flight')
-db.search('airlines', 'text')</code></pre>
+db.search.find('airlines', 'text')</code></pre>
         
         <p>or in a Map/Reduce scenario:</p>
         
-        <pre><code>db.addSearch('airlines', 'text').map('Riak.mapValues').run()</code></pre>
+        <pre><code>db.mapreduce.search('airlines', 'text').map('Riak.mapValues').run()</code></pre>
         
 
         <h2>Development</h2>
