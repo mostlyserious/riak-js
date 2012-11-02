@@ -87,6 +87,16 @@ seq()
     assert.equal(meta.links[0].tag, '_');
     this.ok();
   })
+  .seq(function(){
+    test("Fetch via Linkwalk");
+    db.get('users', 'other@gmail.com', {links: [{bucket: 'users'}]}, function(err, data, meta){
+      assert.equal(data.length, 1);
+      assert.equal(data[0].length, 1);
+      assert.ok(data[0][0].meta);
+      assert.ok(data[0][0].data);
+      this.ok();
+    }.bind(this));
+  })
   .seq(function() {
     test('Remove document');
     db.remove('users', 'test@gmail.com', function(err, data, meta) {
