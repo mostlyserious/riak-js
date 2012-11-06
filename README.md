@@ -8,13 +8,13 @@
 
 ### Features and documentation
 
-[Documentation](http://frank06.github.com/riak-js) [soon]
+[Documentation](http://basho-labs.github.com/riak-js) [soon]
 
 Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
-#### 1.0.0
+#### 0.9.0
 
  - Complete rewrite in Javascript (two reasons: better debugging in production deployments, and more people can contribute)
  - Support Riak 1.0 features
