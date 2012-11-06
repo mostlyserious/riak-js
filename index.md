@@ -5,12 +5,10 @@ layout: page
 
 #### [Node.js](http://nodejs.org) [Riak](http://riak.basho.com) client.
       
-```
-db.save('airlines', 'KLM', {fleet: 111, country: 'NL'}, { links:
-[{ bucket: 'flights', key: 'KLM-8098', tag: 'cargo' },
- { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
-})
-```
+    db.save('airlines', 'KLM', {fleet: 111, country: 'NL'}, { links:
+      [{ bucket: 'flights', key: 'KLM-8098', tag: 'cargo' },
+       { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
+    })
 
 * For Riak 0.12+ and node.js 0.4.x
 * Code: <http://github.com/mostlyserious/riak-js>
