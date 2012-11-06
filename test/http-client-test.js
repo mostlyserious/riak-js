@@ -65,6 +65,23 @@ seq()
   })
   
   .seq(function() {
+    test('Storing document with links');
+    db.save('users', 'other@gmail.com', {name: "Other Dude"}, {links: [{bucket: 'users', key: 'test@gmail.com'}]}, function(erro, data, meta) {
+      assert.ok(meta.statusCode === 204);
+      this.ok();
+    }.bind(this));
+  })
+  .seq(function() {
+    test('Fetching a document with links');
+    db.get('users', 'other@gmail.com', function(err, data, meta) {
+      this.ok(meta);
+    }.bind(this));
+  })
+  .seq(function(meta) {
+    assert.equal(meta.links.size, 1);
+    this.ok();
+  })
+  .seq(function() {
     test('Remove document');
     db.remove('users', 'test@gmail.com', function(err, data, meta) {
       assert.equal(meta.statusCode, 204);
