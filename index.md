@@ -338,5 +338,3 @@ Test with `make test`.
 * [ botanicus ](http://github.com/botanicus)
 * [ technoweenie ](http://github.com/technoweenie)
 * [ seancribbs ](http://github.com/seancribbs)
-
-<div class="footer">riak-js is licensed under the <a href="http://opensource.org/licenses/mit-license.php">MIT</a> and supported by <a href="http://widescript.com">widescript</a></div>
