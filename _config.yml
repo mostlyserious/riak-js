@@ -1,2 +1,1 @@
 exclude: index.html, node_modules
-markdown: --rdiscount
