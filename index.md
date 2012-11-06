@@ -1,3 +1,6 @@
+---
+layout: page
+---
 # riak-js
 
 #### [Node.js](http://nodejs.org) [Riak](http://riak.basho.com) client.
@@ -25,7 +28,7 @@ var db = require('riak-js').getClient()
 var db = require('/path/to/riak-js/lib').getClient()
 
 // configure the host and port
-var db = require('riak-js').getClient({host: "riak.myhost", port: "8098"});``
+var db = require('riak-js').getClient({host: "riak.myhost", port: "8098"});
 ```
 
 ## Guide
