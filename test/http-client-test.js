@@ -78,7 +78,7 @@ seq()
     }.bind(this));
   })
   .seq(function(meta) {
-    assert.equal(meta.links.size, 1);
+    assert.equal(meta.links.length, 1);
     this.ok();
   })
   .seq(function() {
