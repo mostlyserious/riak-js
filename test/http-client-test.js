@@ -78,7 +78,13 @@ seq()
     }.bind(this));
   })
   .seq(function(meta) {
+    test('Includes links in the meta object');
     assert.equal(meta.links.length, 1);
+    this.ok(meta);
+  })
+  .seq(function(meta) {
+    test("Doesn't store undefined for empty tags");
+    assert.equal(meta.links[0].tag, '_');
     this.ok();
   })
   .seq(function() {
