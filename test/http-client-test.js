@@ -65,6 +65,29 @@ seq()
   })
   
   .seq(function() {
+    test('Storing document with links');
+    db.save('users', 'other@gmail.com', {name: "Other Dude"}, {links: [{bucket: 'users', key: 'test@gmail.com'}]}, function(erro, data, meta) {
+      assert.ok(meta.statusCode === 204);
+      this.ok();
+    }.bind(this));
+  })
+  .seq(function() {
+    test('Fetching a document with links');
+    db.get('users', 'other@gmail.com', function(err, data, meta) {
+      this.ok(meta);
+    }.bind(this));
+  })
+  .seq(function(meta) {
+    test('Includes links in the meta object');
+    assert.equal(meta.links.length, 1);
+    this.ok(meta);
+  })
+  .seq(function(meta) {
+    test("Doesn't store undefined for empty tags");
+    assert.equal(meta.links[0].tag, '_');
+    this.ok();
+  })
+  .seq(function() {
     test('Remove document');
     db.remove('users', 'test@gmail.com', function(err, data, meta) {
       assert.equal(meta.statusCode, 204);

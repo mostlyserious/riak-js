@@ -21,10 +21,10 @@
        {
            "name": "rick (technoweenie)",
            "url": "http://techno-weenie.net" 
-       }   
+       }
    ],
    "bugs": {
-       "url": "http://github.com/frank06/riak-js/issues" 
+       "url": "http://github.com/mostlyserious/riak-js/issues" 
    },
    "licenses": [
        {
@@ -35,7 +35,7 @@
    "repositories": [
        {
            "type": "git",
-           "url": "git://github.com/frank06/riak-js.git" 
+           "url": "https://github.com/mostlyserious/riak-js.git" 
        } 
    ],
    "main": "./lib/index",
