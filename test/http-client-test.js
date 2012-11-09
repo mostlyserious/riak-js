@@ -89,7 +89,7 @@ seq()
   })
   .seq(function(){
     test("Fetch via Linkwalk");
-    db.get('users', 'other@gmail.com', {links: [{bucket: 'users'}]}, function(err, data, meta){
+    db.walk('users', 'other@gmail.com', [{bucket: 'users'}], function(err, data, meta){
       assert.equal(data.length, 1);
       assert.equal(data[0].length, 1);
       assert.ok(data[0][0].meta);
