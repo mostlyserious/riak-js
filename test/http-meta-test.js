@@ -86,13 +86,13 @@ test('It guesses its content type');
 
 headers = new Meta({ data: { test: true } }).headers;
 
-assert.equal(headers['Content-Type'], 'application/json');
-assert.equal(headers['Link'], undefined);
+assert.equal(headers['content-type'], 'application/json');
+assert.equal(headers['link'], undefined);
 
 test('Does not send clientId if there is no vclock');
 
 headers = new Meta().headers;
-assert.equal(headers['X-Riak-ClientId'], undefined);
+assert.equal(headers['x-riak-clientId'], undefined);
 
 test('It returns its full path including query properties');
 
