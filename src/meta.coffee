@@ -69,7 +69,7 @@ class Meta
 
   # calls encode on data
   encodeData: () ->
-    @data = @encode(@data) if @data?
+    @data = new Buffer @encode(@data) if @data?
 
   # Fills in a full content type based on a few defaults
   resolveType: (type) ->
