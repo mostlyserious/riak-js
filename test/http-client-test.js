@@ -98,6 +98,21 @@ seq()
     }.bind(this));
   })
   .seq(function() {
+    test('Reusing meta object');
+    db.get('users', 'test@gmail.com', function(err, data, meta) {
+      this.ok(data, meta);
+    }.bind(this));
+  })
+  .seq(function(user, meta) {
+    db.save('users', 'test@gmail.com', user, meta, function(err, data, meta) {
+      this.ok(meta);
+    }.bind(this));
+  })
+  .seq(function(meta) {
+    assert.equal(meta.statusCode, 204);
+    this.ok();
+  })
+  .seq(function() {
     test('Remove document');
     db.remove('users', 'test@gmail.com', function(err, data, meta) {
       assert.equal(meta.statusCode, 204);
@@ -128,7 +143,8 @@ seq()
     db.get('users', 'test@gmail.com', { noError404: true }, this);
     // no error should be returned
   })
-  
+
+
   .seq(function() {
     test('Ensure a second riak-js instance does not inherit settings from the first one');
     
@@ -257,7 +273,6 @@ seq()
     assert.equal(user.intercepted, true);
     this.ok();
   })
-    
   .catch(function(err) {
     console.log(err.stack);
     process.exit(1);
