@@ -16,7 +16,7 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 #### 0.9.0
 
- - Complete rewrite in Javascript (two reasons: better debugging in production deployments, and more people can contribute)
+ - Complete rewrite in JavaScript (two reasons: better debugging in production deployments, and more people can contribute)
  - Support Riak 1.0 features
  - First class support for streams (Luwak, key listing, Map/Reduce, logging)
  - Faster testing with node-seq + assert
@@ -29,17 +29,14 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
    Search is namespaced on the client separately: `riak.search.find('users',
    'email:test@example.com')`
  - Moved MapReduce to a separate namespace on the client to separate concerns in
-   a nicer way: `riak.mapreduce.add('')`
+   a nicer way: `riak.mapreduce.add('users').run()`
 
 ##### TODO
 
- - HTTP 300 and conflict resolution strategies
  - Unify `meta` in all responses (check `getAll`, chunked map/reduce) - meta should allow for fine-grained mappings
- - Links + Link-walking (see `link` issues)
  - SSL support
  - Use path internally but don't expose it as API (see `path` branch), to prepare for new URIs in Riak 1.0
  - More rigorous test suite (port from master)
- - Port documentation, update and deploy to `gh-pages`
 
 ##### LATER
  - Integrate test backend
