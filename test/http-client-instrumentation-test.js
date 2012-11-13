@@ -9,7 +9,7 @@ var db = new HttpClient({ port: 8098 });
 var events = []
 
 var listener = {
-  "request.start": function(event) {
+  "riak.request.start": function(event) {
     events.push(event)
   }
 }
