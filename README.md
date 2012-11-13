@@ -14,6 +14,10 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.9.1
+
+- Request instrumentation for metrics, logging, etc.
+
 #### 0.9.0
 
  - Complete rewrite in Javascript (two reasons: better debugging in production deployments, and more people can contribute)
