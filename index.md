@@ -244,11 +244,11 @@ Provide `{ noJSON: true }` if you are not targeting JSON data!
 
 Three variations of the same query:
 
-    db.mapreduce.add('albums').map('Riak.mapValuesJson').run()
+    db.mapreduce.add('flights').map('Riak.mapValuesJson').run()
 
-    db.mapreduce.add('albums').map({name: 'Riak.mapValuesJson', keep: true }).run()
+    db.mapreduce.add('flights').map({name: 'Riak.mapValuesJson', keep: true }).run()
 
-    db.mapreduce.add('albums').map(function(v) { return [Riak.mapValuesJson(v)[0]] }).run()
+    db.mapreduce.add('flights').map(function(v) { return [Riak.mapValuesJson(v)[0]] }).run()
 
 You can chain any number of phases or pass arrays, too:
 
@@ -305,12 +305,15 @@ argument, internally reference the `luwak` raw resource, and always use
 
 #### Get bucket properties
 
-    db.getBucket('airlines').props
+    db.getBucket('airlines', function(err, properties) {
+      console.log(properties.pw)
+    })
 
 #### Search
 
     db.saveBucket('airlines', {search: true})
     db.save('airlines', 'FYI-8098', 'this is a plain text flight')
+
     db.search.find('airlines', 'text')
 
 or in a Map/Reduce scenario:
