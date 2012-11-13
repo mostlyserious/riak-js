@@ -320,6 +320,17 @@ or in a Map/Reduce scenario:
 
     db.mapreduce.search('airlines', 'text').map('Riak.mapValues').run()
 
+You can also add or remove documents directly to a search index:
+
+    db.search.add('airlines', {id: 'Lufthansa', country: 'DE'});
+
+    // adding multiple documents is also possible
+    db.search.add('airlines', [{id: 'American Airlines', country: 'US'},
+                               {id: 'Aer Lingus', country: 'IE'}]);
+
+    db.search.remove('airlines', {id: 'Aer Lingus'})
+    db.search.remove('airlines', [{id: 'Lufthansa'}, {country: 'US'}])
+
 ## Development
 
 ### Follow riak-js on Twitter: [@riakjs](http://twitter.com/riakjs)
