@@ -10,7 +10,7 @@
 
 ### Features and documentation
 
-[Documentation](http://basho-labs.github.com/riak-js) [soon]
+[Documentation](http://mostlyserious.github.com/riak-js)
 
 Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
