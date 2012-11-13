@@ -331,6 +331,35 @@ You can also add or remove documents directly to a search index:
     db.search.remove('airlines', {id: 'Aer Lingus'})
     db.search.remove('airlines', [{id: 'Lufthansa'}, {country: 'US'}])
 
+#### Secondary Indexes
+
+*Note: to use secondary indexes, make sure to have your Riak configured to use the
+[LevelDB
+backend](http://docs.basho.com/riak/latest/cookbooks/Secondary-Indexes---Configuration/#Configuration).*
+
+To add objects to the index, simply specify the desired indexes and their values
+when storing it:
+
+    db.save('airlines', 'KLM', {country: 'NL', established: 1919}, {index: {country: 'NL', established: 1919}});
+
+riak-js will automatically pick the right kind of index, binary or numerical,
+depending on the value specified.
+
+Now you can query the index:
+
+    db.query('airlines', {country: 'NL'});
+
+To query a range, use an array:
+
+    db.query('airlines', {established: [1900, 1920]});
+
+A query returns a list of keys. You can feed the query into MapReduce to fetch
+the values.
+
+    db.mapreduce.add(
+      {bucket: 'airlines', index: 'established_int', start: 1900, end: 1920}).
+        map('Riak.mapValuesJson').run()
+
 ## Development
 
 ### Follow riak-js on Twitter: [@riakjs](http://twitter.com/riakjs)
