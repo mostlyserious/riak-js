@@ -11,6 +11,15 @@ var events = []
 var listener = {
   "riak.request.start": function(event) {
     events.push(event)
+  },
+  "riak.request.response": function(event) {
+    events.push(event)
+  },
+  "riak.request.finish": function(event) {
+    events.push(event)
+  },
+  "riak.request.end": function(event) {
+    events.push(event)
   }
 }
 
@@ -29,6 +38,14 @@ seq()
 .seq(function(event) {
   test('Assigns a unique ID to a request');
   assert.notEqual(event.uuid, undefined);
-  this.ok(event);
+  this.ok();
+})
+.seq(function() {
+  test('Creates four unique events');
+  assert.equal(events.length, 4);
+  for (var i in events) {
+    assert.notEqual(events[i], undefined);
+  }
+  this.ok();
 });
 
