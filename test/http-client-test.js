@@ -45,6 +45,17 @@ seq()
   })
   
   .seq(function() {
+    test('Store plain text with unicode in it');
+    db.save('users', 'text-user', 'tét', function() {
+      db.get('users', 'text-user', this);
+    }.bind(this));
+  })
+  .seq(function(text) {
+    assert.equal(new Buffer(text).length, 4);
+    assert.equal(text, 'tét');
+    this.ok();
+  })
+  .seq(function() {
     test("Get all");
     db.getAll('users', this);
   })
