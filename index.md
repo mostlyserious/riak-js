@@ -360,6 +360,30 @@ the values.
       {bucket: 'airlines', index: 'established_int', start: 1900, end: 1920}).
         map('Riak.mapValuesJson').run()
 
+### Instrumenting Requests
+
+To track metrics, add logging, or do other practical things around the lifecycle
+of a request in riak-js, you can add event listeners to the client object to
+register for different events. Currently available are:
+
+- riak.request.start: Before the request is sent
+- riak.request.request: When the response was received
+- riak.request.finish: When collecting request output finished
+- riak.request.end: When processing the request ended
+
+To register for an event, e.g. to log a line when a request is sent, register a
+listener with the client object.
+
+    db.registerListener({
+      "riak.request.start": function(event) {
+        console.log(event.method + ' ' + event.path);
+      }
+    })
+
+You can find more examples for using instrumentation [in the
+repository](https://github.com/mostlyserious/riak-js/tree/master/examples), e.g.
+to instrument the code to collect metrics for request times.
+
 ## Development
 
 ### Follow riak-js on Twitter: [@riakjs](http://twitter.com/riakjs)
