@@ -18,7 +18,13 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 #### 0.9.1
 
-- Request instrumentation for metrics, logging, etc.
+ - Request instrumentation for metrics, logging, etc.
+ - Fix a leak in Httpmeta (github.com/rkusa), (#134)
+ - Handle content length properly for Unicode data (#132)
+ - Fix MapReduce options so it handles hostname and port (github.com/spencergibb)
+ - Add support for link-walking (github.com/TauZero) 
+ - Handle JSONified error messages (github.com/spencergibb)
+ - Fix parsing of links on get requests (github.com/TauZero)
 
 #### 0.9.0
 
