@@ -45,6 +45,17 @@ seq()
   })
   
   .seq(function() {
+    test('Store plain text with unicode in it');
+    db.save('users', 'text-user', 'tét', function() {
+      db.get('users', 'text-user', this);
+    }.bind(this));
+  })
+  .seq(function(text) {
+    assert.equal(new Buffer(text).length, 4);
+    assert.equal(text, 'tét');
+    this.ok();
+  })
+  .seq(function() {
     test("Get all");
     db.getAll('users', this);
   })
@@ -87,6 +98,31 @@ seq()
     assert.equal(meta.links[0].tag, '_');
     this.ok();
   })
+  .seq(function(){
+    test("Fetch via Linkwalk");
+    db.walk('users', 'other@gmail.com', [{bucket: 'users'}], function(err, data, meta){
+      assert.equal(data.length, 1);
+      assert.equal(data[0].length, 1);
+      assert.ok(data[0][0].meta);
+      assert.ok(data[0][0].data);
+      this.ok();
+    }.bind(this));
+  })
+  .seq(function() {
+    test('Reusing meta object');
+    db.get('users', 'test@gmail.com', function(err, data, meta) {
+      this.ok(data, meta);
+    }.bind(this));
+  })
+  .seq(function(user, meta) {
+    db.save('users', 'test@gmail.com', user, meta, function(err, data, meta) {
+      this.ok(meta);
+    }.bind(this));
+  })
+  .seq(function(meta) {
+    assert.equal(meta.statusCode, 204);
+    this.ok();
+  })
   .seq(function() {
     test('Remove document');
     db.remove('users', 'test@gmail.com', function(err, data, meta) {
@@ -118,7 +154,8 @@ seq()
     db.get('users', 'test@gmail.com', { noError404: true }, this);
     // no error should be returned
   })
-  
+
+
   .seq(function() {
     test('Ensure a second riak-js instance does not inherit settings from the first one');
     
@@ -247,7 +284,6 @@ seq()
     assert.equal(user.intercepted, true);
     this.ok();
   })
-    
   .catch(function(err) {
     console.log(err.stack);
     process.exit(1);

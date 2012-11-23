@@ -1,53 +1,59 @@
 {
-   "name": "riak-js",
-   "version": "1.0.0",
-   "description": "Node.js client for Riak",
-   "keywords": [
-       "riak",
-       "nosql",
-       "database",
-       "http"
-   ],
-   "maintainers": [
-       {
-           "name": "Francisco Treacy",
-           "email": "francisco.treacy@gmail.com",
-           "url": "http://franciscotreacy.com" 
-       },
-       {
-           "name": "Sean Cribbs",
-           "email": "sean@basho.com"
-       },
-       {
-           "name": "rick (technoweenie)",
-           "url": "http://techno-weenie.net" 
-       }   
-   ],
-   "bugs": {
-       "url": "http://github.com/frank06/riak-js/issues" 
-   },
-   "licenses": [
-       {
-           "type": "BSD",
-           "url": "http://opensource.org/licenses/bsd-license.php" 
-       } 
-   ],
-   "repositories": [
-       {
-           "type": "git",
-           "url": "git://github.com/frank06/riak-js.git" 
-       } 
-   ],
-   "main": "./lib/index",
-   "directories": {
-       "lib": "./lib"
-   },
-   "os": [ "linux", "darwin" ],
-   "dependencies": {
-     "xml": "0.0.7"
-   },
-   "devDependencies": {
-     "seq": "0.3.5"
-   },
-   "engines": { "node": ">=0.4.0" }
+  "name": "riak-js",
+  "version": "0.9.0",
+  "description": "Node.js client for Riak",
+  "keywords": [
+    "riak",
+    "nosql",
+    "database",
+    "http"
+  ],
+  "maintainers": [
+    {
+      "name": "Francisco Treacy",
+      "email": "francisco.treacy@gmail.com",
+      "url": "http://franciscotreacy.com"
+    },
+    {
+      "name": "Sean Cribbs",
+      "email": "sean@basho.com"
+    },
+    {
+      "name": "rick (technoweenie)",
+      "url": "http://techno-weenie.net"
+    }
+  ],
+  "bugs": {
+    "url": "http://github.com/mostlyserious/riak-js/issues"
+  },
+  "licenses": [
+    {
+      "type": "BSD",
+      "url": "http://opensource.org/licenses/bsd-license.php"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/mostlyserious/riak-js.git"
+    }
+  ],
+  "main": "./lib/index",
+  "directories": {
+    "lib": "./lib"
+  },
+  "os": [
+    "linux",
+    "darwin",
+    "sunos"
+  ],
+  "dependencies": {
+    "xml": "0.0.7"
+  },
+  "devDependencies": {
+    "seq": "0.3.5"
+  },
+  "engines": {
+    "node": ">=0.4.0"
+  }
 }

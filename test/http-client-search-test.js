@@ -46,13 +46,13 @@ seq()
   })
   .seq(function(data) {
     test('Finds one result');
-    assert.equal(data.response.numFound, 1);
-    assert.equal(data.response.docs[0].id, "test-search@gmail.com");
+    assert.equal(data.numFound, 1);
+    assert.equal(data.docs[0].id, "test-search@gmail.com");
     this.ok(data)
   })
   .seq(function(data) {
     test('Includes the document');
-    assert.equal(data.response.docs[0].fields.email, "test-search@gmail.com");
+    assert.equal(data.docs[0].fields.email, "test-search@gmail.com");
     this.ok();
   })
   .seq(function() {
@@ -70,7 +70,7 @@ seq()
   })
   .seq(function(data) {
     test('Includes the added document');
-    assert.equal(data.response.docs[0].fields.name, "Sean Cribbs");
+    assert.equal(data.docs[0].fields.name, "Sean Cribbs");
     this.ok();
   })
   .seq(function() {
@@ -87,7 +87,7 @@ seq()
     }.bind(this));
   })
   .seq(function(data) {
-    assert.equal(data.response.numFound, 0);
+    assert.equal(data.numFound, 0);
     this.ok();
   })
   .seq(function() {
