@@ -204,8 +204,6 @@ with the `meta` and `data` properties.
 
     db.getAll('airlines')
 
-    db.getAll('airlines', { where: { country: 'NL', fleet: 111 } })
-
 #### Buckets
 
     db.buckets()
