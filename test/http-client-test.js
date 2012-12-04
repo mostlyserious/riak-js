@@ -174,6 +174,13 @@ seq()
     
     db2.get('users', 'test@gmail.com');
   })
+
+  .seq(function() {
+    test('Ensure riak-js gracefully handles a down riak connection');
+    db2.get('users', 'test@gmail.com', function(err, user, meta) {
+      assert.ok(err);
+    });
+  })
   
   .seq(function() {
     test('Save with returnbody=true actually returns the body');
