@@ -109,6 +109,13 @@ seq()
     }.bind(this));
   })
   .seq(function() {
+    test("Vector clock not overwritten on link walk");
+    db.walk('users', 'other@gmail.com', [{bucket: 'users'}], function(err, data, meta) {
+      assert.ok(data[0][0].meta.vclock);
+      this.ok();
+    }.bind(this));
+  })
+  .seq(function() {
     test('Reusing meta object');
     db.get('users', 'test@gmail.com', function(err, data, meta) {
       this.ok(data, meta);
