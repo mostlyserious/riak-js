@@ -20,12 +20,6 @@ seq().
       this.ok(meta);
     }.bind(this));
   })
-  .seq(function(meta) {
-    test('Reusing a meta object');
-    db.save('pb-users', 'user@gmail.com', meta, function() {
-      this.ok();
-    }.bind(this));
-  })
   .seq(function() {
     db.end();
   })
