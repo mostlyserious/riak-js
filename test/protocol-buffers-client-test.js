@@ -47,6 +47,13 @@ seq().
     }.bind(this));
   })
   .seq(function() {
+    test('Get buckets');
+    db.buckets(function(err, data) {
+      console.log(data);
+      this.ok()
+    }.bind(this));
+  })
+  .seq(function() {
     setTimeout(function() {
       db.end();
     }, 100);
