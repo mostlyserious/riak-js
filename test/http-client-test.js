@@ -1,308 +1,384 @@
 var HttpClient = require('../lib/http-client'),
   HttpMeta = require('../lib/http-meta'),
-  seq = require('seq'),
+  async = require('async'),
   util = require('util'),
-  assert = require('assert'),
-  test = require('../lib/utils').test;
+  should = require('should');
 
-var db = new HttpClient({ port: 8098 }),
-  db2 = new HttpClient({ port: 64208 }),
-  many = [];
-for (var i = 0; i < 600; i++) many.push(String(i));
+var db, db2, many = [], bucket;
 
 /* Tests */
 
-seq()
+describe('http-client-tests', function() {
+  before(function(done) {
+    db = new HttpClient({ port: 8098 });
+    db2 = new HttpClient({ port: 64208 });
+    for (var i = 0; i < 600; i++) {
+      many.push(String(i));
+    }
+    // Ensure unit tests don't collide with pre-existing buckets
+    bucket = 'users-riak-js-tests';
 
-  .seq(function() {
-    test('Save with returnbody');
-    db.save('users', 'test-returnbody@gmail.com', { email: 'test@gmail.com', name: 'Testy Test', a: [1,2], returnbody: 'yes please' }, { returnbody: true }, function(err, data, meta) {
-      assert.equal(meta.statusCode, 200);
-      assert.ok(data);
-      assert.deepEqual(data.a, [1,2]);
-      assert.equal(meta.key, 'test-returnbody@gmail.com');
-      this.ok();
-    }.bind(this));
-  })
-
-  .seq(function() {
-    test('Save');
-    db.save('users', 'test@gmail.com', "Some text", function(err, data, meta) {
-      assert.equal(meta.statusCode, 204);
-      assert.ok(!data);
-      assert.equal(meta.key, 'test@gmail.com');
-      this.ok();
-    }.bind(this));
-  })
-
-  .seq(function() {
-    test('Get with no options or callback');
-    db.get('users', 'test@gmail.com', this);    
-  })
-  .seq(function(doc2) {
-    assert.equal(doc2, "Some text");
-    this.ok();
-  })
-  
-  .seq(function() {
-    test('Store plain text with unicode in it');
-    db.save('users', 'text-user', 'tét', function() {
-      db.get('users', 'text-user', this);
-    }.bind(this));
-  })
-  .seq(function(text) {
-    assert.equal(new Buffer(text).length, 4);
-    assert.equal(text, 'tét');
-    this.ok();
-  })
-  .seq(function() {
-    test("Get all");
-    db.getAll('users', this);
-  })
-
-  .seq(function(users) {
-    assert.ok(Array.isArray(users));
-    assert.ok(users.some(function(u) { return u == "Some text" }));
-    this.ok();
-  })
-  
-  .seq(function() {
-    test('Head request');
-    db.head('users', 'test@gmail.com', function(err, data, meta) {
-      assert.ok(!err && !data);
-      assert.ok(meta.statusCode === 200);
-      this.ok();
-    }.bind(this));
-  })
-  
-  .seq(function() {
-    test('Storing document with links');
-    db.save('users', 'other@gmail.com', {name: "Other Dude"}, {links: [{bucket: 'users', key: 'test@gmail.com'}]}, function(erro, data, meta) {
-      assert.ok(meta.statusCode === 204);
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test('Fetching a document with links');
-    db.get('users', 'other@gmail.com', function(err, data, meta) {
-      this.ok(meta);
-    }.bind(this));
-  })
-  .seq(function(meta) {
-    test('Includes links in the meta object');
-    assert.equal(meta.links.length, 1);
-    this.ok(meta);
-  })
-  .seq(function(meta) {
-    test("Doesn't store undefined for empty tags");
-    assert.equal(meta.links[0].tag, '_');
-    this.ok();
-  })
-  .seq(function(){
-    test("Fetch via Linkwalk");
-    db.walk('users', 'other@gmail.com', [{bucket: 'users'}], function(err, data, meta){
-      assert.equal(data.length, 1);
-      assert.equal(data[0].length, 1);
-      assert.ok(data[0][0].meta);
-      assert.ok(data[0][0].data);
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test("Vector clock not overwritten on link walk");
-    db.walk('users', 'other@gmail.com', [{bucket: 'users'}], function(err, data, meta) {
-      assert.ok(data[0][0].meta.vclock);
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test('Reusing meta object');
-    db.get('users', 'test@gmail.com', function(err, data, meta) {
-      this.ok(data, meta);
-    }.bind(this));
-  })
-  .seq(function(user, meta) {
-    db.save('users', 'test@gmail.com', user, meta, function(err, data, meta) {
-      this.ok(meta);
-    }.bind(this));
-  })
-  .seq(function(meta) {
-    assert.equal(meta.statusCode, 204);
-    this.ok();
-  })
-  .seq(function() {
-    test('Remove document');
-    db.remove('users', 'test@gmail.com', function(err, data, meta) {
-      assert.equal(meta.statusCode, 204);
-      this.ok();
-    }.bind(this));
-  })
-
-  .seq(function() {
-    test('Document exists');
-    db.exists('users', 'test@gmail.com', function(err, does, meta) {
-      assert.equal(meta.statusCode, 404);
-      assert.equal(does, false);
-      this.ok();
-    }.bind(this));
-  })
-
-  .seq(function() {
-    test('Get non-existent document');
-    db.get('users', 'test@gmail.com', function(err, does, meta) {
-      assert.equal(err.message, 'not found');
-      assert.equal(meta.statusCode, 404);
-      this.ok();
-    }.bind(this));
-  })
-  
-  .seq(function() {
-    test('Get non-existent document, ignoring the not found error');
-    db.get('users', 'test@gmail.com', { noError404: true }, this);
-    // no error should be returned
-  })
-
-
-  .seq(function() {
-    test('Ensure a second riak-js instance does not inherit settings from the first one');
-    
-    // we're expecting this instance to be down (listening on port 64208)
-    db2.on('error', function(err) {
-      assert.ok(err);
-      this.ok();
-    }.bind(this));
-    
-    db2.get('users', 'test@gmail.com');
-  })
-
-  .seq(function() {
-    test('Ensure riak-js gracefully handles a down riak connection');
-    db2.get('users', 'test@gmail.com', function(err, user, meta) {
-      assert.ok(err);
-    });
-  })
-  
-  .seq(function() {
-    test('Save with returnbody=true actually returns the body');
-    db.save('users', 'test2@gmail.com', { user: 'test2@gmail.com' }, { returnbody: true }, this);
-  })
-  .seq(function(doc) {
-    assert.ok(doc);
-    assert.equal(doc.user, 'test2@gmail.com');
-    setTimeout(this.ok, 3000); // wait for damn dead horse riak; see https://issues.basho.com/show_bug.cgi?id=1269
-  })
-  
-  .set(many)
-  .flatten()
-  .parEach(20, function(key) {
-    db.save('test', key, key, this);
-  })
-  
-  .seq(function() {
-    test("Stream keys");
-    var buf = [],
-      keys = function(keys) { buf = buf.concat(keys) },
-      end = function() {
-        // keys come in random order, need to sort both arrays by string in order to compare
-        buf = buf.sort(); many = many.sort();
-        assert.deepEqual(many, buf);
-        this.ok();
-      }.bind(this);
-
-    db
-      .keys('test')
-      .on('keys', keys)
-      .on('end', end)
-      .start();
-  })
-  
-  .seq(function() {
-    test("Count keys");
-    db.count('test', this);
-  })
-  .seq(function(total) {
-    assert.equal(total, many.length);
-    this.ok();
-  })
-  .seq(function() {
-    test("Secondary indices");
-    db.save('users', 'fran@gmail.com', { age: 28 }, { index: { age: 28, alias: 'fran' } }, this);
-  })
-  .seq(function() {
-    db.query('users', { age: [20,30] }, this);
-  })
-  .seq(function(keys) {
-    assert.equal(keys[0], 'fran@gmail.com');
-    this.ok();
-  })
-  .seq(function() {
-    db.query('users', { alias: 'fran' }, this);
-  })
-  .seq(function(keys) {
-    assert.equal(keys[0], 'fran@gmail.com');
-    this.ok();
-  })
-  
-  .seq(function() {
-    test('Buckets is an Array');
-    db.buckets(this);
-  })
-  .seq(function(buckets) {
-    assert.ok(Array.isArray(buckets));
-    this.ok(buckets);
-  })
-  
-  .seq(function(buckets) {
-    test('Get the properties of a bucket');
-    var bucket = buckets[0];
-    db.getBucket(bucket, this);
-  })
-  .seq(function(props) {
-    assert.ok(props && props.r);
-    this.ok()
-  })
-  
-  .seq(function() {
-    test("List resources");
-    db.resources(this);
-  })
-  .seq(function(resources) {
-    assert.ok(resources && resources.riak_kv_wm_buckets);
-    this.ok();
-  })
-  
-  .seq(function() {
-    test('Ping');
-    db.ping(this);
-  })
-  .seq(function(pong) {
-    assert.ok(pong);
-    this.ok()
-  })
-  
-  .seq(function() {
-    test('Stats');
-    db.stats(this);
-  })
-  .seq(function(stats) {
-    assert.ok(stats.riak_core_version);
-    this.ok();
-  })
-  
-  .seq(function() {
-    test('Custom Meta');
-    var meta = new CustomMeta();
-    db.get('users', 'test2@gmail.com', meta, this);
-  })
-  .seq(function(user) {
-    assert.equal(user.intercepted, true);
-    this.ok();
-  })
-  .catch(function(err) {
-    console.log(err.stack);
-    process.exit(1);
+    done();
   });
-  
+
+  it('Save with returnbody', function(done) {
+    db.save(bucket, 'test-returnbody@gmail.com',
+      { email: 'test@gmail.com',
+        name: 'Testy Test',
+        a: [1, 2],
+        returnbody: 'yes please' },
+      { returnbody: true },
+      function(err, data, meta) {
+        should.not.exist(err);
+        meta.statusCode.should.equal(200);
+        should.exist(data);
+        data.a.should.eql([1, 2]);
+        meta.key.should.equal('test-returnbody@gmail.com');
+
+        done();
+      });
+  });
+
+  it('Save', function(done) {
+    db.save(bucket, 'test@gmail.com', 'Some text', function(err, data, meta) {
+      should.not.exist(err);
+      should.not.exist(data);
+      meta.key.should.equal('test@gmail.com');
+
+      done();
+    });
+  });
+
+  it('Get with no options', function(done) {
+    db.get(bucket, 'test@gmail.com', function(err, document) {
+      should.not.exist(err);
+      should.exist(document);
+      document.should.equal('Some text');
+
+      done();
+    });
+  });
+
+  it('Store plain text with unicode in it', function(done) {
+    db.save(bucket, 'text-with-unicode', 'tét', function(err) {
+      should.not.exist(err);
+
+      db.get(bucket, 'text-with-unicode', function(err, document) {
+        should.not.exist(err);
+        should.exist(document);
+        new Buffer(document).length.should.equal(4);
+        document.should.equal('tét');
+
+        done();
+      });
+    });
+  });
+
+  it('Get all', function(done) {
+    db.getAll(bucket, function(err, documents) {
+      should.not.exist(err);
+      should.exist(documents);
+      documents.should.be.an.instanceof(Array);
+      // TODO get this to properly match expected contents
+      //documents.should.includeEql('some text');
+
+      done();
+    });
+  });
+
+  it('Head Request', function(done) {
+    db.head(bucket, 'test@gmail.com', function(err, data, meta) {
+      should.not.exist(err);
+      should.not.exist(data);
+      should.exist(meta);
+      meta.statusCode.should.equal(200);
+
+      done();
+    });
+  });
+
+  it('Storing document with links', function(done) {
+    db.save(bucket, 'other@gmail.com',
+      { name: 'Other Dude' },
+      { links: [
+        { bucket: bucket, key: 'test@gmail.com' }
+      ]}, function(err, data, meta) {
+        should.not.exist(err);
+        should.not.exist(data);
+        should.exist(meta);
+        meta.statusCode.should.equal(204);
+
+        done();
+      });
+  });
+
+  it('Fetching a document with links', function(done) {
+    db.get(bucket, 'other@gmail.com', function(err, data, meta) {
+      should.not.exist(err);
+      should.exist(data);
+      should.exist(meta);
+      meta.links.length.should.equal(1);
+      meta.links[0].tag.should.equal('_');
+
+      done();
+    });
+  });
+
+  it('Fetch via Linkwalk', function(done) {
+    db.walk(bucket, 'other@gmail.com', [
+      {bucket: bucket}
+    ],
+      function(err, data, meta) {
+        should.not.exist(err);
+        should.exist(data);
+        data.length.should.equal(1);
+        data[0].length.should.equal(1);
+        should.exist(data[0][0].meta);
+        should.exist(data[0][0].data);
+
+        done();
+      });
+  });
+
+  it('Vector clock not overwritten on link walk', function(done) {
+    db.walk(bucket, 'other@gmail.com', [
+      {bucket: bucket}
+    ],
+      function(err, data, meta) {
+        should.not.exist(err);
+        should.exist(data);
+        data.length.should.equal(1);
+        data[0].length.should.equal(1);
+        should.exist(data[0][0].meta);
+        should.exist(data[0][0].data);
+        should.exist(data[0][0].meta.vclock);
+
+        done();
+      });
+  });
+
+  it('Reusing meta object', function(done) {
+    db.get(bucket, 'test@gmail.com', function(err, data, meta) {
+      should.not.exist(err);
+      should.exist(data);
+      should.exist(meta);
+
+      db.save(bucket, 'test@gmail.com', data, meta, function(err, data, meta) {
+        should.not.exist(err);
+        should.exist(meta);
+        meta.statusCode.should.equal(204);
+
+        done();
+      });
+    });
+  });
+
+  it('Remove document', function(done) {
+    db.remove(bucket, 'test@gmail.com', function(err, data, meta) {
+      should.not.exist(err);
+      should.exist(meta);
+      meta.statusCode.should.equal(204);
+
+      done();
+    });
+  });
+
+  it('Document exists', function(done) {
+    db.exists(bucket, 'test@gmail.com', function(err, data, meta) {
+      should.not.exist(err);
+      data.should.equal(false);
+      should.exist(meta);
+      meta.statusCode.should.equal(404);
+
+      done();
+    });
+  });
+
+  it('Get non-existent document', function(done) {
+    db.get(bucket, 'test@gmail.com', function(err, data, meta) {
+      should.exist(err);
+      should.exist(data);
+      data.notFound.should.equal(true);
+      should.exist(meta);
+      meta.statusCode.should.equal(404);
+
+      done();
+    });
+  });
+
+  it('Get non-existent document, ignoring not found error', function(done) {
+    db.get(bucket, 'test@gmail.com', { noError404: true },
+      function(err, data, meta) {
+        should.not.exist(err);
+        should.exist(data);
+        data.statusCode.should.equal(404);
+        should.exist(meta);
+        meta.statusCode.should.equal(404);
+
+        done();
+      });
+  });
+
+  it('Ensure a second riak-js instance does not inherit settings from the first one', function(done) {
+    db2.get(bucket, 'test@gmail.com', function(err, data, meta) {
+      should.exist(err);
+      should.not.exist(data);
+      should.not.exist(meta);
+
+      done();
+    });
+  });
+
+  it('Save with returnbody=true actually returns the body', function(done) {
+    db.save(bucket, 'test2@gmail.com',
+      { user: 'test2@gmail.com' },
+      { returnbody: true },
+      function(err, data, meta) {
+        should.not.exist(err);
+        should.exist(data);
+        data.should.eql({ user: 'test2@gmail.com' });
+
+        done();
+      });
+  });
+
+  it('Stream Keys', function(done) {
+    async.forEachLimit(many, 10, function(key, next) {
+      db.save(bucket + '-keys', key, key, function(err) {
+        should.not.exist(err);
+        next();
+      });
+    }, function() {
+      var buf = [],
+        keys = function(keys) {
+          buf = buf.concat(keys)
+        },
+        end = function() {
+          // keys come in random order, need to sort
+          // both arrays by string in order to compare
+          buf = buf.sort();
+          many = many.sort();
+          many.should.eql(buf);
+          done();
+        };
+
+      db.keys(bucket + '-keys')
+        .on('keys', keys)
+        .on('end', end)
+        .start();
+    });
+  });
+
+  it('Count Keys', function(done) {
+    db.count(bucket + '-keys', function(err, total) {
+      should.not.exist(err);
+      should.exist(total);
+      total.should.equal(many.length);
+
+      done();
+    });
+  });
+
+  it('Secondary Indices', function(done) {
+    db.save(bucket, 'fran@gmail.com',
+      { age: 28 },
+      { index: { age: 28, alias: 'fran' } },
+      function(err, data, meta) {
+        should.not.exist(err);
+        async.parallel([
+          function(callback) {
+            db.query(bucket, { age: [20, 30] }, function(err, results) {
+              should.not.exist(err);
+              should.exist(results);
+              results.length.should.equal(1);
+              results[0].should.equal('fran@gmail.com');
+
+              callback();
+            });
+          }, function(callback) {
+            db.query(bucket, { alias: 'fran' }, function(err, results) {
+              should.not.exist(err);
+              should.exist(results);
+              results.length.should.equal(1);
+              results[0].should.equal('fran@gmail.com');
+
+              callback();
+            });
+          }], function() {
+          done();
+        });
+      });
+  });
+
+  it('Buckets is an Array', function(done) {
+    db.buckets(function(err, buckets) {
+      should.not.exist(err);
+      should.exist(buckets);
+      buckets.should.be.an.instanceof(Array);
+
+      done();
+    });
+  });
+
+  it('Get the properties of a bucket', function(done) {
+    db.buckets(function(err, buckets) {
+      should.not.exist(err);
+      should.exist(buckets);
+      buckets.should.be.an.instanceof(Array);
+
+      var bucket = buckets[0];
+
+      db.getBucket(bucket, function(err, data) {
+        should.not.exist(err);
+        should.exist(data);
+        should.exist(data.r);
+
+        done();
+      });
+    });
+  });
+
+  it('List Resources', function(done) {
+    db.resources(function(err, resources) {
+      should.not.exist(err);
+      should.exist(resources);
+      should.exist(resources.riak_kv_wm_buckets);
+
+      done();
+    });
+  });
+
+  it('Ping', function(done) {
+    db.ping(function(err, pong) {
+      should.not.exist(err);
+      should.exist(pong);
+
+      done();
+    });
+  });
+
+  it('Stats', function(done) {
+    db.stats(function(err, stats) {
+      should.not.exist(err);
+      should.exist(stats);
+      should.exist(stats.riak_core_version);
+
+      done();
+    });
+  });
+
+  it('Custom Meta', function(done) {
+    var meta = new CustomMeta();
+    db.get(bucket, 'test2@gmail.com', meta, function(err, document) {
+      should.not.exist(err);
+      should.exist(document);
+      document.intercepted.should.equal(true);
+
+      done();
+    });
+  });
+});
+
 /* Custom Meta */
 
 var CustomMeta = function() {

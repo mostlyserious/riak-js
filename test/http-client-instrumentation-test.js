@@ -1,51 +1,46 @@
 var HttpClient = require('../lib/http-client'),
   HttpMeta = require('../lib/http-meta'),
-  seq = require('seq'),
-  util = require('util'),
-  assert = require('assert'),
-  test = require('../lib/utils').test;
+  should = require('should'),
+  util = require('util');
 
-var db = new HttpClient({ port: 8098 });
-var events = []
+var db, events = [], listener, bucket;
 
-var listener = {
-  "riak.request.start": function(event) {
-    events.push(event)
-  },
-  "riak.request.response": function(event) {
-    events.push(event)
-  },
-  "riak.request.finish": function(event) {
-    events.push(event)
-  },
-  "riak.request.end": function(event) {
-    events.push(event)
-  }
-}
+describe('http-client-instrumentation-tests', function() {
+  before(function(done) {
+    db = new HttpClient({ port: 8098 });
 
-seq()
-.seq(function() {
-  test('Register event listeners');
-  db.registerListener(listener);
-  this.ok();
-})
-.seq(function() {
-  test('Creates an object');
-  db.save('users', 'someone@gmail.com', {name: 'Someone Else'}, function() {
-    this.ok(events[0]);
-  }.bind(this));
-})
-.seq(function(event) {
-  test('Assigns a unique ID to a request');
-  assert.notEqual(event.uuid, undefined);
-  this.ok();
-})
-.seq(function() {
-  test('Creates four unique events');
-  assert.equal(events.length, 4);
-  for (var i in events) {
-    assert.notEqual(events[i], undefined);
-  }
-  this.ok();
+    listener = {
+      "riak.request.start": function(event) {
+        events.push(event)
+      },
+      "riak.request.response": function(event) {
+        events.push(event)
+      },
+      "riak.request.finish": function(event) {
+        events.push(event)
+      },
+      "riak.request.end": function(event) {
+        events.push(event)
+      }
+    };
+
+    // Ensure unit tests don't collide with pre-existing buckets
+    bucket = 'users-riak-js-tests';
+
+    db.registerListener(listener);
+
+    done();
+  });
+
+  it('Create an object', function(done) {
+    db.save(bucket, 'someone@gmail.com',
+      {name: 'Someone Else'}, function(err, doc, meta) {
+        events.length.should.equal(4);
+        for (var i = 0; i < events.length; i++) {
+          should.exist(events[i].uuid);
+        }
+        done();
+      });
+  });
 });
 
