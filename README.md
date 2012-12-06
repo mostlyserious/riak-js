@@ -16,6 +16,12 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.9.2
+
+ - Fix Search options so it handles hostname and port (github.com/kenperkins)
+ - Fix unwanted vector clock overwriting during link walking (github.com/TauZero)
+ - Handle connection errors gracefully so that they don't kill the process
+
 #### 0.9.1
 
  - Request instrumentation for metrics, logging, etc.
