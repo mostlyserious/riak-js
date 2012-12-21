@@ -49,9 +49,12 @@ seq().
   .seq(function() {
     test('Get buckets');
     db.buckets(function(err, data) {
-      console.log(data);
-      this.ok()
+      this.ok(data)
     }.bind(this));
+  })
+  .seq(function(buckets) {
+    assert(buckets.indexOf("users") >= 0);
+    this.ok();
   })
   .seq(function() {
     setTimeout(function() {
