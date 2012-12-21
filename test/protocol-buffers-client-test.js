@@ -57,6 +57,29 @@ seq().
     this.ok();
   })
   .seq(function() {
+    test("Get bucket properties");
+    db.getBucket('users', function(err, properties, meta) {
+      assert.ok(properties);
+      this.ok(properties);
+    }.bind(this));
+  })
+  .seq(function(properties) {
+    assert.equal(properties.n_val, 3);
+    this.ok(properties.allow_mult);
+  })
+  .seq(function(allow_mult) {
+    test("Set bucket properties");
+    db.setBucket('users', {allow_mult: !allow_mult}, function(err) {
+      this.ok(!allow_mult);
+    }.bind(this));
+  })
+  .seq(function(allow_mult) {
+    db.getBucket('users', function(err, properties, meta) {
+      assert.equal(properties.allow_mult, allow_mult)
+      this.ok();
+    }.bind(this));
+  })
+  .seq(function() {
     setTimeout(function() {
       db.end();
     }, 100);
