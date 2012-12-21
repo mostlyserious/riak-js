@@ -80,6 +80,12 @@ seq().
     }.bind(this));
   })
   .seq(function() {
+    test("Ping");
+    db.ping(function(pong) {
+      this.ok(pong);
+    }.bind(this));
+  })
+  .seq(function() {
     setTimeout(function() {
       db.end();
     }, 100);
