@@ -68,8 +68,8 @@ seq().
     this.ok(properties.allow_mult);
   })
   .seq(function(allow_mult) {
-    test("Set bucket properties");
-    db.setBucket('users', {allow_mult: !allow_mult}, function(err) {
+    test("Save bucket properties");
+    db.saveBucket('users', {allow_mult: !allow_mult}, function(err) {
       this.ok(!allow_mult);
     }.bind(this));
   })
