@@ -42,11 +42,6 @@
   "directories": {
     "lib": "./lib"
   },
-  "os": [
-    "linux",
-    "darwin",
-    "sunos"
-  ],
   "dependencies": {
     "xml": "0.0.7"
   },
