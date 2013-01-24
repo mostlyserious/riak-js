@@ -1,9 +1,9 @@
-var HttpClient = require('../lib/http-client'),
-  HttpMeta = require('../lib/http-meta'),
+var HttpClient = require('../../lib/http-client'),
+  HttpMeta = require('../../lib/http-meta'),
   seq = require('seq'),
   util = require('util'),
   assert = require('assert'),
-  test = require('../lib/utils').test;
+  test = require('../../lib/utils').test;
 
 var db = new HttpClient({ pool: {
   servers: [
