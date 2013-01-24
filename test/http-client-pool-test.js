@@ -27,7 +27,21 @@ seq()
   db.get('languages', 'erlang', function(err, data) {
     assert(!err);
     assert.equal(data.type, 'functional');
-    console.log(data);
     this.ok();
   }.bind(this));
+})
+.seq(function() {
+  test('Get the streamed object');
+  var self = this;
+  db.get('languages', 'erlang', {stream: true}, function(err, response, meta) {
+    assert(!err);
+    response.on('data', function(data) {
+      data = JSON.parse(String(data));
+      assert.equal(data.type, 'functional');
+      self.ok();
+    }.bind(this));
+  });
+})
+.seq(function() {
+  process.exit(0);
 });
