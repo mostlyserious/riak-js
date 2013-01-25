@@ -1,101 +1,118 @@
 var HttpClient = require('../lib/http-client'),
-  seq = require('seq'),
-  assert = require('assert'),
-  test = require('../lib/utils').test;
+  should = require('should');
 
-var db = new HttpClient({ port: 8098 }),
-  bucket = 'users';
-  
-seq()
+var db, events = [], listener, bucket;
 
-  .seq(function() {
-    test('Save the properties of a bucket');
-    db.saveBucket(bucket, { search: true }, this);
-  })
+describe('http-client-search-tests', function() {
+  before(function(done) {
+    db = new HttpClient({ port: 8098 });
 
-  .seq(function() {
-    test('Get the properties of a bucket');
-    db.getBucket(bucket, this);
-  })
-  .seq(function(props) {
-    assert.equal(props.search, true);
-    this.ok();
-  })
-  .seq(function() {
-    test('Save');
-    db.save('users', 'test-search@gmail.com', { email: 'test-search@gmail.com', name: 'Testy Test for Riak Search' }, function(err, data, meta) {
-      assert.equal(meta.statusCode, 204);
-      assert.ok(!data);
-      assert.equal(meta.key, 'test-search@gmail.com');
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test('Map/Reduce with search');
-    db.mapreduce.search('users', 'email:test-search@gmail.com').map('Riak.mapValuesJson').run(this);
-  })
-  .seq(function(data) {
-    assert.equal(data[0].email, "test-search@gmail.com");
-    this.ok();
-  })
-  .seq(function() {
-    test('Searching via Solr interface');
-    db.search.find('users', 'email:test-search@gmail.com', function(err, data) {
-      this.ok(data);
-    }.bind(this));
-  })
-  .seq(function(data) {
-    test('Finds one result');
-    assert.equal(data.numFound, 1);
-    assert.equal(data.docs[0].id, "test-search@gmail.com");
-    this.ok(data)
-  })
-  .seq(function(data) {
-    test('Includes the document');
-    assert.equal(data.docs[0].fields.email, "test-search@gmail.com");
-    this.ok();
-  })
-  .seq(function() {
-    test('Add a document');
-    db.search.add('users', {id: "test-add-search@gmail.com", name: "Sean Cribbs"}, function(err) {
-      assert.equal(err, null);
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test('Find added document');
-    db.search.find('users', 'name:"Sean Cribbs"', function(err, data) {
-      this.ok(data);
-    }.bind(this));
-  })
-  .seq(function(data) {
-    test('Includes the added document');
-    assert.equal(data.docs[0].fields.name, "Sean Cribbs");
-    this.ok();
-  })
-  .seq(function() {
-    test('Remove the added document');
-    db.search.remove('users', {id: 'test-add-search@gmail.com'}, function(err) {
-      assert.equal(err, null);
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test('Should have removed the added document');
-    db.search.find('users', 'name:"Sean Cribbs"', function(err, data) {
-      this.ok(data);
-    }.bind(this));
-  })
-  .seq(function(data) {
-    assert.equal(data.numFound, 0);
-    this.ok();
-  })
-  .seq(function() {
-    test('Remove document');
-    db.remove('users', 'test-search@gmail.com', this);
-    this.ok();
-  })
-  .catch(function(err) {
-    console.log(err.stack);
-    process.exit(1);
+    // Ensure unit tests don't collide with pre-existing buckets
+    bucket = 'users-riak-js-tests';
+
+    done();
   });
+
+  it('Save the properties of a bucket', function(done) {
+    db.saveBucket(bucket, { search: true }, function(err) {
+      should.not.exist(err);
+
+      done();
+    });
+  });
+
+  it('Get the properties of a bucket', function(done) {
+    db.getBucket(bucket, function(err, props) {
+      should.not.exist(err);
+      should.exist(props);
+      props.search.should.equal(true);
+
+      done();
+    });
+  });
+
+  it('Save a document to a search enabled bucket', function(done) {
+    db.save(bucket, 'test-search@gmail.com',
+      {
+        email: 'test-search@gmail.com',
+        name: 'Testy Test for Riak Search'
+      },
+      function(err, data, meta) {
+        should.not.exist(err);
+        should.not.exist(data);
+        should.exist(meta);
+        meta.key.should.equal('test-search@gmail.com');
+        meta.statusCode.should.equal(204);
+
+        done();
+      });
+  });
+
+  it('Map/Reduce with saerch', function(done) {
+    db.mapreduce.search(bucket, 'email:test-search@gmail.com')
+      .map('Riak.mapValuesJson')
+      .run(function(err, data) {
+        should.not.exist(err);
+        should.exist(data);
+        data.length.should.equal(1);
+        data[0].email.should.equal('test-search@gmail.com');
+
+        done();
+      });
+  });
+
+  it('Searching via Solr interface', function(done) {
+    db.search.find(bucket, 'email:test-search@gmail.com', function(err, data) {
+      should.not.exist(err);
+      should.exist(data);
+      data.numFound.should.equal(1);
+      data.docs[0].id.should.equal('test-search@gmail.com');
+      data.docs[0].fields.email.should.equal('test-search@gmail.com');
+
+      done();
+    });
+  });
+
+  it('Add a document', function(done) {
+    db.search.add(bucket, {id: 'test-add-search@gmail.com', name: 'Sean Cribbs'},
+      function(err) {
+        should.not.exist(err);
+
+        done();
+    });
+  });
+
+  it('Find added document', function(done) {
+    db.search.find(bucket, 'name:"Sean Cribbs"', function(err, data) {
+      should.not.exist(err);
+      should.exist(data);
+      data.numFound.should.equal(1);
+      data.docs[0].id.should.equal('test-add-search@gmail.com');
+      data.docs[0].fields.name.should.equal('Sean Cribbs');
+
+      done();
+    });
+  });
+
+  it('Remove the added document', function(done) {
+    db.search.remove(bucket, {id: 'test-add-search@gmail.com'}, function(err) {
+      should.not.exist(err);
+
+      // try and find the removed document
+      db.search.find(bucket, 'name:"Sean Cribbs"', function(err, data) {
+        should.not.exist(err);
+        should.exist(data);
+        data.numFound.should.equal(0);
+
+        done();
+      });
+    });
+  });
+
+  after(function(done) {
+    db.remove(bucket, 'test-search@gmail.com');
+    db.remove(bucket, 'test-add-search@gmail.com');
+
+    done();
+  });
+});

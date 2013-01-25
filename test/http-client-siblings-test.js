@@ -1,39 +1,50 @@
-var httpclient = require('../lib/http-client'),
-  httpmeta = require('../lib/http-meta'),
-  seq = require('seq'),
-  util = require('util'),
-  assert = require('assert'),
-  test = require('../lib/utils').test;
+var HttpClient = require('../lib/http-client'),
+  HttpMeta = require('../lib/http-meta'),
+  should = require('should'),
+  util = require('util');
 
-var db = new httpclient({ port: 8098, accept: 'multipart/mixed,application/json;q=0.7, */*;q=0.5'}),
-  bucket = 'siblings';
+var db, bucket;
 
-seq()
-  .seq(function() {
-    test('Enable siblings');
-    db.saveBucket(bucket, {allow_mult: true}, this);
-  })
-  .seq(function() {
-    test('Delete existing objects');
-    db.remove(bucket, 'haensel', function() {
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test('Create first sibling');
-    db.save(bucket, 'haensel', {eats: 'lebkuchen'}, function() {
-      this.ok();
-    }.bind(this));
-  })
-  .seq(function() {
-    test('Create second sibling');
-    db.save(bucket, 'haensel', {likes: 'lebkuchen'}, function() {
-      this.ok()
-    }.bind(this));
-  })
-  .seq(function() {
-    db.get(bucket, 'haensel', function(err, data, meta) {
-      assert.equal(data.length, 2)
-      this.ok();
-    }.bind(this));
+describe('http-client-siblings-tests', function() {
+  before(function(done) {
+    db = new HttpClient({
+      port: 8098,
+      accept: 'multipart/mixed,application/json;q=0.7, */*;q=0.5'
+    });
+
+    // Ensure unit tests don't collide with pre-existing buckets
+    bucket = 'siblings-riak-js-tests';
+
+    done();
   });
+
+  it('Enable siblings', function(done) {
+    db.saveBucket(bucket, {allow_mult: true}, function(err) {
+      should.not.exist(err);
+      done();
+    });
+  });
+
+  it('Create and get siblings', function(done) {
+    db.save(bucket, 'haensel', {eats: 'lebkuchen'}, function(err) {
+      should.not.exist(err);
+      db.save(bucket, 'haensel', {likes: 'lebkuchen'}, function(err) {
+        should.not.exist(err);
+        db.get(bucket, 'haensel', function(err, data, meta) {
+          should.not.exist(err);
+          should.exist(data);
+          data.length.should.equal(2);
+
+          done();
+        });
+      });
+    });
+  });
+
+  after(function(done) {
+    db.remove(bucket, 'haensel', function(err) {
+      should.not.exist(err);
+      done();
+    });
+  });
+});
