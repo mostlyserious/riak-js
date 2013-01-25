@@ -46,7 +46,10 @@
     "xml": "0.0.7"
   },
   "devDependencies": {
-    "seq": "0.3.5"
+    "seq": "0.3.5",
+    "mocha": "1.7.3",
+    "should": "*",
+    "async": "*"
   },
   "engines": {
     "node": ">=0.4.0"

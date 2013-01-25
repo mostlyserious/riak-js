@@ -1,17 +1,27 @@
 var HttpClient = require('../lib/http-client'),
-  HttpMeta = require('../lib/http-meta'),
-  seq = require('seq'),
-  util = require('util'),
-  assert = require('assert'),
-  test = require('../lib/utils').test;
+  should = require('should');
 
-var db = new HttpClient({ port: 64208 });
+var db, bucket;
 
-seq().
-  seq(function() {
-    test("Connection to an unavailable port shouldn't fail the process");
-    db.get('users', 'test', function(err) {
-      assert.ok(err);
-      this.ok();
-    }.bind(this));
+/* Tests */
+
+describe('http-connection-tests', function() {
+  before(function(done) {
+    db = new HttpClient({ port: 64208 });
+
+    // Ensure unit tests don't collide with pre-existing buckets
+    bucket = 'users-riak-js-tests';
+
+    done();
   });
+
+  it('Connection to an unavailable port shouldn\'t fail the process', function(done) {
+    db.get(bucket, 'test@gmail.com', function(err, data, meta) {
+      should.exist(err);
+      should.not.exist(data);
+      should.not.exist(meta);
+
+      done();
+    });
+  });
+});
