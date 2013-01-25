@@ -1,35 +1,47 @@
 var Meta = require('../lib/protocol-buffers-meta'),
-  test = require('../lib/utils').test,
-  assert = require('assert');
+  should = require('should');
 
-var meta = new Meta({bucket: 'bucket', key: 'key', contentType: 'png', data: 'asdfdsfaslj'});
+var meta, response;
 
-var response = {
-  content: [{
-    value: 'Joe Example',
-    vtag: '4SDUsFbniqHEYsPO6kbEwk',
-    last_mod: 1354021798,
-    last_mod_usecs: 692437,
-    content_type: 'text/plain'
-  }],
-  vclock: "4SDUsFbniqHEYsPO6kbEwkklajsf4SDUsFbniqHEYsPO6kbEwk"
-};
+describe('protocol-buffers-meta-tests', function() {
+  before(function(done) {
+    meta = new Meta({bucket: 'bucket', key: 'key', contentType: 'png', data: 'asdfdsfaslj'});
+    done();
+  });
 
-meta.loadResponse(response);
+  it('Loads the response', function(done) {
+    var response = {
+      content: [{
+        value: 'Joe Example',
+        vtag: '4SDUsFbniqHEYsPO6kbEwk',
+        last_mod: 1354021798,
+        last_mod_usecs: 692437,
+        content_type: 'text/plain'
+      }],
+      vclock: "4SDUsFbniqHEYsPO6kbEwkklajsf4SDUsFbniqHEYsPO6kbEwk"
+    };
 
-test('Load response');
-assert.equal(meta.contentType, "text/plain");
-assert.equal(new Date(meta.lastMod).getTime(), 1354021798);
-assert.ok(meta.vclock);
+    meta.loadResponse(response);
 
-test('Load response with serialized data');
+    meta.contentType.should.equal('text/plain');
+    new Date(meta.lastMod).getTime().should.equal(1354021798);
+    should.exist(meta.vclock);
+    done();
+  });
 
-response = {
-  content: [{
-    value: '{"name": "Joe Example"}',
-    vtag: '4SDUsFbniqHEYsPO6kbEwk',
-    last_mod: 1354021798,
-    last_mod_usecs: 692437,
-    content_type: 'application/json'
-  }]
-};
+  it('Loads response with serialized data', function(done) {
+    response = {
+      content: [{
+        value: '{"name": "Joe Example"}',
+        vtag: '4SDUsFbniqHEYsPO6kbEwk',
+        last_mod: 1354021798,
+        last_mod_usecs: 692437,
+        content_type: 'application/json'
+      }]
+    };
+    done();
+  });
+});
+
+
+
