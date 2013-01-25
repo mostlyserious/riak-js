@@ -55,7 +55,7 @@ describe('protocol-buffers-client-tests', function() {
     db.buckets(function(err, data) {
       console.log(data);
       should.exist(data);
-      data.should.include("users");
+      data.should.include("pb-users");
       should.exist(data.indexOf("users"));
       done();
     });
