@@ -2,8 +2,7 @@ var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
   util = require('util'),
   should = require('should');
 
-
-var db
+var db;
 
 describe('protocol-buffers-client-tests', function() {
   beforeEach(function(done) {
@@ -59,7 +58,7 @@ describe('protocol-buffers-client-tests', function() {
       should.exist(data.indexOf("users"));
       done();
     });
-  })
+  });
 
   it("Gets bucket properties", function(done) {
     db.getBucket('users', function(err, properties, meta) {
@@ -68,26 +67,29 @@ describe('protocol-buffers-client-tests', function() {
       should.exist(properties.allow_mult)
       done();
     });
-  })
+  });
+
   it("Saves bucket properties", function(done) {
     db.getBucket('users', function(err, properties, meta) {
       var allow_mult = properties.allow_mult;
       db.saveBucket('users', {allow_mult: !allow_mult}, function(err) {
         should.exist(!allow_mult);
         done();
-      })
+      });
     });
   })
+
   it("Checks the updated bucket properties", function(done) {
     db.getBucket('users', function(err, properties, meta) {
       properties.allow_mult.should.equal(true);
       done();
     });
-  })
+  });
+
   it("Pings", function(done) {
     db.ping(function(pong) {
       should.exist(pong)
       done();
     });
-  })
+  });
 });
