@@ -1,12 +1,18 @@
 var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
+    HttpClient = require('../lib/http-client'),
     should = require('should');
 
-var db;
+var db, http;
 
 describe('protocol-buffers-search-client', function() {
   beforeEach(function(done) {
     db = new ProtocolBuffersClient();    
-    done();
+    http = new HttpClient();
+    http.saveBucket('pb-search', {search: true}, function(error) {
+      db.save('pb-search', 'roidrage', {name: "Mathias Meyer"}, {content_type: "application/json"}, function(error, data) {
+        done();
+      });
+    })
   });
 
   afterEach(function(done) {
@@ -15,7 +21,7 @@ describe('protocol-buffers-search-client', function() {
   });
 
   it('Finds documents via search', function(done) {
-    db.search.find('pb-users', 'name:Mathias*', {}, function(data) {
+    db.search.find('pb-search', 'name:Mathias*', function(data) {
       done();
     });
   });
