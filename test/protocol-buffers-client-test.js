@@ -11,7 +11,6 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   afterEach(function(done) {
-    console.log('done')
     db.end();
     done();
   });
@@ -52,7 +51,6 @@ describe('protocol-buffers-client-tests', function() {
 
   it('Gets buckets', function(done) {
     db.buckets(function(err, data) {
-      console.log(data);
       should.exist(data);
       data.should.include("pb-users");
       should.exist(data.indexOf("users"));
@@ -78,13 +76,6 @@ describe('protocol-buffers-client-tests', function() {
       });
     });
   })
-
-  it("Checks the updated bucket properties", function(done) {
-    db.getBucket('users', function(err, properties, meta) {
-      properties.allow_mult.should.equal(true);
-      done();
-    });
-  });
 
   it("Pings", function(done) {
     db.ping(function(pong) {
