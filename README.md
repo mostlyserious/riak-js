@@ -84,7 +84,7 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 #### 0.4.0rc2
 
- - Major docs update => [http://riakjs.org](http://riakjs.org)
+ - Major docs update => [http://riak-js.org](http://riak-js.org)
  - `keys=stream` emits `keys` events
  - `walk` now accepts `noJSON`
  - Support Map/Reduce timeout option
