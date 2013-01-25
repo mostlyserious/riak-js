@@ -1,56 +1,108 @@
 var Meta = require('../lib/meta'),
-  assert = require('assert'),
-  test = require('../lib/utils').test;
+  should = require('should');
 
-test('Sets its attributes');
+describe('meta-tests', function() {
+  it('Sets its attributes', function(done) {
+    var meta = new Meta({
+      bucket: 'bucket',
+      key: 'key',
+      contentType: 'png',
+      data: 'd32n92390XMIW0',
+      host: '192.168.1.2',
+      myown: 'field' });
 
-var meta = new Meta({ bucket: 'bucket', key: 'key', contentType: 'png', data: 'd32n92390XMIW0', host: '192.168.1.2', myown: 'field' });
+    meta.bucket.should.equal('bucket');
+    meta.key.should.equal('key');
+    should.not.exist(meta.vclock);
+    meta.contentType.should.equal('image/png');
+    meta.data.toString().should.equal('d32n92390XMIW0');
 
-assert.equal(meta.bucket, 'bucket');
-assert.equal(meta.key, 'key');
-assert.equal(meta.vclock, null);
-assert.equal(meta.contentType, 'image/png');
-assert.equal(meta.data, 'd32n92390XMIW0');
+    done();
+  });
 
-test('Properly falls back to defaults');
+  it('Properly falls back to defaults', function(done) {
 
-assert.deepEqual(meta.links, Meta.defaults.links);
-assert.equal(meta.resource, Meta.defaults.resource);
-assert.equal(meta.clientId, Meta.defaults.clientId);
-assert.equal(meta.host, '192.168.1.2');
+    var meta = new Meta({
+      bucket: 'bucket',
+      key: 'key',
+      contentType: 'png',
+      data: 'd32n92390XMIW0',
+      host: '192.168.1.2',
+      myown: 'field' });
 
-test('Unrecognized properties are ignored');
+    meta.links.should.eql(Meta.defaults.links);
+    meta.resource.should.equal(Meta.defaults.resource);
+    meta.clientId.should.equal(Meta.defaults.clientId);
+    meta.host.should.equal('192.168.1.2');
+    done();
+  });
 
-assert.equal(meta.myown, null);
+  it('Properly falls back to defaults', function(done) {
 
-test('Is able to detect the content type');
+    var meta = new Meta({
+      bucket: 'bucket',
+      key: 'key',
+      contentType: 'png',
+      data: 'd32n92390XMIW0',
+      host: '192.168.1.2',
+      myown: 'field' });
 
-meta = new Meta({ data: { a: 1 } });
-assert.equal(meta.contentType, 'application/json');
+    should.not.exist(meta.myown);
 
-meta = new Meta({ contentType: 'xml', data: '<a>b</a>' })
-assert.equal(meta.contentType, 'text/xml');
+    done();
+  });
 
-test("Manual content type setting has priority over detection");
+  it('Is able to detect the content type', function(done) {
+    var meta = new Meta({ data: { a: 1 } });
+    meta.contentType.should.equal('application/json');
 
-meta.loadData('some text');
-assert.notEqual(meta.contentType, 'text/plain');
+    done();
+  });
 
-test("Can be passed multiple option objects, and it mixes in correctly");
+  it('Is able to detect the content type (XML)', function(done) {
+    var meta = new Meta({ contentType: 'xml', data: '<a>b</a>' });
+    meta.contentType.should.equal('text/xml');
 
-meta = new Meta({ bucket: '?', stream: true, key: 'key' }, { bucket: '_', callback: function() { console.log('test') }}, { bucket: 'bucket' });
+    done();
+  });
 
-assert.equal(meta.bucket, 'bucket');
-assert.equal(meta.key, 'key');
-assert.ok(meta.stream);
-assert.equal(meta.callback, 'function () { console.log(\'test\') }')
+  it('Manual content type setting has priority over detection', function(done) {
+    var meta = new Meta();
 
-test("A Meta fed with another Meta results in identity");
+    meta.loadData('some text');
+    meta.contentType.should.equal('text/plain');
 
-var meta = new Meta({ bucket: 'bucket', key: 'key' }),
-  meta2 = new Meta(meta);
+    done();
+  });
 
-assert.deepEqual(meta, meta2);
+  it('Can be passed multiple option objects, and it mixes in correctly', function(done) {
+    var meta = new Meta({
+        bucket: '?',
+        stream: true,
+        key: 'key' },
+      { bucket: '_',
+        callback: function() { console.log('test') }
+      }, { bucket: 'bucket' });
+
+    meta.bucket.should.equal('bucket');
+    meta.key.should.equal('key');
+    should.exist(meta.stream);
+    meta.callback.toString().should.equal('function () { console.log(\'test\') }');
+
+    done();
+  });
+
+  it('A Meta fed with another Meta results in identity', function(done) {
+    var meta = new Meta({ bucket: 'bucket', key: 'key' }),
+      meta2 = new Meta(meta);
+
+    meta.should.eql(meta2);
+    done();
+  });
+
+});
+
+// TODO What are these?
 
 //       keyless.addLink { bucket: 'bucket', key: 'test' }
 //       keyless.addLink { bucket: 'bucket', key: 'test2', tag: '_' }

@@ -16,6 +16,12 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.9.2
+
+ - Fix Search options so it handles hostname and port (github.com/kenperkins)
+ - Fix unwanted vector clock overwriting during link walking (github.com/TauZero)
+ - Handle connection errors gracefully so that they don't kill the process
+
 #### 0.9.1
 
  - Request instrumentation for metrics, logging, etc.
@@ -78,7 +84,7 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 #### 0.4.0rc2
 
- - Major docs update => [http://riakjs.org](http://riakjs.org)
+ - Major docs update => [http://riak-js.org](http://riak-js.org)
  - `keys=stream` emits `keys` events
  - `walk` now accepts `noJSON`
  - Support Map/Reduce timeout option
