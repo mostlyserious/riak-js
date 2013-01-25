@@ -41,7 +41,27 @@ describe('protocol-buffers-meta-tests', function() {
     };
     done();
   });
+
+  describe("requestParameters()", function() {
+    before(function(done) {
+      meta = new Meta();
+      done();
+    });
+
+    it('Adds bucket and key to the params', function(done) {
+      meta.bucket = 'users';
+      meta.key = 'roidrage';
+      meta.requestParameters().should.have.property('key', 'roidrage');
+      meta.requestParameters().should.have.property('bucket', 'users');
+      done();
+    });
+
+    it("Adds q and index if specified", function(done) {
+      meta.index = 'users';
+      meta.q = "name:Mathias*"
+      meta.requestParameters().should.have.property('index', 'users');
+      meta.requestParameters().should.have.property('q', 'name:Mathias*');
+      done();
+    })
+  });
 });
-
-
-

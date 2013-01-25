@@ -21,7 +21,12 @@ describe('protocol-buffers-search-client', function() {
   });
 
   it('Finds documents via search', function(done) {
-    db.search.find('pb-search', 'name:Mathias*', function(data) {
+    db.search.find('pb-search', 'name:Mathias*', function(error, data) {
+      console.log(data.docs[0].fields)
+      data.docs[0].fields[0].should.include({key: 'id'});
+      data.docs[0].fields[0].should.include({value: 'roidrage'});
+      data.docs[0].fields[1].should.include({key: 'name'});
+      data.docs[0].fields[1].should.include({value: 'Mathias Meyer'});
       done();
     });
   });
