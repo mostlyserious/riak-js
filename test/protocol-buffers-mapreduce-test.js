@@ -85,13 +85,11 @@ describe('protocol-buffers-search-client', function() {
   });
 
   it('Stores error messages', function(done) {
-    db.save(bucket + 'error', 'non-json-user', '1234', {content_type: 'text/html'}, function() {
-      db.mapreduce.add('users').map('Riak.mapValuesJson').run(function(err) {
-        should.exist(err.message);
-        should.exist(err.statusCode);
-        done();
-      })
-    });
+    db.mapreduce.add('users').map('illegal-code').run(function(err) {
+      should.exist(err.message);
+      should.exist(err.statusCode);
+      done();
+    })
   });
 
 
