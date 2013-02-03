@@ -53,7 +53,6 @@ describe('protocol-buffers-search-client', function() {
     db.mapreduce.add(bucket).map('Riak.mapByFields', {
       name: 'Sean Cribbs'
     }, {keep: true}).run(function(err, data) {
-        console.log(data)
         should.exist(data);
         data[0].should.have.length(1);
         data[0][0].name.should.equal('Sean Cribbs');
@@ -86,7 +85,9 @@ describe('protocol-buffers-search-client', function() {
   });
 
   it('Stores error messages', function(done) {
-    db.mapreduce.add('users').map(function() {return 1}).run(function(err, data) {
+    db.mapreduce.add('users').map('Riak.illegal_code').run(function(err, data) {
+      console.log(err);
+      console.log(data);
       should.exist(err.message);
       should.exist(err.statusCode);
       done();
