@@ -3,7 +3,7 @@ var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
 
 var db, bucket;
 
-describe('protocol-buffers-search-client', function() {
+describe('protocol-buffers-mapreduce-client', function() {
   beforeEach(function(done) {
     db = new ProtocolBuffersClient();    
     bucket = 'map-pb-users-riak-js-tests';
