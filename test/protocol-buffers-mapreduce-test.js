@@ -86,6 +86,7 @@ describe('protocol-buffers-search-client', function() {
 
   it('Stores error messages', function(done) {
     db.mapreduce.add('users').map('illegal-code').run(function(err, data) {
+      console.log(err);
       console.log(data);
       should.exist(err.message);
       should.exist(err.statusCode);
