@@ -46,7 +46,7 @@
     "xml": "0.0.7",
     "butils": "",
     "protobuf.js": "",
-    "riakpbc": ""
+    "riakpbc": "git://github.com/roidrage/riakpbc.git#mm-fix-mapreduce-merge"
   },
   "devDependencies": {
     "seq": "0.3.5",
