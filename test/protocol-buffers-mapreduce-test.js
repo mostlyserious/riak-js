@@ -22,6 +22,7 @@ describe('protocol-buffers-search-client', function() {
 
   it('Map to an array of JSON objects', function(done) {
     db.mapreduce.add(bucket).map('Riak.mapValuesJson').run(function(err, data) {
+      should.not.exist(err);
       data['0'].should.have.length(2);
       should.exist(data);
 
