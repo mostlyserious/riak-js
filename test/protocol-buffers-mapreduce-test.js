@@ -23,7 +23,7 @@ describe('protocol-buffers-search-client', function() {
   it('Map to an array of JSON objects', function(done) {
     db.mapreduce.add(bucket).map('Riak.mapValuesJson').run(function(err, data) {
       should.not.exist(err);
-      data['0'].should.have.length(2);
+      data[0].should.have.length(2);
       should.exist(data);
 
       for (var i = 0; i < data.length; i++) {
@@ -39,10 +39,10 @@ describe('protocol-buffers-search-client', function() {
       return ['custom'];
     }).run(function(err, data) {
       should.exist(data);
-      data['0'].should.have.length(2);
+      data[0].should.have.length(2);
 
-      for (var i = 0; i < data.length; i++) {
-        data[i].should.equal('custom');
+      for (var i = 0; i < data[0].length; i++) {
+        data[0][i].should.equal('custom');
       }
 
       done();
@@ -54,8 +54,8 @@ describe('protocol-buffers-search-client', function() {
       name: 'Sean Cribbs'
     }).run(function(err, data) {
         should.exist(data);
-        data["0"].should.have.length(1);
-        data["0"][0].name.should.equal('Sean Cribbs');
+        data[0].should.have.length(1);
+        data[0][0].name.should.equal('Sean Cribbs');
         done();
       });
   });
@@ -67,7 +67,7 @@ describe('protocol-buffers-search-client', function() {
     }).reduce('Riak.reduceLimit', 2)
       .run(function(err, data) {
         should.exist(data);
-        data['1'].should.have.length(1)
+        data[1].should.have.length(1)
         done();
       });
   });
@@ -79,7 +79,7 @@ describe('protocol-buffers-search-client', function() {
       function: 'map_object_value'})
       .run(function(err, data) {
         should.exist(data);
-        data['0'].should.have.length(2);
+        data[0].should.have.length(2);
         done();
       });
   });
@@ -87,7 +87,8 @@ describe('protocol-buffers-search-client', function() {
   it('Stores error messages', function(done) {
     db.save(bucket + 'error', 'non-json-user', '1234', {content_type: 'text/html'}, function() {
       db.mapreduce.add('users').map('Riak.mapValuesJson').run(function(err) {
-        should.exist(err.message)
+        should.exist(err.message);
+        should.exist(err.statusCode);
         done();
       })
     });
