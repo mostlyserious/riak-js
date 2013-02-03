@@ -3,4 +3,4 @@ var Meta = require('../lib/protocol-buffers-mapreduce-meta'),
   fs = require('fs');
 
 describe('http-meta-tests', function() {
-
+});
