@@ -22,7 +22,6 @@ describe('protocol-buffers-search-client', function() {
 
   it('Finds documents via search', function(done) {
     db.search.find('pb-search', 'name:Mathias*', function(error, data) {
-      console.log(data)
       data.docs[0].fields.should.include({name: 'Mathias Meyer'})
       data.docs[0].fields.should.include({id: 'roidrage'})
       done();
