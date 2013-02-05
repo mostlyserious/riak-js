@@ -43,7 +43,8 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "xml": "0.0.7"
+    "xml": "0.0.7",
+    "poolee": "~0.4.8"
   },
   "devDependencies": {
     "seq": "0.3.5",
