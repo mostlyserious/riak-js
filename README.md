@@ -16,6 +16,12 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.9.3
+  
+ - Switch testing framework to mocha/should.js (github.com/kenperkins)
+ - Remove requirement of a Unix system from package.json (github.com/yawnt)
+ - Fix a global leak of HttpSearchMeta (github.com/brianedgerton)
+
 #### 0.9.2
 
  - Fix Search options so it handles hostname and port (github.com/kenperkins)
