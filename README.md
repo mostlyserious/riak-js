@@ -16,7 +16,7 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
-#### 0.9.4pre1
+#### 0.9.4pre3
 
  - Preliminary support for Protocol Buffers. Still missing is streaming
    MapReduce and streaming key fetching.
