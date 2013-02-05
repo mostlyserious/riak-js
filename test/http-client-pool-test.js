@@ -1,9 +1,6 @@
-var HttpClient = require('../../lib/http-client'),
-  HttpMeta = require('../../lib/http-meta'),
-  should = require('should'),
-  util = require('util'),
-  assert = require('assert'),
-  test = require('../../lib/utils').test;
+var HttpClient = require('../lib/http-client'),
+  HttpMeta = require('../lib/http-meta'),
+  should = require('should');
 
 var db;
 
@@ -31,7 +28,7 @@ describe('http-client-pool', function () {
 
   it('Fetches the streamed object', function(done) {
     db.get('languages', 'erlang', {stream: true}, function(err, response, meta) {
-      assert(!err);
+      should.not.exist(err);
       response.on('data', function(data) {
         data = JSON.parse(String(data));
         data.type.should.equal('functional');
