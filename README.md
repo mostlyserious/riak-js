@@ -16,6 +16,13 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.9.4 (dev)
+
+ - Populate meta.links when saving an object based on the response's HTTP
+   headers (github.com/accelerated)
+ - Fix content length override. Allows handing in streaming data from e.g.
+   connect.js. (github.com/englercj)
+
 #### 0.9.3
   
  - Switch testing framework to mocha/should.js (github.com/kenperkins)
