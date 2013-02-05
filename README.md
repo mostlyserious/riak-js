@@ -16,6 +16,11 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 0.9.4pre1
+
+ - Preliminary support for Protocol Buffers. Still missing is streaming
+   MapReduce and streaming key fetching.
+
 #### 0.9.3
   
  - Switch testing framework to mocha/should.js (github.com/kenperkins)
