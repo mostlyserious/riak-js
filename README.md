@@ -22,6 +22,8 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
    headers (github.com/accelerated)
  - Fix content length override. Allows handing in streaming data from e.g.
    connect.js. (github.com/englercj)
+ - Only set the language attribute on map and reduce phases. Avoid setting it on
+   phases where it's not according to spec. (github.com/accelerated)
 
 #### 0.9.3
   
