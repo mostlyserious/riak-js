@@ -85,7 +85,7 @@ describe('protocol-buffers-mapreduce-client', function() {
   });
 
   it('Stores error messages', function(done) {
-    db.mapreduce.add('users').map('Riak.illegal_code').run(function(err, data) {
+    db.mapreduce.add(bucket).map('Riak.illegal_code').run(function(err, data) {
       console.log(err);
       console.log(data);
       should.exist(err.message);
