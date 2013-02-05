@@ -61,10 +61,15 @@ describe('http-meta-tests', function() {
       links: [
         { bucket: 'test', key: 'doc%2$@', tag: 'next' }
       ],
-      headers: { Authorization: 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==', 'X-Riak-Meta-fire': 'yes' }
+      headers: {
+        Authorization: 'Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==',
+        'content-length': '2687',
+        'X-Riak-Meta-fire': 'yes'
+      }
     });
 
     should.not.exist(meta.headers.statusCode);
+    meta.headers['content-length'].should.equal('2687');
     meta.headers['X-Riak-Meta-fire'].should.equal('yes');
     // meta.headers['Link'].should.equal('</riak/test/doc%252%24%40>; riaktag="next"'); -- not yet implemented
     meta.headers['Authorization'].should.equal('Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==');
