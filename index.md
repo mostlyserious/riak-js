@@ -224,7 +224,7 @@ Yes, in this case `db.keys` will return an `EventEmitter`. It will emit both the
 
 #### Link-walking
 
-    db.walk('airlines', 'KLM', [["_", "flight"]])
+    db.walk('airlines', 'KLM', [{bucket: 'flights', tag: "_"}])
 
 Provide `{ noJSON: true }` if you are not targeting JSON data!
 
