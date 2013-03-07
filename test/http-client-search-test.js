@@ -48,7 +48,7 @@ describe('http-client-search-tests', function() {
       });
   });
 
-  it('Map/Reduce with saerch', function(done) {
+  it('Map/Reduce with search', function(done) {
     db.mapreduce.search(bucket, 'email:test-search@gmail.com')
       .map('Riak.mapValuesJson')
       .run(function(err, data) {
