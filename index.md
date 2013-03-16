@@ -142,7 +142,17 @@ A typical response would be:
     , european: true
     }
 
-If, however, there is a *sibling conflict* (when `allow_mult = true`) then a typical response would have a `meta.statusCode = 300` and would look like:
+If, however, there is a *sibling conflict* (when `allow_mult` is set to true in the `default_bucket_props` [configuration](http://docs.basho.com/riak/latest/references/Configuration-Files/#app-config)), a typical response would be:
+
+    Siblings:
+    3Er2NfIKFYitPwWSqBQdNc
+    4IrKfAZHjahfkicKTZy2Ad
+
+This is a list of *vtags*, that can be used in further requests as a meta property to fetch individual siblings. If you want to obtain all the different siblings at once, you'd need to do the request as:
+
+    db.get('airlines', 'KLM', {headers: {Accept: "multipart/mixed"}})
+
+Then a typical response would have a `meta.statusCode = 300` and would look like:
 
     [ { meta: 
         { bucket: 'airlines'
