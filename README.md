@@ -1,6 +1,6 @@
 # riak-js
 
-[Node.js](http://nodejs.org/) client for [Riak](http://riak.basho.com).
+[Node.js](http://nodejs.org/) client for [Riak](http://basho.com/riak/).
 
 [![Build Status](https://secure.travis-ci.org/mostlyserious/riak-js.png?branch=master)](https://travis-ci.org/mostlyserious/riak-js)
 
