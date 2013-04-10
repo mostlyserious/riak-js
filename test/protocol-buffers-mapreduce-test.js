@@ -92,5 +92,14 @@ describe('protocol-buffers-mapreduce-client', function() {
     })
   });
 
-
+  it('Supports chunked map/reduce', function(done) {
+    var job = db.mapreduce.add(bucket).map('Riak.mapValuesJson').run({chunked: true});
+    var result = [];
+    job.on('data', function(data) {
+      result.push(data)
+    }).on('end', function(data) {
+      result.should.have.length(2);
+      done();
+    });
+  })
 });
