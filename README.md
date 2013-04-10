@@ -18,6 +18,7 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 #### 0.9.4 (dev)
 
+ - Fetch siblings by default, restoring previous riak-js behavior
  - Populate meta.links when saving an object based on the response's HTTP
    headers (github.com/accelerated)
  - Fix content length override. Allows handing in streaming data from e.g.
