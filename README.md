@@ -2,7 +2,7 @@
 
 [Node.js](http://nodejs.org/) client for [Riak](http://riak.basho.com).
 
-[![Build Status](https://secure.travis-ci.org/mostlyserious/riak-js.png?branch=js)](https://travis-ci.org/mostlyserious/riak-js)
+[![Build Status](https://secure.travis-ci.org/mostlyserious/riak-js.png?branch=master)](https://travis-ci.org/mostlyserious/riak-js)
 
 ### Installation
 
