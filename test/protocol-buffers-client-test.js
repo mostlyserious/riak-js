@@ -84,4 +84,15 @@ describe('protocol-buffers-client-tests', function() {
       done();
     });
   });
+
+  it("Fetches keys", function(done) {
+    var keys = db.keys('users', {keys: 'stream'});
+    var result = []
+    keys.on('keys', function(keys) {
+      result.push(keys);
+    }).on('end', function(data) {
+      result.should.have.length(5);
+      done();
+    });
+  });
 });
