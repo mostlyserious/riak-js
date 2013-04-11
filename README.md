@@ -1,8 +1,8 @@
 # riak-js
 
-[Node.js](http://nodejs.org/) client for [Riak](http://riak.basho.com).
+[Node.js](http://nodejs.org/) client for [Riak](http://basho.com/riak/).
 
-[![Build Status](https://secure.travis-ci.org/mostlyserious/riak-js.png?branch=js)](https://travis-ci.org/mostlyserious/riak-js)
+[![Build Status](https://secure.travis-ci.org/mostlyserious/riak-js.png?branch=master)](https://travis-ci.org/mostlyserious/riak-js)
 
 ### Installation
 
@@ -16,10 +16,16 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
-#### 0.9.4pre3
+#### 0.10.0 (dev)
 
- - Preliminary support for Protocol Buffers. Still missing is streaming
-   MapReduce and streaming key fetching.
+ - Preliminary support for Protocol Buffers via a single connection.
+ - Fetch siblings by default, restoring previous riak-js behavior
+ - Populate meta.links when saving an object based on the response's HTTP
+   headers (github.com/accelerated)
+ - Fix content length override. Allows handing in streaming data from e.g.
+   connect.js. (github.com/englercj)
+ - Only set the language attribute on map and reduce phases. Avoid setting it on
+   phases where it's not according to spec. (github.com/accelerated)
 
 #### 0.9.3
   

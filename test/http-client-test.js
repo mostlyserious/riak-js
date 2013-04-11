@@ -124,6 +124,20 @@ describe('http-client-tests', function() {
     });
   });
 
+  it('Populates the links when saving an object', function(done) {
+    db.save(bucket, 'other@gmail.com',
+      { name: 'Other Dude' },
+      { links: [
+        { bucket: bucket, key: 'test@gmail.com' }
+      ]}, function(err, data, meta) {
+        should.exist(meta.links);
+        meta.links.should.have.length(1)
+
+        done();
+      });
+
+  });
+
   it('Fetch via Linkwalk', function(done) {
     db.walk(bucket, 'other@gmail.com', [
       {bucket: bucket}

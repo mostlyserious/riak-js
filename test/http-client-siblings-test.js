@@ -9,7 +9,6 @@ describe('http-client-siblings-tests', function() {
   before(function(done) {
     db = new HttpClient({
       port: 8098,
-      accept: 'multipart/mixed,application/json;q=0.7, */*;q=0.5'
     });
 
     // Ensure unit tests don't collide with pre-existing buckets
