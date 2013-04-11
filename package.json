@@ -46,7 +46,7 @@
     "xml": "0.0.7",
     "butils": "",
     "protobuf.js": "",
-    "riakpbc": "git://github.com/roidrage/riakpbc.git#mm-streaming-mapreduce"
+    "riakpbc": "0.0.10"
   },
   "devDependencies": {
     "seq": "0.3.5",
