@@ -10,7 +10,7 @@ layout: page
        { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
     })
 
-* For Riak 0.12+ and node.js 0.8.x
+* For Riak 1.0+ and node.js 0.8.x
 * Code: <http://github.com/mostlyserious/riak-js>
 * License: [MIT](http://opensource.org/licenses/mit-license.php)
 
