@@ -10,13 +10,11 @@ layout: page
        { bucket: 'flights', key: 'KLM-1196', tag: 'passenger' }]
     })
 
-* For Riak 0.12+ and node.js 0.4.x
+* For Riak 0.12+ and node.js 0.8.x
 * Code: <http://github.com/mostlyserious/riak-js>
 * License: [MIT](http://opensource.org/licenses/mit-license.php)
 
 ## Setup
-      
-**Please note:** Protocol Buffers currently aren't supported
       
     // npm install riak-js@latest
     var db = require('riak-js').getClient()
@@ -26,6 +24,15 @@ layout: page
 
     // configure the host and port
     var db = require('riak-js').getClient({host: "riak.myhost", port: "8098"});
+
+### Protocol Buffers
+
+To use Protocol Buffers, specify an API when running `getClient()`
+
+    var db = require('riak-js').getClient({api: 'protobuf'})
+
+Currently, only one connection per client is supported for Protocol Buffers,
+connection pooling is on the roadmap.
 
 ## Guide
 
