@@ -87,13 +87,21 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   it("Fetches keys", function(done) {
-    var keys = db.keys('pb-users', {keys: 'stream'});
-    var result = []
-    keys.on('keys', function(keys) {
-      result.push(keys);
-    }).on('end', function(data) {
-      result.should.have.length(5);
-      done();
+    db.save('pb-users', 'user1@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+      db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+        db.save('pb-users', 'user3@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+          db.save('pb-users', 'user4@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+            var keys = db.keys('pb-users', {keys: 'stream'});
+            var result = []
+            keys.on('keys', function(keys) {
+              result = result.concat(keys);
+            }).on('end', function(data) {
+              result.should.have.length(5);
+              done();
+            });
+          });
+        });
+      });
     });
   });
 });
