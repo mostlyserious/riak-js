@@ -1,6 +1,6 @@
 {
   "name": "riak-js",
-  "version": "0.9.3",
+  "version": "0.10.0rc2",
   "description": "Node.js client for Riak",
   "keywords": [
     "riak",
@@ -43,7 +43,10 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "xml": "0.0.7"
+    "xml": "0.0.7",
+    "butils": "",
+    "protobuf.js": "0.0.17",
+    "riakpbc": "0.0.12"
   },
   "devDependencies": {
     "seq": "0.3.5",
