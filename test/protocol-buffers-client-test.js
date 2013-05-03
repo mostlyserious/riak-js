@@ -61,6 +61,7 @@ describe('protocol-buffers-client-tests', function() {
 
   it("Gets bucket properties", function(done) {
     db.getBucket('users', function(err, properties, meta) {
+      console.log(properties)
       should.exist(properties);
       properties.n_val.should.equal(3);
       should.exist(properties.allow_mult)
@@ -86,7 +87,7 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   it("Fetches keys", function(done) {
-    var keys = db.keys('users', {keys: 'stream'});
+    var keys = db.keys('pb-users', {keys: 'stream'});
     var result = []
     keys.on('keys', function(keys) {
       result.push(keys);
