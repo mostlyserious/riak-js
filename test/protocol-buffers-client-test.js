@@ -86,6 +86,20 @@ describe('protocol-buffers-client-tests', function() {
     });
   });
 
+  it("Doesn't set notFound on ping", function(done) {
+    db.ping(function(err, pong) {
+      should.not.exist(err);
+      done();
+    })
+  });
+
+  it("Doesn't set notFound on save", function(done) {
+    db.save('users', 'paul', {}, function(err) {
+      should.not.exist(err);
+      done();
+    });
+  });
+
   it("Fetches keys", function(done) {
     db.save('pb-users', 'user1@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
       db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
