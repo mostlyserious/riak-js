@@ -19,6 +19,8 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 #### 0.10.1 (dev)
 
   - Support for HTTP connection pooling (github.com/andrewjstone)
+  - Fix unwanted errors in ping and save operation callbacks
+    (github.com/matehat)
 
 #### 0.10.0
 
