@@ -34,6 +34,24 @@ To use Protocol Buffers, specify an API when running `getClient()`
 Currently, only one connection per client is supported for Protocol Buffers,
 connection pooling is on the roadmap.
 
+### Load Balancing/Connection Pooling
+
+riak-js' HTTP transport supports load balancing and connection pooling by way of
+the [poolee](https://github.com/dannycoates/poolee) library. You can specify a
+list of servers to connect to:
+
+    var db = require('riak-js').
+      getClient({pool: {servers: ['127.0.0.1:8098', '127.0.0.1:8198']}})
+
+poolee supports keep-alive connections by way of an alternative request agent
+too, which you can specify in the options for the pool:
+
+    var db = require('riak-js').
+      getClient({pool: {options: {keepAlive: true}}})
+    
+See the [poolee documentation](https://github.com/dannycoates/poolee#new) for
+all available options.
+
 ## Guide
 
     db.get('flights', 'KLM-5034', function(err, flight, meta) {
