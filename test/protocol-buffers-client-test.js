@@ -80,7 +80,7 @@ describe('protocol-buffers-client-tests', function() {
   })
 
   it("Pings", function(done) {
-    db.ping(function(pong) {
+    db.ping(function(err, pong) {
       should.exist(pong)
       done();
     });
