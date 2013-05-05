@@ -212,8 +212,16 @@ If, however, there is a *sibling conflict* (when `allow_mult = true`) then a typ
 
 ##### Siblings
 
-    riak-js fetches all siblings by default. Should the meta object have a
-    status of 300, the data object will be an array of all siblings.
+riak-js fetches all siblings by default. Should the meta object have a
+status of 300, the data object will be an array of all siblings.
+
+    db.get('airlines', 'KLM', function(err, data, meta) {
+      if (meta.statusCode == 300) {
+        for (var obj in data) {
+          // reconcile siblings
+        }
+      }
+    });
 
 #### Head
 
