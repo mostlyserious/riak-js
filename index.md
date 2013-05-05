@@ -210,6 +210,11 @@ If, however, there is a *sibling conflict* (when `allow_mult = true`) then a typ
       }
     } ]
 
+##### Siblings
+
+    riak-js fetches all siblings by default. Should the meta object have a
+    status of 300, the data object will be an array of all siblings.
+
 #### Head
 
 Head will only get the `meta` object back &mdash; no data. (It uses the HTTP HEAD verb under the hood.)
