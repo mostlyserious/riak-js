@@ -16,7 +16,12 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
-#### 0.10.1 (dev)
+#### 0.10.2
+
+  - Fix HTTP status codes intepreted as errors when using the connection pool
+    (github.com/chirag04 and github.com/domasx2)
+
+#### 0.10.1
 
   - Support for HTTP connection pooling (github.com/andrewjstone)
   - Fix unwanted errors in ping and save operation callbacks
