@@ -324,6 +324,45 @@ describe('http-client-tests', function() {
       });
   });
 
+    it('Special Secondary Indices', function (done) {
+        db.save(bucket, 1500,
+            { email: 'fran@gmail.com', age: 28 },
+            function (err, data, meta) {
+                should.not.exist(err);
+                db.save(bucket, 1501,
+                    { email: 'bob@gmail.com', age: 29 },
+                    function (err, data, meta) {
+                        should.not.exist(err);
+                        db.save(bucket, 1502,
+                            { email: 'joe@gmail.com', age: 30 },
+                            function (err, data, meta) {
+                                should.not.exist(err);
+                                async.parallel([
+                                    function (callback) {
+                                        db.query(bucket, { "$key": [1500, 1501] }, function (err, results) {
+                                            should.not.exist(err);
+                                            should.exist(results);
+                                            results.length.should.equal(2);
+                                            results[0].should.equal('1500');
+                                            results[1].should.equal('1501');
+                                            callback();
+                                        });
+                                    }, function (callback) {
+                                        db.query(bucket, { "$bucket": '_' }, {max_results: 2}, function (err, results) {
+                                            should.not.exist(err);
+                                            should.exist(results);
+                                            results.length.should.equal(2);
+                                            should.exist(results.continuation);
+                                            callback();
+                                        });
+                                    }], function () {
+                                    done();
+                                });
+                            });
+                    });
+            });
+    });
+
   it('Buckets is an Array', function(done) {
     db.buckets(function(err, buckets) {
       should.not.exist(err);
