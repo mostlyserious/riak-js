@@ -317,22 +317,22 @@ These commands (`getFile`, `saveFile`, `removeFile`) behave much like their
 counterparts `get`, `save`, `remove`.  Except they don't take a `bucket`
 argument, internally reference the `luwak` raw resource, and always use
 `responseEncoding = 'binary'` therefore returning `Buffer`s.
-  
+
     db.getFile('lowcost-pilot')
-    
+
     db.saveFile('lowcost-pilot', buffer)
 
     db.removeFile('lowcost-pilot')
 
 #### Ping
 
-*Note: this command **only** takes an optional `callback`*
+*Note: this command _only_ takes an optional `callback`*
 
     db.ping()
 
 #### Stats
 
-*Note: this command **only** takes an optional `callback`*
+*Note: this command _only_ takes an optional `callback`*
 
     db.stats()
 
