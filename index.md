@@ -63,22 +63,23 @@ all available options.
 
 ### Meta
 
-Meta is an important concept in riak-js. It is a
-*implementation-agnostic* object that carries all metadata associated to
-a document, such as the bucket, key, vclock, links, and so on.  It is meant to
-be *recycled* &mdash; all properties that make sense to be updated for a
-subsequent store operation can be modified and sent back.  Any given properties
-that aren't used by Riak are assumed to be custom metadata for Riak values.
-This will become more clear as we go through the guide.
+Meta is an important concept in riak-js. It is a *implementation-agnostic*
+object that carries all metadata associated to a document, such as the bucket,
+key, vclock, links, and so on. All properties that make sense to be sent back
+for a subsequent store operation can be taken from a response meta object. You
+need to make sure so not to send back invalid headers, a thing to watch out for
+is, for example not to send back invalid `Content-Length` headers. Any given
+properties that aren't used by Riak are assumed to be custom metadata for Riak
+values. This will become more clear as we go through the guide.
 
 An example `meta` object could look like:
-      
+
     { bucket: 'riakjs_airlines'
     , key: 'CPA'
     , usermeta: { important: false }
     , _type: 'application/json'
     , binary: false
-    , links: 
+    , links:
      [ { tag: 'flight'
        , key: 'CPA-729'
        , bucket: 'riakjs_client_test_flights'
