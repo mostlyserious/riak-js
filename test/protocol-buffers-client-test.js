@@ -42,7 +42,7 @@ describe('protocol-buffers-client-tests', function() {
       done();
     });
   });
- 
+
   it('Set a notFound error when fetching a deleted object', function(done) {
     db.get('pb-users', 'user@gmail.com', function(err, data, meta) {
       should.exist(err.notFound);
@@ -61,7 +61,6 @@ describe('protocol-buffers-client-tests', function() {
 
   it("Gets bucket properties", function(done) {
     db.getBucket('users', function(err, properties, meta) {
-      console.log(properties)
       should.exist(properties);
       properties.n_val.should.equal(3);
       should.exist(properties.allow_mult)
