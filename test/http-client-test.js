@@ -131,7 +131,7 @@ describe('http-client-tests', function() {
         { bucket: bucket, key: 'test@gmail.com' }
       ]}, function(err, data, meta) {
         should.exist(meta.links);
-        meta.links.should.have.length(1)
+        meta.links.should.have.length(1);
 
         done();
       });
@@ -265,7 +265,7 @@ describe('http-client-tests', function() {
     }, function() {
       var buf = [],
         keys = function(keys) {
-          buf = buf.concat(keys)
+          buf = buf.concat(keys);
         },
         end = function() {
           // keys come in random order, need to sort
@@ -398,7 +398,7 @@ describe('http-client-tests', function() {
 var CustomMeta = function() {
   var args = Array.prototype.slice.call(arguments);
   HttpMeta.apply(this, args);
-}
+};
 
 util.inherits(CustomMeta, HttpMeta);
 
@@ -406,4 +406,4 @@ CustomMeta.prototype.parse = function(data) {
   var result = HttpMeta.prototype.parse.call(this, data);
   if (result instanceof Object) result.intercepted = true;
   return result;
-}
+};
