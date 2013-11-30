@@ -35,6 +35,6 @@ describe('http-client-pool', function () {
         done();
       });
     });
-  })
-})
+  });
+});
 
