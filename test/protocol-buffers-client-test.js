@@ -71,7 +71,7 @@ describe('protocol-buffers-client-tests', function() {
     db.getBucket('users', function(err, properties, meta) {
       should.exist(properties);
       properties.n_val.should.equal(3);
-      should.exist(properties.allow_mult)
+      should.exist(properties.allow_mult);
       done();
     });
   });
@@ -84,11 +84,11 @@ describe('protocol-buffers-client-tests', function() {
         done();
       });
     });
-  })
+  });
 
   it("Pings", function(done) {
     db.ping(function(err, pong) {
-      should.exist(pong)
+      should.exist(pong);
       done();
     });
   });
@@ -97,7 +97,7 @@ describe('protocol-buffers-client-tests', function() {
     db.ping(function(err, pong) {
       should.not.exist(err);
       done();
-    })
+    });
   });
 
   it("Doesn't set notFound on save", function(done) {
@@ -113,7 +113,7 @@ describe('protocol-buffers-client-tests', function() {
         db.save('pb-users', 'user3@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
           db.save('pb-users', 'user4@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
             var keys = db.keys('pb-users', {keys: 'stream'});
-            var result = []
+            var result = [];
             keys.on('keys', function(keys) {
               result = result.concat(keys);
             }).on('end', function(data) {
