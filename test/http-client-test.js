@@ -2,6 +2,7 @@ var HttpClient = require('../lib/http-client'),
   HttpMeta = require('../lib/http-meta'),
   async = require('async'),
   util = require('util'),
+  helpers = require('./test_helper'),
   should = require('should');
 
 var db, db2, many = [], bucket;
@@ -19,6 +20,12 @@ describe('http-client-tests', function() {
     bucket = 'users-riak-js-tests';
 
     done();
+  });
+
+  after(function (done) {
+    helpers.cleanupBucket(bucket + '-keys', function () {
+      helpers.cleanupBucket(bucket, done);
+    });
   });
 
   it('Save with returnbody', function(done) {

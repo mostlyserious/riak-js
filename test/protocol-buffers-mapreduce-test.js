@@ -1,11 +1,12 @@
 var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
-    should = require('should');
+    should = require('should'),
+    helpers = require('./test_helper');
 
 var db, bucket;
 
 describe('protocol-buffers-mapreduce-client', function() {
   beforeEach(function(done) {
-    db = new ProtocolBuffersClient();    
+    db = new ProtocolBuffersClient();
     bucket = 'map-pb-users-riak-js-tests';
 
     db.save(bucket, 'test@gmail.com', {name: "Sean Cribbs"}, function(err, data, meta) {
@@ -16,8 +17,10 @@ describe('protocol-buffers-mapreduce-client', function() {
   });
 
   afterEach(function(done) {
-    db.end();
-    done();
+    helpers.cleanupBucket(bucket, function () {
+      db.end();
+      done();
+    });
   });
 
   it('Map to an array of JSON objects', function(done) {
@@ -67,7 +70,7 @@ describe('protocol-buffers-mapreduce-client', function() {
     }).reduce('Riak.reduceLimit', 2)
       .run(function(err, data) {
         should.exist(data);
-        data[1].should.have.length(1)
+        data[1].should.have.length(1);
         done();
       });
   });

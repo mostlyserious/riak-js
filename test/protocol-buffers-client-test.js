@@ -1,6 +1,8 @@
 var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
   util = require('util'),
+  helpers = require('./test_helper'),
   should = require('should');
+
 
 var db;
 
@@ -11,8 +13,12 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   afterEach(function(done) {
-    db.end();
-    done();
+    helpers.cleanupBucket('pb-users', function () {
+      helpers.cleanupBucket('users', function () {
+        db.end();
+        done();
+      });
+    });
   });
 
   it("Saves an object", function(done) {
@@ -22,10 +28,12 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   it('Gets an object', function(done) {
-    db.get('pb-users', 'user@gmail.com', function(err, data, meta) {
-      should.not.exist(err);
-      data.name.should.equal('Joe Example');
-      done();
+    db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+      db.get('pb-users', 'user2@gmail.com', function(err, data, meta) {
+        should.not.exist(err);
+        data.name.should.equal('Joe Example');
+        done();
+      });
     });
   });
 

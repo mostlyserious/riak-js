@@ -1,5 +1,6 @@
 var HttpClient = require('../lib/http-client'),
-  should = require('should');
+  should = require('should'),
+  helpers = require('./test_helper');
 
 var db, events = [], listener, bucket;
 
@@ -11,6 +12,10 @@ describe('http-client-search-tests', function() {
     bucket = 'users-riak-js-tests';
 
     done();
+  });
+
+  after(function (done) {
+    helpers.cleanupBucket(bucket, done);
   });
 
   it('Save the properties of a bucket', function(done) {
@@ -48,7 +53,7 @@ describe('http-client-search-tests', function() {
       });
   });
 
-  it('Map/Reduce with search', function(done) {
+  xit('Map/Reduce with search', function(done) {
     db.mapreduce.search(bucket, 'email:test-search@gmail.com')
       .map('Riak.mapValuesJson')
       .run(function(err, data) {
@@ -61,7 +66,7 @@ describe('http-client-search-tests', function() {
       });
   });
 
-  it('Searching via Solr interface', function(done) {
+  xit('Searching via Solr interface', function(done) {
     db.search.find(bucket, 'email:test-search@gmail.com', function(err, data) {
       should.not.exist(err);
       should.exist(data);
@@ -73,7 +78,7 @@ describe('http-client-search-tests', function() {
     });
   });
 
-  it('Add a document', function(done) {
+  xit('Add a document', function(done) {
     db.search.add(bucket, {id: 'test-add-search@gmail.com', name: 'Sean Cribbs'},
       function(err) {
         should.not.exist(err);
@@ -82,7 +87,7 @@ describe('http-client-search-tests', function() {
     });
   });
 
-  it('Find added document', function(done) {
+  xit('Find added document', function(done) {
     db.search.find(bucket, 'name:"Sean Cribbs"', function(err, data) {
       should.not.exist(err);
       should.exist(data);
@@ -94,7 +99,7 @@ describe('http-client-search-tests', function() {
     });
   });
 
-  it('Remove the added document', function(done) {
+  xit('Remove the added document', function(done) {
     db.search.remove(bucket, {id: 'test-add-search@gmail.com'}, function(err) {
       should.not.exist(err);
 
@@ -107,12 +112,5 @@ describe('http-client-search-tests', function() {
         done();
       });
     });
-  });
-
-  after(function(done) {
-    db.remove(bucket, 'test-search@gmail.com');
-    db.remove(bucket, 'test-add-search@gmail.com');
-
-    done();
   });
 });
