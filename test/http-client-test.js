@@ -119,6 +119,20 @@ describe('http-client-tests', function() {
       });
   });
 
+  it('Fetching a document with 2ii', function(done) {
+    var index = { type: 'dude', number: 1 };
+    db.save(bucket, 'indexed_dude',
+      { name: 'Indexed Dude' },
+      { index: index },
+      function(_err, _data, _meta) {
+        db.get(bucket, 'indexed_dude', function(err, data, meta) {
+          should.exist(meta.index);
+          meta.index.should.eql(index);
+          done();
+        })
+      })
+  })
+
   it('Fetching a document with links', function(done) {
     db.get(bucket, 'other@gmail.com', function(err, data, meta) {
       should.not.exist(err);
