@@ -1,22 +1,24 @@
-var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
-    HttpClient = require('../lib/http-client'),
-    should = require('should');
+var ProtocolBuffersClient = require('../../lib/protocol-buffers-client'),
+    HttpClient = require('../../lib/http-client'),
+    should = require('should'),
+    helpers = require('./../test_helper');
 
-var db, http;
+var db, http, bucket;
 
-xdescribe('protocol-buffers-search-client', function() {
+describe('protocol-buffers-search-client', function() {
   beforeEach(function(done) {
-    db = new ProtocolBuffersClient();    
+    db = new ProtocolBuffersClient();
     http = new HttpClient();
-    http.saveBucket('pb-search', {search: true}, function(error) {
-      db.save('pb-search', 'roidrage', {name: "Mathias Meyer"}, {content_type: "application/json"}, function(error, data) {
+    bucket = 'pb-search';
+    http.saveBucket(bucket, {search: true}, function(error) {
+      db.save(bucket, 'roidrage', {name: "Mathias Meyer"}, {content_type: "application/json"}, function(error, data) {
         done();
       });
     });
   });
 
   afterEach(function(done) {
-    helpers.cleanupBucket('pb-search', function() {
+    helpers.cleanupBucket(bucket, function() {
       db.end();
       done();
     });
