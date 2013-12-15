@@ -10,6 +10,4 @@ services:
   - riak
 script:
   - make test
-branches:
-  only:
-    - master
+
