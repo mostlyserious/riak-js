@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if $RIAK_VERSION != "default"
+if [ $RIAK_VERSION != "default" ]
 then
   echo "Stopping Riak service"
   sudo service riak stop
