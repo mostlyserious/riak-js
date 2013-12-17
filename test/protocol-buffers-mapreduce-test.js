@@ -5,7 +5,7 @@ var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
 var db, bucket;
 
 describe('protocol-buffers-mapreduce-client', function() {
-  beforeEach(function(done) {
+  before(function(done) {
     db = new ProtocolBuffersClient();
     bucket = 'map-pb-users-riak-js-tests';
 
@@ -16,7 +16,7 @@ describe('protocol-buffers-mapreduce-client', function() {
     });
   });
 
-  afterEach(function(done) {
+  after(function(done) {
     helpers.cleanupBucket(bucket, function () {
       db.end();
       done();
@@ -92,17 +92,17 @@ describe('protocol-buffers-mapreduce-client', function() {
       should.exist(err.message);
       should.exist(err.statusCode);
       done();
-    })
+    });
   });
 
   it('Supports chunked map/reduce', function(done) {
     var job = db.mapreduce.add(bucket).map('Riak.mapValuesJson').run({chunked: true});
     var result = [];
     job.on('data', function(data) {
-      result.push(data)
+      result.push(data);
     }).on('end', function(data) {
       result.should.have.length(2);
       done();
     });
-  })
+  });
 });

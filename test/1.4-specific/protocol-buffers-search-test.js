@@ -6,7 +6,7 @@ var ProtocolBuffersClient = require('../../lib/protocol-buffers-client'),
 var db, http, bucket;
 
 describe('protocol-buffers-search-client', function() {
-  beforeEach(function(done) {
+  before(function(done) {
     db = new ProtocolBuffersClient();
     http = new HttpClient();
     bucket = 'pb-search';
@@ -17,7 +17,7 @@ describe('protocol-buffers-search-client', function() {
     });
   });
 
-  afterEach(function(done) {
+  after(function(done) {
     helpers.cleanupBucket(bucket, function() {
       db.end();
       done();
