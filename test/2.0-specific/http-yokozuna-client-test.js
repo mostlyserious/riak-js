@@ -21,9 +21,9 @@ describe('http-client-solr-tests', function() {
           db.save(bucket, 'test-search@gmail.com', obj, function(err, data, meta) {
             setTimeout(function () {
               done();
-            }, 1000);
+            }, 4000);
           });
-        }, 1000);
+        }, 4000);
       });
     });
   });
