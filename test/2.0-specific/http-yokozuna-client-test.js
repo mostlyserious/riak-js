@@ -15,9 +15,15 @@ describe('http-client-solr-tests', function() {
       email_s: 'test-search@gmail.com',
       name: 'Testy Test for Riak Search'
     };
-    db.saveBucket(bucket, { yz_index: yzIndex }, function (err) {
-      db.save(bucket, 'test-search@gmail.com', obj, function(err, data, meta) {
-        done();
+    db.yokozuna.createIndex(yzIndex, function(err) {
+      db.saveBucket(bucket, { yz_index: yzIndex }, function (err) {
+        setTimeout(function () {
+          db.save(bucket, 'test-search@gmail.com', obj, function(err, data, meta) {
+            setTimeout(function () {
+              done();
+            }, 1000);
+          });
+        }, 1000);
       });
     });
   });
@@ -27,13 +33,11 @@ describe('http-client-solr-tests', function() {
   });
 
   it('creates an index', function (done) {
-    db.yokozuna.createIndex(yzIndex, function(err) {
-      db.yokozuna.getIndex(yzIndex, function (err, data) {
-        should.not.exist(err);
-        data.name.should.equal(yzIndex);
-        data.schema.should.equal('_yz_default');
-        done();
-      });
+    db.yokozuna.getIndex(yzIndex, function (err, data) {
+      should.not.exist(err);
+      data.name.should.equal(yzIndex);
+      data.schema.should.equal('_yz_default');
+      done();
     });
   });
 
