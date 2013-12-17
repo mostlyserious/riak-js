@@ -7,12 +7,12 @@ var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
 var db;
 
 describe('protocol-buffers-client-tests', function() {
-  before(function(done) {
+  beforeEach(function(done) {
     db = new ProtocolBuffersClient();
     done();
   });
 
-  after(function(done) {
+  afterEach(function(done) {
     helpers.cleanupBucket('pb-users', function () {
       helpers.cleanupBucket('users', function () {
         db.end();

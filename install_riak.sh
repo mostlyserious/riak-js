@@ -11,6 +11,8 @@ then
   wget http://s3.amazonaws.com/downloads.basho.com/riak/$RIAK_RELEASE/$RIAK_VERSION/ubuntu/precise/$riak_file
   echo "Installing Riak $RIAK_VERSION"
   sudo dpkg -i $riak_file
+  echo "Enabling yokozuna"
+  sudo sed -i'' 's/yokozuna = off/yokozuna = on/' /etc/riak/riak.conf
   echo "Starting Riak..."
   sudo service riak start
 fi
