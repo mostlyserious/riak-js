@@ -117,7 +117,7 @@ describe('protocol-buffers-client-tests', function() {
             keys.on('keys', function(keys) {
               result = result.concat(keys);
             }).on('end', function(data) {
-              result.should.have.length(5);
+              result.should.have.length(4);
               done();
             });
           });
