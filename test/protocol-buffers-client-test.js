@@ -7,12 +7,12 @@ var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
 var db;
 
 describe('protocol-buffers-client-tests', function() {
-  beforeEach(function(done) {
+  before(function(done) {
     db = new ProtocolBuffersClient();
     done();
   });
 
-  afterEach(function(done) {
+  after(function(done) {
     helpers.cleanupBucket('pb-users', function () {
       helpers.cleanupBucket('users', function () {
         db.end();
@@ -108,17 +108,19 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   it("Fetches keys", function(done) {
-    db.save('pb-users', 'user1@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-      db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-        db.save('pb-users', 'user3@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-          db.save('pb-users', 'user4@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-            var keys = db.keys('pb-users', {keys: 'stream'});
-            var result = [];
-            keys.on('keys', function(keys) {
-              result = result.concat(keys);
-            }).on('end', function(data) {
-              result.should.have.length(4);
-              done();
+    db.save('pb-users', 'user@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+      db.save('pb-users', 'user1@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+        db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+          db.save('pb-users', 'user3@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+            db.save('pb-users', 'user4@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+              var keys = db.keys('pb-users', {keys: 'stream'});
+              var result = [];
+              keys.on('keys', function(keys) {
+                result = result.concat(keys);
+              }).on('end', function(data) {
+                result.should.have.length(5);
+                done();
+              });
             });
           });
         });
