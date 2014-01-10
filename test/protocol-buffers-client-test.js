@@ -24,7 +24,7 @@ describe('protocol-buffers-client-tests', function() {
   it('Gets an object', function(done) {
     db.get('pb-users', 'user@gmail.com', function(err, data, meta) {
       should.not.exist(err);
-      data.name.should.equal('Joe Example');
+      data[0].data.name.should.equal('Joe Example');
       done();
     });
   });
