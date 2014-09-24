@@ -1,11 +1,13 @@
 var HttpClient = require('../lib/http-client'),
   HttpMeta = require('../lib/http-meta'),
-  should = require('should');
+  should = require('should'),
+  helpers = require('./test_helper.js');
 
-var db;
+var db, bucket;
 
 describe('http-client-pool', function () {
   before(function(done) {
+    bucket = 'languages';
     db = new HttpClient({ pool: {
       servers: [
         'localhost:8098',
@@ -16,9 +18,13 @@ describe('http-client-pool', function () {
     done();
   });
 
+  after(function (done) {
+    helpers.cleanupBucket(bucket, done);
+  });
+
   it('Creates an object', function(done) {
-    db.save('languages', 'erlang', {type: 'functional'}, function(err) {
-      db.get('languages', 'erlang', function(err, data) {
+    db.save(bucket, 'erlang', {type: 'functional'}, function(err) {
+      db.get(bucket, 'erlang', function(err, data) {
         should.not.exist(err);
         data.type.should.equal('functional');
         done();
@@ -27,7 +33,7 @@ describe('http-client-pool', function () {
   });
 
   it('Fetches the streamed object', function(done) {
-    db.get('languages', 'erlang', {stream: true}, function(err, response, meta) {
+    db.get(bucket, 'erlang', {stream: true}, function(err, response, meta) {
       should.not.exist(err);
       response.on('data', function(data) {
         data = JSON.parse(String(data));
@@ -35,6 +41,6 @@ describe('http-client-pool', function () {
         done();
       });
     });
-  })
-})
+  });
+});
 

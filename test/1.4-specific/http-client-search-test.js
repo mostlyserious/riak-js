@@ -1,5 +1,6 @@
-var HttpClient = require('../lib/http-client'),
-  should = require('should');
+var HttpClient = require('../../lib/http-client'),
+should = require('should'),
+helpers = require('./../test_helper');
 
 var db, events = [], listener, bucket;
 
@@ -9,8 +10,16 @@ describe('http-client-search-tests', function() {
 
     // Ensure unit tests don't collide with pre-existing buckets
     bucket = 'users-riak-js-tests';
+    var obj = { email: 'test-search@gmail.com', name: 'Testy Test for Riak Search' };
+    db.saveBucket(bucket, {search: true}, function(error) {
+      db.save(bucket, 'test-search@gmail.com', obj, function(err, data, meta) {
+        done();
+      });
+    });
+  });
 
-    done();
+  after(function (done) {
+    helpers.cleanupBucket(bucket, done);
   });
 
   it('Save the properties of a bucket', function(done) {
@@ -32,16 +41,16 @@ describe('http-client-search-tests', function() {
   });
 
   it('Save a document to a search enabled bucket', function(done) {
-    db.save(bucket, 'test-search@gmail.com',
+    db.save(bucket, 'test-search2@gmail.com',
       {
-        email: 'test-search@gmail.com',
-        name: 'Testy Test for Riak Search'
+        email: 'test-search2@gmail.com',
+        name: 'Testy Test 2 for Riak Search'
       },
       function(err, data, meta) {
         should.not.exist(err);
         should.not.exist(data);
         should.exist(meta);
-        meta.key.should.equal('test-search@gmail.com');
+        meta.key.should.equal('test-search2@gmail.com');
         meta.statusCode.should.equal(204);
 
         done();
@@ -50,15 +59,15 @@ describe('http-client-search-tests', function() {
 
   it('Map/Reduce with search', function(done) {
     db.mapreduce.search(bucket, 'email:test-search@gmail.com')
-      .map('Riak.mapValuesJson')
-      .run(function(err, data) {
-        should.not.exist(err);
-        should.exist(data);
-        data.length.should.equal(1);
-        data[0].email.should.equal('test-search@gmail.com');
+    .map('Riak.mapValuesJson')
+    .run(function(err, data) {
+      should.not.exist(err);
+      should.exist(data);
+      data.length.should.equal(1);
+      data[0].email.should.equal('test-search@gmail.com');
 
-        done();
-      });
+      done();
+    });
   });
 
   it('Searching via Solr interface', function(done) {
@@ -79,7 +88,7 @@ describe('http-client-search-tests', function() {
         should.not.exist(err);
 
         done();
-    });
+      });
   });
 
   it('Find added document', function(done) {
@@ -107,12 +116,5 @@ describe('http-client-search-tests', function() {
         done();
       });
     });
-  });
-
-  after(function(done) {
-    db.remove(bucket, 'test-search@gmail.com');
-    db.remove(bucket, 'test-add-search@gmail.com');
-
-    done();
   });
 });

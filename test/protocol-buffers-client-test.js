@@ -1,18 +1,24 @@
 var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
   util = require('util'),
+  helpers = require('./test_helper'),
   should = require('should');
+
 
 var db;
 
 describe('protocol-buffers-client-tests', function() {
-  beforeEach(function(done) {
+  before(function(done) {
     db = new ProtocolBuffersClient();
     done();
   });
 
-  afterEach(function(done) {
-    db.end();
-    done();
+  after(function(done) {
+    helpers.cleanupBucket('pb-users', function () {
+      helpers.cleanupBucket('users', function () {
+        db.end();
+        done();
+      });
+    });
   });
 
   it("Saves an object", function(done) {
@@ -22,10 +28,12 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   it('Gets an object', function(done) {
-    db.get('pb-users', 'user@gmail.com', function(err, data, meta) {
-      should.not.exist(err);
-      data.name.should.equal('Joe Example');
-      done();
+    db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+      db.get('pb-users', 'user2@gmail.com', function(err, data, meta) {
+        should.not.exist(err);
+        data.name.should.equal('Joe Example');
+        done();
+      });
     });
   });
 
@@ -42,7 +50,7 @@ describe('protocol-buffers-client-tests', function() {
       done();
     });
   });
- 
+
   it('Set a notFound error when fetching a deleted object', function(done) {
     db.get('pb-users', 'user@gmail.com', function(err, data, meta) {
       should.exist(err.notFound);
@@ -61,10 +69,9 @@ describe('protocol-buffers-client-tests', function() {
 
   it("Gets bucket properties", function(done) {
     db.getBucket('users', function(err, properties, meta) {
-      console.log(properties)
       should.exist(properties);
       properties.n_val.should.equal(3);
-      should.exist(properties.allow_mult)
+      should.exist(properties.allow_mult);
       done();
     });
   });
@@ -77,11 +84,11 @@ describe('protocol-buffers-client-tests', function() {
         done();
       });
     });
-  })
+  });
 
   it("Pings", function(done) {
     db.ping(function(err, pong) {
-      should.exist(pong)
+      should.exist(pong);
       done();
     });
   });
@@ -90,7 +97,7 @@ describe('protocol-buffers-client-tests', function() {
     db.ping(function(err, pong) {
       should.not.exist(err);
       done();
-    })
+    });
   });
 
   it("Doesn't set notFound on save", function(done) {
@@ -101,17 +108,19 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   it("Fetches keys", function(done) {
-    db.save('pb-users', 'user1@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-      db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-        db.save('pb-users', 'user3@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-          db.save('pb-users', 'user4@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
-            var keys = db.keys('pb-users', {keys: 'stream'});
-            var result = []
-            keys.on('keys', function(keys) {
-              result = result.concat(keys);
-            }).on('end', function(data) {
-              result.should.have.length(5);
-              done();
+    db.save('pb-users', 'user@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+      db.save('pb-users', 'user1@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+        db.save('pb-users', 'user2@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+          db.save('pb-users', 'user3@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+            db.save('pb-users', 'user4@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+              var keys = db.keys('pb-users', {keys: 'stream'});
+              var result = [];
+              keys.on('keys', function(keys) {
+                result = result.concat(keys);
+              }).on('end', function(data) {
+                result.should.have.length(5);
+                done();
+              });
             });
           });
         });
