@@ -45,7 +45,7 @@
     "poolee": "~0.4.8",
     "butils": "",
     "protobuf.js": "0.0.17",
-    "riakpbc": "0.0.17"
+    "riakpbc": "^2.1.0"
   },
   "devDependencies": {
     "seq": "0.3.5",
