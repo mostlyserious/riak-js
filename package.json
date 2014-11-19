@@ -32,12 +32,10 @@
       "url": "http://opensource.org/licenses/bsd-license.php"
     }
   ],
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/mostlyserious/riak-js.git"
-    }
-  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mostlyserious/riak-js.git"
+  },
   "main": "./lib/index",
   "directories": {
     "lib": "./lib"
