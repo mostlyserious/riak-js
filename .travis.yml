@@ -1,11 +1,9 @@
 language: node_js
 node_js:
-  - "0.8"
   - "0.10"
 services:
   - riak
 script:
+  - sudo riak-admin wait-for-service riak_kv riak@127.0.0.1
+  - sudo riak-admin wait-for-service riak_search riak@127.0.0.1
   - make test
-branches:
-  only:
-    - master
