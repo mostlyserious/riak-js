@@ -16,6 +16,12 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 1.0.0
+
+  - Using riakpbc 2.1 : dropping support for node 0.8 / dropping support for non-streams on protobuf for keys and buckets retrievals.
+  - Fix Travis CI
+  - Cleaner dependencies
+
 #### 0.10.2
 
   - Fix HTTP status codes intepreted as errors when using the connection pool
