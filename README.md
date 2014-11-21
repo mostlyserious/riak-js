@@ -16,6 +16,13 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 1.0.1
+
+  - Remove useless console.log
+  - Attach response headers to error, enabling for example tombstone detection on 404.
+  - Allow user to override the riak port with HTTP_PORT / PB_PORT environement variables
+  - Fix a streaming error with node.js 0.10.x
+
 #### 1.0.0
 
   - Using riakpbc 2.1 : dropping support for node 0.8 / dropping support for non-streams on protobuf for keys and buckets retrievals.
