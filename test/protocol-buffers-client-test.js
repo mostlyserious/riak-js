@@ -1,4 +1,4 @@
-var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
+var ProtocolBuffersClient = require('./protocol-buffers-test-client'),
   util = require('util'),
   should = require('should');
 

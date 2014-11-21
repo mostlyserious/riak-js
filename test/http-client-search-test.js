@@ -1,4 +1,4 @@
-var HttpClient = require('../lib/http-client'),
+var HttpClient = require('./http-test-client'),
   should = require('should');
 
 var db, events = [], listener, bucket;

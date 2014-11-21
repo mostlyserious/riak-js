@@ -1,5 +1,5 @@
-var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
-    HttpClient = require('../lib/http-client'),
+var ProtocolBuffersClient = require('./protocol-buffers-test-client'),
+    HttpClient = require('./http-test-client'),
     should = require('should');
 
 var db, http;
