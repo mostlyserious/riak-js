@@ -1,4 +1,4 @@
-var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
+var ProtocolBuffersClient = require('./protocol-buffers-test-client'),
   util = require('util'),
   helpers = require('./test_helper'),
   should = require('should');
@@ -22,7 +22,8 @@ describe('protocol-buffers-client-tests', function() {
   });
 
   it("Saves an object", function(done) {
-    db.save('pb-users', 'user@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(data) {
+    db.save('pb-users', 'user@gmail.com', {name: 'Joe Example'}, {content_type: "application/json"}, function(err, data) {
+      should.not.exist(err);
       done();
     });
   });
@@ -61,7 +62,7 @@ describe('protocol-buffers-client-tests', function() {
   it('Gets buckets', function(done) {
     db.buckets(function(err, data) {
       should.exist(data);
-      data.should.include("pb-users");
+      data.should.containEql("pb-users");
       should.exist(data.indexOf("users"));
       done();
     });

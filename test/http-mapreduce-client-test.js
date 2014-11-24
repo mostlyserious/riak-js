@@ -1,4 +1,4 @@
-var HttpClient = require('../lib/http-client'),
+var HttpClient = require('./http-test-client'),
   HttpMeta = require('../lib/http-meta'),
   util = require('util'),
   should = require('should'),
