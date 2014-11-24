@@ -1,7 +1,8 @@
 var HttpClient = require('./http-test-client'),
   HttpMeta = require('../lib/http-meta'),
   should = require('should'),
-  util = require('util');
+  util = require('util'),
+  helpers = require('./test_helper.js');
 
 var db, events = [], listener, bucket;
 
@@ -11,16 +12,16 @@ describe('http-client-instrumentation-tests', function() {
 
     listener = {
       "riak.request.start": function(event) {
-        events.push(event)
+        events.push(event);
       },
       "riak.request.response": function(event) {
-        events.push(event)
+        events.push(event);
       },
       "riak.request.finish": function(event) {
-        events.push(event)
+        events.push(event);
       },
       "riak.request.end": function(event) {
-        events.push(event)
+        events.push(event);
       }
     };
 
@@ -30,6 +31,10 @@ describe('http-client-instrumentation-tests', function() {
     db.registerListener(listener);
 
     done();
+  });
+
+  after(function (done) {
+    helpers.cleanupBucket(bucket, done);
   });
 
   it('Create an object', function(done) {
