@@ -1,4 +1,5 @@
-var HttpClient = require('../lib/http-client'),
+var HttpClient = require('./http-test-client'),
+  HttpClientLib = require('../lib/http-client'),
   HttpMeta = require('../lib/http-meta'),
   async = require('async'),
   util = require('util'),
@@ -12,7 +13,7 @@ var db, db2, many = [], bucket;
 describe('http-client-tests', function() {
   before(function(done) {
     db = new HttpClient({ port: 8098 });
-    db2 = new HttpClient({ port: 64208 });
+    db2 = new HttpClientLib({ port: 64208 });
     for (var i = 0; i < 600; i++) {
       many.push(String(i));
     }

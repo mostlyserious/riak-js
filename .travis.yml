@@ -1,7 +1,7 @@
 language: node_js
 env:
   - RIAK_VERSION=default
-  - RIAK_VERSION=2.0.0pre5 RIAK_RELEASE=2.0
+  - RIAK_VERSION=2.0.2 RIAK_RELEASE=2.0
 before_install:
   - ./install_riak.sh
 node_js:
