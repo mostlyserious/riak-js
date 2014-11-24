@@ -365,8 +365,8 @@ describe('http-client-tests', function() {
                                             should.not.exist(err);
                                             should.exist(results);
                                             results.length.should.equal(2);
-                                            results[0].should.equal('1500');
-                                            results[1].should.equal('1501');
+                                            results.should.include('1500');
+                                            results.should.include('1501');
                                             callback();
                                         });
                                     }, function (callback) {
