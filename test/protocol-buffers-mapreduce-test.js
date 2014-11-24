@@ -1,10 +1,14 @@
-var ProtocolBuffersClient = require('./protocol-buffers-test-client'),
-    should = require('should');
+var ProtocolBuffersClient = require('../lib/protocol-buffers-client'),
+    should = require('should'),
+    helpers = require('./test_helper');
+
 
 var db, bucket;
 
 describe('protocol-buffers-mapreduce-client', function() {
-  beforeEach(function(done) {
+
+  before(function(done) {
+
     db = new ProtocolBuffersClient();
     bucket = 'map-pb-users-riak-js-tests';
 
@@ -15,9 +19,11 @@ describe('protocol-buffers-mapreduce-client', function() {
     });
   });
 
-  afterEach(function(done) {
-    db.end();
-    done();
+  after(function(done) {
+    helpers.cleanupBucket(bucket, function () {
+      db.end();
+      done();
+    });
   });
 
   it('Map to an array of JSON objects', function(done) {
@@ -67,7 +73,7 @@ describe('protocol-buffers-mapreduce-client', function() {
     }).reduce('Riak.reduceLimit', 2)
       .run(function(err, data) {
         should.exist(data);
-        data.should.have.length(1)
+        data[1].should.have.length(1);
         done();
       });
   });
@@ -89,17 +95,17 @@ describe('protocol-buffers-mapreduce-client', function() {
       should.exist(err);
       should.exist(err.code);
       done();
-    })
+    });
   });
 
   it('Supports chunked map/reduce', function(done) {
     var job = db.mapreduce.add(bucket).map('Riak.mapValuesJson').run({chunked: true});
     var result = [];
     job.on('data', function(data) {
-      result.push(data)
+      result.push(data);
     }).on('end', function(data) {
       result.should.have.length(2);
       done();
     });
-  })
+  });
 });
