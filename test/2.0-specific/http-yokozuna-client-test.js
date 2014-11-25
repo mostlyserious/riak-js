@@ -6,26 +6,38 @@ var db, bucket, yzIndex;
 
 describe('http-client-solr-tests', function() {
   before(function(done) {
-    db = new HttpClient({ port: 8098 });
-
+    this.timeout(30000);
+    db = new HttpClient({port: 8098});
     // Ensure unit tests don't collide with pre-existing buckets
     bucket = 'users-riak-js-tests-solr';
-    yzIndex = 'riak-js-yz-index-test';
+    yzIndex = 'riak-js-index-test';
     var obj = {
       email_s: 'test-search@gmail.com',
-      name: 'Testy Test for Riak Search'
+      name_s: 'Testy Test for Riak Search'
     };
-    db.yokozuna.createIndex(yzIndex, function(err) {
-      db.saveBucket(bucket, { yz_index: yzIndex }, function (err) {
-        setTimeout(function () {
-          db.save(bucket, 'test-search@gmail.com', obj, function(err, data, meta) {
-            setTimeout(function () {
-              done();
-            }, 4000);
-          });
-        }, 4000);
-      });
+
+    db.saveBucket(bucket, {yz_index: "_dont_index_"}, function (err) {
+      setTimeout(function () {
+        db.yokozuna.removeIndex(yzIndex, function (err) {
+          setTimeout(function () {
+            db.yokozuna.createIndex(yzIndex, function (err) {
+              setTimeout(function () {
+                db.saveBucket(bucket, {yz_index: yzIndex}, function (err) {
+                  setTimeout(function () {
+                    db.save(bucket, 'test-search@gmail.com', obj, function (err, data, meta) {
+                      setTimeout(function () {
+                        done();
+                      }, 1000);
+                    });
+                  }, 4000)
+                });
+              }, 1000)
+            });
+          }, 4000)
+        });
+      }, 4000);
     });
+
   });
 
   after(function (done) {
@@ -63,6 +75,7 @@ describe('http-client-solr-tests', function() {
       should.exist(data);
 
       data.docs[0].email_s.should.equal('test-search@gmail.com');
+      data.docs[0].name_s.should.equal('Testy Test for Riak Search');
 
       done();
     });
