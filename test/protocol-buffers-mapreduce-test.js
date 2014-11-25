@@ -70,7 +70,8 @@ describe('protocol-buffers-mapreduce-client', function() {
     }).reduce('Riak.reduceLimit', 2)
       .run(function(err, data) {
         should.exist(data);
-        data[1].should.have.length(1);
+        data.should.have.length(1);
+        data[0].name.should.equal('Sean Cribbs');
         done();
       });
   });
