@@ -12,7 +12,7 @@ then
   echo "Installing Riak $RIAK_VERSION"
   sudo dpkg -i $riak_file
   echo "Enabling Yokozuna"  #http://docs.basho.com/riak/latest/ops/advanced/configs/search/
-  sudo sed -i 'search = off/search = on/' /etc/riak/riak.conf  
+  sudo sed -i 's/search = off/search = on/' /etc/riak/riak.conf  
   echo "Use leveldb as the backend"
   sudo sed -i 's/storage_backend = bitcask/storage_backend = leveldb/' /etc/riak/riak.conf
   echo "Set ulimit"
