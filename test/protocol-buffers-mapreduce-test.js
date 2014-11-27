@@ -104,6 +104,8 @@ describe('protocol-buffers-mapreduce-client', function() {
     }).on('end', function(data) {
       result.should.have.length(2);
       done();
-    });
+    }).on('error', function(err) {
+          done(err);
+        });
   });
 });

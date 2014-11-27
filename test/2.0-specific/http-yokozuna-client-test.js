@@ -6,7 +6,7 @@ var db, bucket, yzIndex;
 
 describe('http-client-solr-tests', function() {
   before(function(done) {
-    this.timeout(30000);
+    this.timeout(40000);
     db = new HttpClient({port: 8098});
     // Ensure unit tests don't collide with pre-existing buckets
     bucket = 'users-riak-js-tests-solr';
@@ -27,17 +27,16 @@ describe('http-client-solr-tests', function() {
                     db.save(bucket, 'test-search@gmail.com', obj, function (err, data, meta) {
                       setTimeout(function () {
                         done();
-                      }, 1000);
+                      }, 2000);
                     });
-                  }, 4000)
+                  }, 5000)
                 });
-              }, 1000)
+              }, 5000)
             });
-          }, 4000)
+          }, 5000)
         });
-      }, 4000);
+      }, 5000);
     });
-
   });
 
   after(function (done) {
