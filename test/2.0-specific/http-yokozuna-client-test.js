@@ -16,13 +16,13 @@ describe('http-client-solr-tests', function() {
       name_s: 'Testy Test for Riak Search'
     };
 
-    db.saveBucket(bucket, {yz_index: "_dont_index_"}, function (err) {
+    db.saveBucket(bucket, {search_index: "_dont_index_"}, function (err) {
       setTimeout(function () {
         db.yokozuna.removeIndex(yzIndex, function (err) {
           setTimeout(function () {
             db.yokozuna.createIndex(yzIndex, function (err) {
               setTimeout(function () {
-                db.saveBucket(bucket, {yz_index: yzIndex}, function (err) {
+                db.saveBucket(bucket, {search_index: yzIndex}, function (err) {
                   setTimeout(function () {
                     db.save(bucket, 'test-search@gmail.com', obj, function (err, data, meta) {
                       setTimeout(function () {
@@ -54,7 +54,7 @@ describe('http-client-solr-tests', function() {
   });
 
   it('saves the index bucket property', function (done) {
-    db.saveBucket(bucket, { yz_index: yzIndex }, function (err) {
+    db.saveBucket(bucket, { search_index: yzIndex }, function (err) {
       should.not.exist(err);
 
       done();
@@ -63,7 +63,7 @@ describe('http-client-solr-tests', function() {
 
   it('gets the index bucket property', function (done) {
     db.getBucket(bucket, function (err, props) {
-      props.yz_index.should.equal(yzIndex);
+      props.search_index.should.equal(yzIndex);
       done();
     });
   });
