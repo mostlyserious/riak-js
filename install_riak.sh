@@ -18,11 +18,11 @@ then
   echo "Set ulimit"
   sudo sh -c 'echo "ulimit -n 65536" > /etc/default/riak'
   echo "Starting Riak..."
-  sudo service riak start
-  sleep 3000  
+  sudo service riak start  
 fi
 curl http://localhost:8098/ping  
 java -version
-sudo ls /var/log/riak
-sudo tail /var/log/riak/error.log
+sudo ls -ls /var/log/riak
+sudo cat /etc/riak/riak.conf
+# 
 
