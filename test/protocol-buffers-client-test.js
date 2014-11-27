@@ -63,7 +63,7 @@ describe('protocol-buffers-client-tests', function() {
   it('Gets buckets', function(done) {
     db.buckets(function(err, data) {
       should.exist(data);
-      data.should.include("riak-js-test-pb-users");
+      data.should.containEql("riak-js-test-pb-users");
       should.exist(data.indexOf("riak-js-test-pb-users"));
       done();
     });
