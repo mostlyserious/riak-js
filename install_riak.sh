@@ -23,5 +23,6 @@ then
 fi
 curl http://localhost:8098/ping  
 java -version
-sudo tail  /var/log/riak/error.log
+sudo ls /var/log/riak
+sudo tail /var/log/riak/error.log
 
