@@ -11,14 +11,15 @@ then
   wget http://s3.amazonaws.com/downloads.basho.com/riak/$RIAK_RELEASE/$RIAK_VERSION/ubuntu/precise/$riak_file
   echo "Installing Riak $RIAK_VERSION"
   sudo dpkg -i $riak_file
-  echo "Enabling Yokozuna"
-  sudo sed -i 's/yokozuna = off/yokozuna = on/' /etc/riak/riak.conf
+  echo "Enabling Yokozuna"  #http://docs.basho.com/riak/latest/ops/advanced/configs/search/
+  sudo sed -i 'search = off/search = on/' /etc/riak/riak.conf  
   echo "Use leveldb as the backend"
   sudo sed -i 's/storage_backend = bitcask/storage_backend = leveldb/' /etc/riak/riak.conf
   echo "Set ulimit"
   sudo sh -c 'echo "ulimit -n 65536" > /etc/default/riak'
   echo "Starting Riak..."
   sudo service riak start  
+  sleep 15
 fi
 curl http://localhost:8098/ping  
 java -version
