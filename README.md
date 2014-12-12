@@ -16,6 +16,11 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 1.0.2
+
+  - Fix javascript error when we use data with an error
+  - options.keys / options.buckets are now taken into account with client.keys / client.buckets
+
 #### 1.0.1
 
   - Remove useless console.log
