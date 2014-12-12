@@ -291,7 +291,7 @@ describe('http-client-tests', function() {
           done();
         };
 
-      db.keys(bucket + '-keys')
+      db.keys(bucket + '-keys', {keys: 'stream'})
         .on('keys', keys)
         .on('end', end)
         .start();
