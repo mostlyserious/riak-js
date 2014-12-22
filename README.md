@@ -16,6 +16,11 @@ Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
 ### Changelog
 
+#### 1.0.3
+
+  - Fix a bug with buckets stream
+  - Add possibility to overwrite timeout value in Poolee for any requests
+
 #### 1.0.2
 
   - Fix javascript error when we use data with an error
