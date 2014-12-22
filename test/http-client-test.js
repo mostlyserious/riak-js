@@ -298,6 +298,16 @@ describe('http-client-tests', function() {
     });
   });
 
+  it('Keys is an Array', function(done) {
+    db.keys(bucket + '-keys', {keys: 'true'}, function(err, keys) {
+      should.not.exist(err);
+      should.exist(keys);
+      keys.should.be.an.instanceof(Array);
+
+      done();
+    });
+  });
+
   it('Count Keys', function(done) {
     db.count(bucket + '-keys', function(err, total) {
       should.not.exist(err);
@@ -337,6 +347,27 @@ describe('http-client-tests', function() {
           done();
         });
       });
+  });
+
+  it('Stream Buckets', function(done) {
+    var savedBuckets = [];
+
+    async.forEachLimit(many, 10, function(key, next) {
+      db.save(bucket + '-keys', key, key, function(err) {
+        should.not.exist(err);
+        next();
+      });
+    }, function() {
+      db.buckets({buckets: 'stream'})
+        .on('buckets', function(buckets) {
+          savedBuckets = savedBuckets.concat(buckets);
+        })
+        .on('end', function() {
+          savedBuckets.length.should.be.greaterThan(0);
+          done();
+        })
+        .start();
+    });
   });
 
   it('Buckets is an Array', function(done) {
