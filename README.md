@@ -14,6 +14,8 @@
 
 Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
+If you need a tiny little lib, you can use [riak-dc](https://github.com/janearc/riak-dc)
+
 ### Changelog
 
 #### 1.0.3
