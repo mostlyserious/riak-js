@@ -3,7 +3,7 @@ var HttpClient = require('../http-test-client'),
     should = require('should'),
     helpers = require('./../test_helper');
 
-var db, bucket, yzIndex;
+var db, bucket, yzIndex, yzIndexVer = 1;
 
 describe('http-client-solr-tests', function() {
   before(function(done) {
@@ -11,28 +11,37 @@ describe('http-client-solr-tests', function() {
     db = new HttpClient();
     // Ensure unit tests don't collide with pre-existing buckets
     bucket = 'users-riak-js-tests-solr';
-    yzIndex = 'riak-js-index-test';
+    yzIndex = 'riak-js-index-test-' + yzIndexVer ;
     var obj = {
       email_s: 'test-search@gmail.com',
       name_s: 'Testy Test for Riak Search'
     };
 
     var dbSave = Promise.promisify( db.save, (db) );
+    var dbGetBucket = Promise.promisify( db.getBucket, (db) );
     var dbSaveBucket = Promise.promisify( db.saveBucket, (db) );
     var dbYokozunaRemoveIndex = Promise.promisify( db.yokozuna.removeIndex, (db.yokozuna) );
     var dbYokozunaCreateIndex = Promise.promisify( db.yokozuna.createIndex, (db.yokozuna) );
 
-    //delays required because schema propagation in riak is not async
-    //Values taken from practical usage that can guarantee success on most environments
-    //TODO: Probably test schema should be static( versioned ) and  setting up as prerequisite, to runs test much faster
-    dbSaveBucket(bucket, {search_index: "_dont_index_"} )
+    function reCreateSchema(){
+      //delays required because schema propagation in riak is not async
+      //Values taken from practical usage that can guarantee success on most environments
+      return dbSaveBucket(bucket, {search_index: "_dont_index_"} )
         .delay(5000)
-        .then ( function(){ return dbYokozunaRemoveIndex (yzIndex ); } )
-        .delay(5000)
-        .then ( function(){ return dbYokozunaCreateIndex (yzIndex ); } )
-        .delay(10000)
-        .then ( function(){ return dbSaveBucket(bucket, {search_index: yzIndex } ); } )
-        .delay(5000)
+            .then ( function(){ return dbYokozunaRemoveIndex (yzIndex ); } )
+            .delay(5000)
+            .then ( function(){ return dbYokozunaCreateIndex (yzIndex ); } )
+            .delay(10000)
+            .then ( function(){ return dbSaveBucket(bucket, {search_index: yzIndex } ); } )
+            .delay(5000)
+    }
+
+    dbGetBucket(bucket)
+        .then ( function( response ) {
+            var bucketProps = response && response[0];
+            if ( ( bucketProps && bucketProps.search_index) != yzIndex)
+              return reCreateSchema();
+        })
         .then ( function(){ return dbSave( bucket, 'test-search@gmail.com', obj ); } )
         .delay(2000)
         .then ( function(){
