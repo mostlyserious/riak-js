@@ -14,7 +14,19 @@
 
 Follow updates on Twitter: [@riakjs](http://twitter.com/riakjs)
 
+If you need a tiny little lib, you can use [riak-dc](https://github.com/janearc/riak-dc)
+
 ### Changelog
+
+#### 1.0.3
+
+  - Fix a bug with buckets stream
+  - Add possibility to overwrite timeout value in Poolee for any requests
+
+#### 1.0.2
+
+  - Fix javascript error when we use data with an error
+  - options.keys / options.buckets are now taken into account with client.keys / client.buckets
 
 #### 1.0.1
 

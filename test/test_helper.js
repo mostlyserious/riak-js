@@ -22,7 +22,7 @@ var helpers = module.exports = {
         }
       );
     };
-    db.keys(bucket)
+    db.keys(bucket, {keys: 'stream'} )
       .on('keys', onKeys)
       .on('end', onEnd)
       .start();
