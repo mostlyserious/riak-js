@@ -1,3 +1,4 @@
+var Promise = require("bluebird");
 var HttpClient = require('../../lib/http-client'),
     should = require('should'),
     helpers = require('./../test_helper');
@@ -6,7 +7,7 @@ var db, bucket, yzIndex;
 
 describe('http-client-solr-tests', function() {
   before(function(done) {
-    this.timeout(40000);
+    this.timeout(50000);
     db = new HttpClient({port: 8098});
     // Ensure unit tests don't collide with pre-existing buckets
     bucket = 'users-riak-js-tests-solr';
@@ -16,27 +17,27 @@ describe('http-client-solr-tests', function() {
       name_s: 'Testy Test for Riak Search'
     };
 
-    db.saveBucket(bucket, {search_index: "_dont_index_"}, function (err) {
-      setTimeout(function () {
-        db.yokozuna.removeIndex(yzIndex, function (err) {
-          setTimeout(function () {
-            db.yokozuna.createIndex(yzIndex, function (err) {
-              setTimeout(function () {
-                db.saveBucket(bucket, {search_index: yzIndex}, function (err) {
-                  setTimeout(function () {
-                    db.save(bucket, 'test-search@gmail.com', obj, function (err, data, meta) {
-                      setTimeout(function () {
-                        done();
-                      }, 2000);
-                    });
-                  }, 5000)
-                });
-              }, 5000)
-            });
-          }, 5000)
-        });
-      }, 5000);
-    });
+    var dbSave = Promise.promisify( db.save, (db) );
+    var dbSaveBucket = Promise.promisify( db.saveBucket, (db) );
+    var dbYokozunaRemoveIndex = Promise.promisify( db.yokozuna.removeIndex, (db.yokozuna) );
+    var dbYokozunaCreateIndex = Promise.promisify( db.yokozuna.createIndex, (db.yokozuna) );
+
+    //delays required because schema propagation in riak is not async
+    //Values taken from practical usage that can guarantee success on most environments
+    //TODO: Probably test schema should be static( versioned ) and  setting up as prerequisite, to runs test much faster
+    dbSaveBucket(bucket, {search_index: "_dont_index_"} )
+        .delay(5000)
+        .then ( function(){ return dbYokozunaRemoveIndex (yzIndex ); } )
+        .delay(5000)
+        .then ( function(){ return dbYokozunaCreateIndex (yzIndex ); } )
+        .delay(10000)
+        .then ( function(){ return dbSaveBucket(bucket, {search_index: yzIndex } ); } )
+        .delay(5000)
+        .then ( function(){ return dbSave( bucket, 'test-search@gmail.com', obj ); } )
+        .delay(2000)
+        .then ( function(){
+            done();
+         } )
   });
 
   after(function (done) {
