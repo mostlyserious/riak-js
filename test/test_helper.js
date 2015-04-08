@@ -1,9 +1,9 @@
 var async = require('async');
-var HttpClient = require('../lib/http-client');
+var HttpClient = require('./http-test-client');
 
 var helpers = module.exports = {
   cleanupBucket: function (bucket, done) {
-    var db = new HttpClient({ port: 8098 });
+    var db = new HttpClient();
     var allKeys = [];
     var onKeys = function (keys) {
       allKeys = allKeys.concat(keys);

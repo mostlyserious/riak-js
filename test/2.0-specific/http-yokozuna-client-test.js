@@ -1,5 +1,5 @@
 var Promise = require("bluebird");
-var HttpClient = require('../../lib/http-client'),
+var HttpClient = require('../http-test-client'),
     should = require('should'),
     helpers = require('./../test_helper');
 
@@ -8,7 +8,7 @@ var db, bucket, yzIndex;
 describe('http-client-solr-tests', function() {
   before(function(done) {
     this.timeout(50000);
-    db = new HttpClient({port: 8098});
+    db = new HttpClient();
     // Ensure unit tests don't collide with pre-existing buckets
     bucket = 'users-riak-js-tests-solr';
     yzIndex = 'riak-js-index-test';
