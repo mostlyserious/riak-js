@@ -1,2 +1,7 @@
 node_modules/
 .testing/
+.idea/
+.idea/workspace.xml
+*.user
+src.iws
+

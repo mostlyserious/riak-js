@@ -3,6 +3,7 @@ var HttpClient = require('./http-test-client'),
   HttpMeta = require('../lib/http-meta'),
   async = require('async'),
   util = require('util'),
+  helpers = require('./test_helper'),
   should = require('should');
 
 var db, db2, many = [], bucket;
@@ -20,6 +21,12 @@ describe('http-client-tests', function() {
     bucket = 'users-riak-js-tests';
 
     done();
+  });
+
+  after(function (done) {
+    helpers.cleanupBucket(bucket + '-keys', function () {
+      helpers.cleanupBucket(bucket, done);
+    });
   });
 
   it('Save with returnbody', function(done) {
@@ -146,7 +153,7 @@ describe('http-client-tests', function() {
         { bucket: bucket, key: 'test@gmail.com' }
       ]}, function(err, data, meta) {
         should.exist(meta.links);
-        meta.links.should.have.length(1)
+        meta.links.should.have.length(1);
 
         done();
       });
@@ -280,7 +287,7 @@ describe('http-client-tests', function() {
     }, function() {
       var buf = [],
         keys = function(keys) {
-          buf = buf.concat(keys)
+          buf = buf.concat(keys);
         },
         end = function() {
           // keys come in random order, need to sort
@@ -370,6 +377,45 @@ describe('http-client-tests', function() {
     });
   });
 
+    it('Special Secondary Indices', function (done) {
+        db.save(bucket, 1500,
+            { email: 'fran@gmail.com', age: 28 },
+            function (err, data, meta) {
+                should.not.exist(err);
+                db.save(bucket, 1501,
+                    { email: 'bob@gmail.com', age: 29 },
+                    function (err, data, meta) {
+                        should.not.exist(err);
+                        db.save(bucket, 1502,
+                            { email: 'joe@gmail.com', age: 30 },
+                            function (err, data, meta) {
+                                should.not.exist(err);
+                                async.parallel([
+                                    function (callback) {
+                                        db.query(bucket, { "$key": [1500, 1501] }, function (err, results) {
+                                            should.not.exist(err);
+                                            should.exist(results);
+                                            results.length.should.equal(2);
+                                            results.should.containEql('1500');
+                                            results.should.containEql('1501');
+                                            callback();
+                                        });
+                                    }, function (callback) {
+                                        db.query(bucket, { "$bucket": '_' }, {max_results: 2}, function (err, results) {
+                                            should.not.exist(err);
+                                            should.exist(results);
+                                            results.length.should.equal(2);
+                                            should.exist(results.continuation);
+                                            callback();
+                                        });
+                                    }], function () {
+                                    done();
+                                });
+                            });
+                    });
+            });
+    });
+
   it('Buckets is an Array', function(done) {
     db.buckets(function(err, buckets) {
       should.not.exist(err);
@@ -444,7 +490,7 @@ describe('http-client-tests', function() {
 var CustomMeta = function() {
   var args = Array.prototype.slice.call(arguments);
   HttpMeta.apply(this, args);
-}
+};
 
 util.inherits(CustomMeta, HttpMeta);
 
@@ -452,4 +498,4 @@ CustomMeta.prototype.parse = function(data) {
   var result = HttpMeta.prototype.parse.call(this, data);
   if (result instanceof Object) result.intercepted = true;
   return result;
-}
+};

@@ -17,10 +17,14 @@
     {
       "name": "Sean Cribbs",
       "email": "sean@basho.com"
-    },
+    },    
     {
       "name": "rick (technoweenie)",
       "url": "http://techno-weenie.net"
+    },
+    {
+      "name": "Aleksandr Popov",
+      "email": "mogadanez@mogadanez.com"
     }
   ],
   "bugs": {
@@ -50,6 +54,7 @@
     "seq": "0.3.5",
     "mocha": "1.7.3",
     "should": "^4.3.0",
+    "bluebird": "^2.9.24",
     "async": "*"
   },
   "engines": {
