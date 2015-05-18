@@ -18,6 +18,10 @@ If you need a tiny little lib, you can use [riak-dc](https://github.com/janearc/
 
 ### Changelog
 
+#### 1.1.0
+
+  - Support Riak 2.0 (see https://github.com/mostlyserious/riak-js/pull/225)
+
 #### 1.0.3
 
   - Fix a bug with buckets stream
